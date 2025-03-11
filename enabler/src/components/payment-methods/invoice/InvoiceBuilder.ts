@@ -4,7 +4,7 @@ import {
   PaymentComponent,
   PaymentComponentBuilder,
 } from "../../../payment-enabler";
-import { Invoice } from "./InvoiceREMOVE";
+import { Invoice } from "./Invoice";
 
 export class InvoiceBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true;

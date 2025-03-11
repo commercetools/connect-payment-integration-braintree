@@ -4,7 +4,7 @@ import {
   PaymentComponent,
   PaymentComponentBuilder,
 } from "../../../payment-enabler";
-import { Card } from "./CardREMOVE";
+import { Card } from "./Card";
 
 export class CardBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true;
