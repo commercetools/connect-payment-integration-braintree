@@ -1,27 +1,13 @@
 import {
+  BaseOptions,
   ComponentOptions,
-  PaymentComponent,
-  PaymentComponentBuilder,
   PaymentMethod,
-} from "../../../payment-enabler/payment-enabler";
-import { BaseComponent } from "../../base";
+} from "../../../payment-enabler";
+import { BaseComponent } from "../../BaseComponent";
 import inputFieldStyles from "../../../style/inputField.module.scss";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
-import {
-  PaymentOutcome,
-  PaymentRequestSchemaDTO,
-} from "../../../dtos/mock-payment.dto";
-import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock";
-
-export class PurchaseOrderBuilder implements PaymentComponentBuilder {
-  public componentHasSubmit = true;
-  constructor(private baseOptions: BaseOptions) {}
-
-  build(config: ComponentOptions): PaymentComponent {
-    return new PurchaseOrder(this.baseOptions, config);
-  }
-}
+import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class PurchaseOrder extends BaseComponent {
   private showPayButton: boolean;

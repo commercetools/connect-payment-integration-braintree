@@ -1,32 +1,20 @@
-import { CardBuilder } from "../components/payment-methods/card/card";
-import { InvoiceBuilder } from "../components/payment-methods/invoice/invoice";
-import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order/purchase-order";
-import { FakeSdk } from "../fake-sdk";
-import {
-  DropinType,
-  EnablerOptions,
-  PaymentComponentBuilder,
-  PaymentDropinBuilder,
-  PaymentEnabler,
-  PaymentResult,
-} from "./payment-enabler";
-import { DropinEmbeddedBuilder } from "../dropin/dropin-embedded";
+import { CardBuilder } from "../components/payment-methods/card";
+import { InvoiceBuilder } from "../components/payment-methods/invoice";
+import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order";
+import { FakeSdk } from "../FakeSdk";
+import { PaymentEnabler } from "./PaymentEnabler";
+import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
+import { BaseOptions } from "./BaseOptions";
+import { DropinType } from "./DropinType";
+import { EnablerOptions } from "./EnablerOptions";
+import { PaymentComponentBuilder } from "./PaymentComponentBuilder";
+import { PaymentDropinBuilder } from "./PaymentDropinBuilder";
 
 declare global {
   interface ImportMeta {
     env: any;
   }
 }
-
-export type BaseOptions = {
-  sdk: FakeSdk;
-  processorUrl: string;
-  sessionId: string;
-  environment: string;
-  locale?: string;
-  onComplete: (result: PaymentResult) => void;
-  onError: (error?: any) => void;
-};
 
 export class MockPaymentEnabler implements PaymentEnabler {
   setupData: Promise<{ baseOptions: BaseOptions }>;
