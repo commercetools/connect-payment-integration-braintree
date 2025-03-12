@@ -48,7 +48,7 @@ const handleAuthError = (error: ErrorAuthErrorResponse, reply: FastifyReply) => 
   return reply.code(error.httpErrorStatus).send(response);
 };
 
-const handleErrors = (errorxList: [Errorx, ...Errorx[]], reply: FastifyReply) => {
+const handleErrors = (errorxList: NonEmptyArray<Errorx>, reply: FastifyReply) => {
   const transformedErrors: TErrorObject[] = transformErrorxToHTTPModel(errorxList);
 
   // Based on CoCo specs, the root level message attribute is always set to the values from the first error. MultiErrorx enforces the same HTTP status code.
