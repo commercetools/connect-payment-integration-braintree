@@ -119,7 +119,7 @@ export abstract class AbstractPaymentService {
     const ctPayment = await this.ctPaymentService.getPayment({
       id: opts.paymentId,
     });
-    const request = opts.data.actions[0];
+    const request = opts.data.actions[0]!;
 
     let requestAmount!: AmountSchemaDTO;
     if (request.action != 'cancelPayment') {

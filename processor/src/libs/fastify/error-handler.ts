@@ -13,6 +13,8 @@ import {
 } from '@commercetools/connect-payments-sdk';
 import { TAuthErrorResponse, TErrorObject, TErrorResponse } from './dtos/error.dto';
 
+type NonEmptyArray<T> = [T, ...T[]];
+
 function isFastifyValidationError(error: Error): error is FastifyError {
   return (error as unknown as FastifyError).validation != undefined;
 }
@@ -25,7 +27,7 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
   } else if (error instanceof Errorx) {
     return handleErrors([error], reply);
   } else if (error instanceof MultiErrorx) {
-    return handleErrors(error.errors, reply);
+    return handleErrors(error.errors as NonEmptyArray<Errorx>, reply);
   }
 
   // If it isn't any of the cases above (for example a normal Error is thrown) then fallback to a general 500 internal server error
@@ -33,7 +35,7 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
 };
 
 const handleAuthError = (error: ErrorAuthErrorResponse, reply: FastifyReply) => {
-  const transformedErrors: TErrorObject[] = transformErrorxToHTTPModel([error]);
+  const transformedErrors = transformErrorxToHTTPModel([error]);
 
   const response: TAuthErrorResponse = {
     message: error.message,
@@ -46,7 +48,7 @@ const handleAuthError = (error: ErrorAuthErrorResponse, reply: FastifyReply) => 
   return reply.code(error.httpErrorStatus).send(response);
 };
 
-const handleErrors = (errorxList: Errorx[], reply: FastifyReply) => {
+const handleErrors = (errorxList: [Errorx, ...Errorx[]], reply: FastifyReply) => {
   const transformedErrors: TErrorObject[] = transformErrorxToHTTPModel(errorxList);
 
   // Based on CoCo specs, the root level message attribute is always set to the values from the first error. MultiErrorx enforces the same HTTP status code.
@@ -59,29 +61,26 @@ const handleErrors = (errorxList: Errorx[], reply: FastifyReply) => {
   return reply.code(errorxList[0].httpErrorStatus).send(response);
 };
 
-const transformErrorxToHTTPModel = (errors: Errorx[]): TErrorObject[] => {
-  const errorObjectList: TErrorObject[] = [];
-
-  for (const err of errors) {
-    if (err.skipLog) {
-      log.debug(err.message, err);
+const transformErrorxToHTTPModel = (errors: NonEmptyArray<Errorx>): NonEmptyArray<TErrorObject> => {
+  return errors.map((error) => {
+    if (error.skipLog) {
+      log.debug(error.message, error);
     } else {
-      log.error(err.message, err);
+      log.error(error.message, error);
     }
 
-    const tErrObj: TErrorObject = {
-      code: err.code,
-      message: err.message,
-      ...(err.fields ? err.fields : {}), // Add any additional field to the response object (which will differ per type of error)
+    return {
+      code: error.code,
+      message: error.message,
+      ...(error.fields ? error.fields : {}), // Add any additional field to the response object (which will differ per type of error)
     };
-
-    errorObjectList.push(tErrObj);
-  }
-
-  return errorObjectList;
+  }) as NonEmptyArray<TErrorObject>;
 };
 
-const transformValidationErrors = (errors: FastifySchemaValidationError[], req: FastifyRequest): Errorx[] => {
+const transformValidationErrors = (
+  errors: FastifySchemaValidationError[],
+  req: FastifyRequest,
+): NonEmptyArray<Errorx> => {
   const errorxList: Errorx[] = [];
 
   for (const err of errors) {
@@ -102,11 +101,7 @@ const transformValidationErrors = (errors: FastifySchemaValidationError[], req: 
   }
 
   // If we cannot map the validation error to a CoCo error then return a general InvalidJsonError
-  if (errorxList.length === 0) {
-    errorxList.push(new ErrorInvalidJsonInput());
-  }
-
-  return errorxList;
+  return errorxList.length === 0 ? [new ErrorInvalidJsonInput()] : (errorxList as NonEmptyArray<Errorx>);
 };
 
 const getKeys = (path: string) => path.replace(/^\//, '').split('/');
