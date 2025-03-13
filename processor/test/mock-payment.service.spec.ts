@@ -23,7 +23,7 @@ interface FlexibleConfig {
 function setupMockConfig(keysAndValues: Record<string, string>) {
   const mockConfig: FlexibleConfig = {};
   Object.keys(keysAndValues).forEach((key) => {
-    mockConfig[key] = keysAndValues[key];
+    mockConfig[key] = keysAndValues[key] as string;
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
