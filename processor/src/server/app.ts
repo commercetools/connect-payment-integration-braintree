@@ -1,5 +1,5 @@
-import { paymentSDK } from '../payment-sdk';
-import { MockPaymentService } from '../services/mock-payment.service';
+import { paymentSDK } from '../sdk/paymentSDK';
+import { MockPaymentService } from '../services/MockPaymentService';
 
 const paymentService = new MockPaymentService({
   ctCartService: paymentSDK.ctCartService,
