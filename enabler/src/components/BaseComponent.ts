@@ -1,26 +1,33 @@
-import { FakeSdk } from '../fake-sdk';
-import { ComponentOptions, PaymentComponent, PaymentMethod, PaymentResult } from '../payment-enabler/payment-enabler';
-import { BaseOptions } from "../payment-enabler/payment-enabler-mock";
+import { FakeSdk } from "../FakeSdk";
+import {
+  BaseOptions,
+  ComponentOptions,
+  PaymentComponent,
+  PaymentMethod,
+  PaymentResult,
+} from "../payment-enabler";
 
 export type ElementOptions = {
   paymentMethod: PaymentMethod;
 };
 
-
-
 /**
  * Base Web Component
  */
 export abstract class BaseComponent implements PaymentComponent {
-  protected paymentMethod: ElementOptions['paymentMethod'];
+  protected paymentMethod: ElementOptions["paymentMethod"];
   protected sdk: FakeSdk;
-  protected processorUrl: BaseOptions['processorUrl'];
-  protected sessionId: BaseOptions['sessionId'];
-  protected environment: BaseOptions['environment'];
+  protected processorUrl: BaseOptions["processorUrl"];
+  protected sessionId: BaseOptions["sessionId"];
+  protected environment: BaseOptions["environment"];
   protected onComplete: (result: PaymentResult) => void;
   protected onError: (error?: any) => void;
 
-  constructor(paymentMethod: PaymentMethod, baseOptions: BaseOptions, _componentOptions: ComponentOptions) {
+  constructor(
+    paymentMethod: PaymentMethod,
+    baseOptions: BaseOptions,
+    _componentOptions: ComponentOptions
+  ) {
     this.paymentMethod = paymentMethod;
     this.sdk = baseOptions.sdk;
     this.processorUrl = baseOptions.processorUrl;
@@ -32,7 +39,7 @@ export abstract class BaseComponent implements PaymentComponent {
 
   abstract submit(): void;
 
-  abstract mount(selector: string): void ;
+  abstract mount(selector: string): void;
 
   showValidation?(): void;
   isValid?(): boolean;
@@ -40,8 +47,8 @@ export abstract class BaseComponent implements PaymentComponent {
     card?: {
       endDigits?: string;
       brand?: string;
-      expiryDate? : string;
-    }
+      expiryDate?: string;
+    };
   };
   isAvailable?(): Promise<boolean>;
 }

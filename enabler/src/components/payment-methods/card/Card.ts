@@ -1,42 +1,40 @@
 import {
+  BaseOptions,
   ComponentOptions,
-  PaymentComponent,
-  PaymentComponentBuilder,
-  PaymentMethod
-} from '../../../payment-enabler/payment-enabler';
-import buttonStyles from '../../../style/button.module.scss';
-import inputFieldStyles from '../../../style/inputField.module.scss';
-import styles from '../../../style/style.module.scss';
-import { BaseComponent } from "../../base";
-import {addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields} from './utils';
-import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
-import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock.ts";
-
-export class CardBuilder implements PaymentComponentBuilder {
-  public componentHasSubmit = true
-
-  constructor(private baseOptions: BaseOptions) {}
-
-  build(config: ComponentOptions): PaymentComponent {
-    return new Card(this.baseOptions, config);
-  }
-}
+  PaymentMethod,
+} from "../../../payment-enabler";
+import buttonStyles from "../../../style/button.module.scss";
+import inputFieldStyles from "../../../style/inputField.module.scss";
+import styles from "../../../style/style.module.scss";
+import { BaseComponent } from "../../BaseComponent";
+import {
+  addFormFieldsEventListeners,
+  fieldIds,
+  getCardBrand,
+  getInput,
+  validateAllFields,
+} from "./utils";
+import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Card extends BaseComponent {
-  private showPayButton: boolean
-  
+  private showPayButton: boolean;
+
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     super(PaymentMethod.card, baseOptions, componentOptions);
     this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
   mount(selector: string) {
-    document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
+    document
+      .querySelector(selector)
+      .insertAdjacentHTML("afterbegin", this._getTemplate());
     if (this.showPayButton) {
-      document.querySelector('#creditCardForm-paymentButton').addEventListener('click', (e) => {
-        e.preventDefault();
-        this.submit();
-      });
+      document
+        .querySelector("#creditCardForm-paymentButton")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          this.submit();
+        });
     }
 
     addFormFieldsEventListeners();
@@ -54,18 +52,22 @@ export class Card extends BaseComponent {
       // please use respective PSP iframe capabilities to handle PAN data
       const requestData = {
         paymentMethod: {
-            type: this.paymentMethod,
-            cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ''),
-            expiryMonth: getInput(fieldIds.expiryDate).value.split('/')[0],
-            expiryYear: getInput(fieldIds.expiryDate).value.split('/')[1],
-            cvc: getInput(fieldIds.cvv).value,
-            holderName: getInput(fieldIds.holderName).value,
-        }
+          type: this.paymentMethod,
+          cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ""),
+          expiryMonth: getInput(fieldIds.expiryDate).value.split("/")[0],
+          expiryYear: getInput(fieldIds.expiryDate).value.split("/")[1],
+          cvc: getInput(fieldIds.cvv).value,
+          holderName: getInput(fieldIds.holderName).value,
+        },
       };
 
       // Mock Validation
-      let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
-      const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
+      let isAuthorized = this.isCreditCardAllowed(
+        requestData.paymentMethod.cardNumber
+      );
+      const resultCode = isAuthorized
+        ? PaymentOutcome.AUTHORIZED
+        : PaymentOutcome.REJECTED;
 
       const request: PaymentRequestSchemaDTO = {
         paymentMethod: {
@@ -73,25 +75,34 @@ export class Card extends BaseComponent {
         },
         paymentOutcome: resultCode,
       };
-      const response = await fetch(this.processorUrl + '/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
+      const response = await fetch(this.processorUrl + "/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-Id": this.sessionId,
+        },
         body: JSON.stringify(request),
       });
       const data = await response.json();
 
       if (resultCode === PaymentOutcome.AUTHORIZED) {
-        this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
+        this.onComplete &&
+          this.onComplete({
+            isSuccess: true,
+            paymentReference: data.paymentReference,
+          });
       } else {
         this.onComplete && this.onComplete({ isSuccess: false });
       }
-    } catch(e) {
-      this.onError('Some error occurred. Please try again.');
+    } catch (e) {
+      this.onError("Some error occurred. Please try again.");
     }
   }
 
   private _getTemplate() {
-    const payButton = this.showPayButton ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="creditCardForm-paymentButton">Pay</button>` : '';
+    const payButton = this.showPayButton
+      ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="creditCardForm-paymentButton">Pay</button>`
+      : "";
     return `
     <div class="${styles.wrapper}">
       <form class="${styles.paymentForm}">
@@ -136,7 +147,7 @@ export class Card extends BaseComponent {
         ${payButton}
       </form>
       </div>
-    `
+    `;
   }
 
   showValidation() {
@@ -162,7 +173,11 @@ export class Card extends BaseComponent {
   }
 
   private isCreditCardAllowed(cardNumber: string) {
-    const allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
+    const allowedCreditCards = [
+      "4111111111111111",
+      "5555555555554444",
+      "341925950237632",
+    ];
     return allowedCreditCards.includes(cardNumber);
   }
 }

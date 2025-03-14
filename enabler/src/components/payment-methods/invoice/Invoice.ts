@@ -1,26 +1,12 @@
 import {
+  BaseOptions,
   ComponentOptions,
-  PaymentComponent,
-  PaymentComponentBuilder,
-  PaymentMethod
-} from '../../../payment-enabler/payment-enabler';
-import { BaseComponent } from "../../base";
-import styles from '../../../style/style.module.scss';
+  PaymentMethod,
+} from "../../../payment-enabler";
+import { BaseComponent } from "../../BaseComponent";
+import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
-import {
-  PaymentOutcome,
-  PaymentRequestSchemaDTO,
-} from "../../../dtos/mock-payment.dto";
-import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock";
-
-export class InvoiceBuilder implements PaymentComponentBuilder {
-  public componentHasSubmit = true;
-  constructor(private baseOptions: BaseOptions) {}
-
-  build(config: ComponentOptions): PaymentComponent {
-    return new Invoice(this.baseOptions, config);
-  }
-}
+import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Invoice extends BaseComponent {
   private showPayButton: boolean;
