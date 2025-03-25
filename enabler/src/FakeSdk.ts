@@ -1,4 +1,3 @@
-
 /**
  * Represents a fake SDK.
  */
@@ -9,9 +8,9 @@ export class FakeSdk {
    * Creates an instance of FakeSdk.
    * @param environment - The environment for the SDK.
    */
-  constructor({ environment }) {
+  constructor({ environment }: { environment: string }) {
     this.environment = environment;
-    console.log('FakeSdk constructor', this.environment);
+    console.log("FakeSdk constructor", this.environment);
   }
 
   /**
@@ -19,6 +18,6 @@ export class FakeSdk {
    * @param opts - The options for initializing the SDK.
    */
   init(opts: any) {
-    console.log('FakeSdk init', opts);
+    console.log("FakeSdk init", opts);
   }
 }

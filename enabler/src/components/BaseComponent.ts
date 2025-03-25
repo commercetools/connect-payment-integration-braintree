@@ -1,10 +1,10 @@
 import { FakeSdk } from "../FakeSdk";
 import {
-  BaseOptions,
-  ComponentOptions,
-  PaymentComponent,
+  type BaseOptions,
+  type ComponentOptions,
+  type PaymentComponent,
   PaymentMethod,
-  PaymentResult,
+  type PaymentResult,
 } from "../payment-enabler";
 
 export type ElementOptions = {

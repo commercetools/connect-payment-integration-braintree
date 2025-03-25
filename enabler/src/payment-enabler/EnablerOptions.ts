@@ -1,4 +1,4 @@
-import { PaymentResult } from "./PaymentResult";
+import { type PaymentResult } from "./PaymentResult";
 
 /**
  * Represents the options for the payment enabler.

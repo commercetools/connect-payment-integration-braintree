@@ -1,8 +1,8 @@
 import {
-  BaseOptions,
-  DropinComponent,
-  DropinOptions,
-  PaymentDropinBuilder,
+  type BaseOptions,
+  type DropinComponent,
+  type DropinOptions,
+  type PaymentDropinBuilder,
 } from "../payment-enabler";
 import { DropinComponents } from "./DropinComponents";
 

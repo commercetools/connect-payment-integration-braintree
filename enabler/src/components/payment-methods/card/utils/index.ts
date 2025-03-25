@@ -14,20 +14,24 @@ export const getInput = (field: string) =>
 const showErrorIfInvalid = (field: string) => {
   if (!isFieldValid(field)) {
     const input = getInput(field);
-    input.parentElement.classList.add(inputFieldStyles.error);
-    input.parentElement
-      .querySelector(`#${field} + .${inputFieldStyles.errorField}`)
-      .classList.remove(styles.hidden);
+    if (input.parentElement) {
+      input.parentElement.classList.add(inputFieldStyles.error);
+      input.parentElement
+        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
+        .classList.remove(styles.hidden);
+    }
   }
 };
 
 const hideErrorIfValid = (field: string) => {
   if (isFieldValid(field)) {
     const input = getInput(field);
-    input.parentElement.classList.remove(inputFieldStyles.error);
-    input.parentElement
-      .querySelector(`#${field} + .${inputFieldStyles.errorField}`)
-      .classList.add(styles.hidden);
+    if (input.parentElement) {
+      input.parentElement.classList.remove(inputFieldStyles.error);
+      input.parentElement
+        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
+        .classList.add(styles.hidden);
+    }
   }
 };
 
@@ -45,16 +49,20 @@ export const validateAllFields = () => {
 const handleFieldValidation = (field: string) => {
   const input = getInput(field);
   input.addEventListener("input", () => {
-    input.value.length > 0
-      ? input.parentElement.classList.add(inputFieldStyles.containValue)
-      : input.parentElement.classList.remove(inputFieldStyles.containValue);
-    hideErrorIfValid(field);
+    if (input.parentElement) {
+      input.value.length > 0
+        ? input.parentElement.classList.add(inputFieldStyles.containValue)
+        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+      hideErrorIfValid(field);
+    }
   });
   input.addEventListener("focusout", () => {
     showErrorIfInvalid(field);
-    input.value.length > 0
-      ? input.parentElement.classList.add(inputFieldStyles.containValue)
-      : input.parentElement.classList.remove(inputFieldStyles.containValue);
+    if (input.parentElement) {
+      input.value.length > 0
+        ? input.parentElement.classList.add(inputFieldStyles.containValue)
+        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+    }
   });
 };
 
@@ -130,7 +138,7 @@ const dateFormatter = (): ((inputValue: string) => string) => {
           output = `${output}/`;
         }
       } else {
-        output = output[0];
+        output = output[0] as string;
       }
     } else if (inputLength === 3 && lastCharacter != "/") {
       output = `${inputValue[0]}${inputValue[1]}/${inputValue[2]}`;
@@ -148,7 +156,7 @@ const dateFormatter = (): ((inputValue: string) => string) => {
 
 function formatCardNumberValue(brand: string, cardNumber: HTMLInputElement) {
   let tempVal = cardNumber.value.replace(/\s/g, "");
-  let selection = cardNumber.selectionStart;
+  let selection: number = cardNumber.selectionStart!;
   if (brand === "amex") {
     cardNumber.value = (
       tempVal.slice(0, 4).replace(/(.{4})/g, "$1 ") +

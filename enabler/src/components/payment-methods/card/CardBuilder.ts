@@ -1,8 +1,8 @@
 import {
-  BaseOptions,
-  ComponentOptions,
-  PaymentComponent,
-  PaymentComponentBuilder,
+  type BaseOptions,
+  type ComponentOptions,
+  type PaymentComponent,
+  type PaymentComponentBuilder,
 } from "../../../payment-enabler";
 import { Card } from "./Card";
 

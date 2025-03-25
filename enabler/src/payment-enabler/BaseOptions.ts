@@ -1,5 +1,5 @@
 import { FakeSdk } from "../FakeSdk";
-import { PaymentResult } from "./PaymentResult";
+import { type PaymentResult } from "./PaymentResult";
 
 export type BaseOptions = {
   sdk: FakeSdk;

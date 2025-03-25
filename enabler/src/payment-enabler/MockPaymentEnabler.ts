@@ -2,16 +2,17 @@ import { CardBuilder } from "../components/payment-methods/card";
 import { InvoiceBuilder } from "../components/payment-methods/invoice";
 import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order";
 import { FakeSdk } from "../FakeSdk";
-import { PaymentEnabler } from "./PaymentEnabler";
+import { type PaymentEnabler } from "./PaymentEnabler";
 import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
-import { BaseOptions } from "./BaseOptions";
+import { type BaseOptions } from "./BaseOptions";
 import { DropinType } from "./DropinType";
-import { EnablerOptions } from "./EnablerOptions";
-import { PaymentComponentBuilder } from "./PaymentComponentBuilder";
-import { PaymentDropinBuilder } from "./PaymentDropinBuilder";
+import { type EnablerOptions } from "./EnablerOptions";
+import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
+import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 
 declare global {
   interface ImportMeta {
+    //@ts-ignore
     env: any;
   }
 }
@@ -71,6 +72,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
       );
     }
 
+    //@ts-ignore
     return new supportedMethods[type](baseOptions);
   }
 
@@ -92,6 +94,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
       );
     }
 
+    //@ts-ignore
     return new supportedMethods[type](baseOptions);
   }
 }

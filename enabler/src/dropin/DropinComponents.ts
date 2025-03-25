@@ -1,4 +1,4 @@
-import { DropinComponent, DropinOptions } from "../payment-enabler";
+import { type DropinComponent, type DropinOptions } from "../payment-enabler";
 
 export class DropinComponents implements DropinComponent {
   private dropinOptions: DropinOptions;
@@ -12,8 +12,8 @@ export class DropinComponents implements DropinComponent {
   }
 
   mount(selector: string) {
-    document
-      .querySelector(selector)
+    document!
+      .querySelector(selector)!
       .insertAdjacentHTML("afterbegin", "Dropin Embedded");
   }
 

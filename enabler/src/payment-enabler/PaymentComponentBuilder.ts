@@ -1,5 +1,5 @@
-import { ComponentOptions } from "./ComponentOptions";
-import { PaymentComponent } from "./PaymentComponent";
+import { type ComponentOptions } from "./ComponentOptions";
+import { type PaymentComponent } from "./PaymentComponent";
 
 /**
  * Represents the interface for a payment component builder.

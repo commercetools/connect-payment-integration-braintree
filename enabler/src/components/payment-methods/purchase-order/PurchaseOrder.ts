@@ -1,13 +1,13 @@
 import {
-  BaseOptions,
-  ComponentOptions,
+  type BaseOptions,
+  type ComponentOptions,
   PaymentMethod,
 } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import inputFieldStyles from "../../../style/inputField.module.scss";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
-import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
+import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class PurchaseOrder extends BaseComponent {
   private showPayButton: boolean;
@@ -21,12 +21,12 @@ export class PurchaseOrder extends BaseComponent {
 
   mount(selector: string) {
     document
-      .querySelector(selector)
+      .querySelector(selector)!
       .insertAdjacentHTML("afterbegin", this._getTemplate());
 
     if (this.showPayButton) {
       document
-        .querySelector("#purchaseOrderForm-paymentButton")
+        .querySelector("#purchaseOrderForm-paymentButton")!
         .addEventListener("click", (e) => {
           e.preventDefault();
           this.submit();
@@ -78,11 +78,11 @@ export class PurchaseOrder extends BaseComponent {
     }
   }
 
-  showValidation() {
+  override showValidation() {
     this.validateAllFields();
   }
 
-  isValid() {
+  override isValid() {
     return this.validateAllFields();
   }
 
@@ -140,20 +140,24 @@ export class PurchaseOrder extends BaseComponent {
   private showErrorIfInvalid(field: string) {
     if (!this.isFieldValid(field)) {
       const input = this.getInput(field);
-      input.parentElement.classList.add(inputFieldStyles.error);
-      input.parentElement
-        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)
-        .classList.remove(styles.hidden);
+      if (input.parentElement) {
+        input.parentElement.classList.add(inputFieldStyles.error);
+        input.parentElement
+          .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
+          .classList.remove(styles.hidden);
+      }
     }
   }
 
   private hideErrorIfValid = (field: string) => {
     if (this.isFieldValid(field)) {
       const input = this.getInput(field);
-      input.parentElement.classList.remove(inputFieldStyles.error);
-      input.parentElement
-        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)
-        .classList.add(styles.hidden);
+      if (input.parentElement) {
+        input.parentElement.classList.remove(inputFieldStyles.error);
+        input.parentElement
+          .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
+          .classList.add(styles.hidden);
+      }
     }
   };
 
@@ -177,8 +181,10 @@ export class PurchaseOrder extends BaseComponent {
   }
 
   private manageLabelClass = (input: HTMLInputElement) => {
-    input.value.length > 0
-      ? input.parentElement.classList.add(inputFieldStyles.containValue)
-      : input.parentElement.classList.remove(inputFieldStyles.containValue);
+    if (input.parentElement) {
+      input.value.length > 0
+        ? input.parentElement.classList.add(inputFieldStyles.containValue)
+        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+    }
   };
 }
