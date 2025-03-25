@@ -1,6 +1,6 @@
 import { DropinType } from "./DropinType";
-import { PaymentComponentBuilder } from "./PaymentComponentBuilder";
-import { PaymentDropinBuilder } from "./PaymentDropinBuilder";
+import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
+import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 
 /**
  * Represents the payment enabler. The payment enabler is the entry point for creating the components.

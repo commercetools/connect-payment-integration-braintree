@@ -1,5 +1,5 @@
-import { DropinComponent } from "./DropinComponent";
-import { DropinOptions } from "./DropinOptions";
+import { type DropinComponent } from "./DropinComponent";
+import { type DropinOptions } from "./DropinOptions";
 
 /**
  * Represents the interface for a payment drop-in builder.

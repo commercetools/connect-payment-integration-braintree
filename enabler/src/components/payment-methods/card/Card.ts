@@ -1,6 +1,6 @@
 import {
-  BaseOptions,
-  ComponentOptions,
+  type BaseOptions,
+  type ComponentOptions,
   PaymentMethod,
 } from "../../../payment-enabler";
 import buttonStyles from "../../../style/button.module.scss";
@@ -14,7 +14,7 @@ import {
   getInput,
   validateAllFields,
 } from "./utils";
-import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
+import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Card extends BaseComponent {
   private showPayButton: boolean;
@@ -26,11 +26,11 @@ export class Card extends BaseComponent {
 
   mount(selector: string) {
     document
-      .querySelector(selector)
+      .querySelector(selector)!
       .insertAdjacentHTML("afterbegin", this._getTemplate());
     if (this.showPayButton) {
       document
-        .querySelector("#creditCardForm-paymentButton")
+        .querySelector("#creditCardForm-paymentButton")!
         .addEventListener("click", (e) => {
           e.preventDefault();
           this.submit();
@@ -150,15 +150,15 @@ export class Card extends BaseComponent {
     `;
   }
 
-  showValidation() {
+  override showValidation() {
     validateAllFields();
   }
 
-  isValid() {
+  override isValid() {
     return validateAllFields();
   }
 
-  getState() {
+  override getState() {
     return {
       card: {
         endDigits: getInput(fieldIds.cardNumber).value.slice(-4),
@@ -168,7 +168,7 @@ export class Card extends BaseComponent {
     };
   }
 
-  isAvailable() {
+  override isAvailable() {
     return Promise.resolve(true);
   }
 

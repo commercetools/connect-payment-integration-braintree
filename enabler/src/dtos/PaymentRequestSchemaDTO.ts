@@ -1,4 +1,4 @@
-import { Static } from "@sinclair/typebox";
+import { type Static } from "@sinclair/typebox";
 import { PaymentRequestSchema } from "./PaymentRequestSchema";
 
 type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;

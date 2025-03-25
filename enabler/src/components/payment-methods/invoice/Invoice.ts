@@ -1,12 +1,12 @@
 import {
-  BaseOptions,
-  ComponentOptions,
+  type BaseOptions,
+  type ComponentOptions,
   PaymentMethod,
 } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
-import { PaymentOutcome, PaymentRequestSchemaDTO } from "../../../dtos";
+import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Invoice extends BaseComponent {
   private showPayButton: boolean;
@@ -18,12 +18,12 @@ export class Invoice extends BaseComponent {
 
   mount(selector: string) {
     document
-      .querySelector(selector)
+      .querySelector(selector)!
       .insertAdjacentHTML("afterbegin", this._getTemplate());
 
     if (this.showPayButton) {
       document
-        .querySelector("#invoiceForm-paymentButton")
+        .querySelector("#invoiceForm-paymentButton")!
         .addEventListener("click", (e) => {
           e.preventDefault();
           this.submit();
