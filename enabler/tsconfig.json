@@ -27,5 +27,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "decs.d.ts"]
+  "include": ["src", "decs.d.ts"],
+  "exclude": ["node_modules", "tests/**/*.ts", "**/*.spec.ts"],
 }
