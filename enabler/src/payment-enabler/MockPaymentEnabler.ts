@@ -72,7 +72,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
       );
     }
 
-    //@ts-ignore
+    // @ts-expect-error - Supported methods are checked above
     return new supportedMethods[type](baseOptions);
   }
 
@@ -94,7 +94,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
       );
     }
 
-    //@ts-ignore
+    // @ts-expect-error - DropinType.hpp currently not supported
     return new supportedMethods[type](baseOptions);
   }
 }

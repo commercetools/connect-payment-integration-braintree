@@ -4,7 +4,8 @@
   "version": "4.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
+    "dev": "concurrently -n VITE,TSC -c magenta,cyan \"vite --port 3000\" \"npm run tsc:dev\"",
+    "tsc:dev": "tsc --noEmit --watch --preserveWatchOutput --pretty",
     "start": "serve public -l 8080 --cors",
     "test": "jest --detectOpenHandles",
     "build": "tsc && vite build",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "22.13.9",
+    "concurrently": "^9.1.2",
     "jest": "29.7.0",
     "sass": "1.85.1",
     "ts-jest": "^29.3.0",
