@@ -15,10 +15,10 @@ const showErrorIfInvalid = (field: string) => {
   if (!isFieldValid(field)) {
     const input = getInput(field);
     if (input.parentElement) {
-      input.parentElement.classList.add(inputFieldStyles.error);
+      input.parentElement.classList.add(inputFieldStyles.error as string);
       input.parentElement
-        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
-        .classList.remove(styles.hidden);
+        .querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
+        .classList.remove(styles.hidden as string);
     }
   }
 };
@@ -27,10 +27,10 @@ const hideErrorIfValid = (field: string) => {
   if (isFieldValid(field)) {
     const input = getInput(field);
     if (input.parentElement) {
-      input.parentElement.classList.remove(inputFieldStyles.error);
+      input.parentElement.classList.remove(inputFieldStyles.error as string);
       input.parentElement
-        .querySelector(`#${field} + .${inputFieldStyles.errorField}`)!
-        .classList.add(styles.hidden);
+        .querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
+        .classList.add(styles.hidden as string);
     }
   }
 };
@@ -51,8 +51,12 @@ const handleFieldValidation = (field: string) => {
   input.addEventListener("input", () => {
     if (input.parentElement) {
       input.value.length > 0
-        ? input.parentElement.classList.add(inputFieldStyles.containValue)
-        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+        ? input.parentElement.classList.add(
+            inputFieldStyles.containValue as string
+          )
+        : input.parentElement.classList.remove(
+            inputFieldStyles.containValue as string
+          );
       hideErrorIfValid(field);
     }
   });
@@ -60,8 +64,12 @@ const handleFieldValidation = (field: string) => {
     showErrorIfInvalid(field);
     if (input.parentElement) {
       input.value.length > 0
-        ? input.parentElement.classList.add(inputFieldStyles.containValue)
-        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+        ? input.parentElement.classList.add(
+            inputFieldStyles.containValue as string
+          )
+        : input.parentElement.classList.remove(
+            inputFieldStyles.containValue as string
+          );
     }
   });
 };
@@ -185,13 +193,15 @@ const addCardNumberEventListeners = () => {
     const brand = getCardBrand(cardNumber.value);
     cardNumber.value = formatCardNumberValue(brand, cardNumber);
 
-    const cardIcons = document.querySelectorAll(`.${styles.cardIcon}`);
+    const cardIcons = document.querySelectorAll(
+      `.${styles.cardIcon as string}`
+    );
     cardIcons.forEach((icon) => {
-      icon.classList.add(styles.hidden);
+      icon.classList.add(styles.hidden as string);
     });
     const cardIcon = document.querySelector(`#creditCardForm-${brand}`);
     if (cardIcon) {
-      cardIcon.classList.remove(styles.hidden);
+      cardIcon.classList.remove(styles.hidden as string);
     }
   });
   handleFieldValidation(fieldIds.cardNumber);

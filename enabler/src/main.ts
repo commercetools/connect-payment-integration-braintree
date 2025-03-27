@@ -1,3 +1,1 @@
-import { MockPaymentEnabler } from "./payment-enabler";
-
-export { MockPaymentEnabler as Enabler };
+export { __setup } from "./__setup";
