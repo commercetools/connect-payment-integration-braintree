@@ -15,14 +15,14 @@ export const __setup = () => {
       body: JSON.stringify({
         iss: "https://issuer.com",
         sub: "test-sub",
-        "https://issuer.com/claims/project_key": `${config.VITE_CTP_PROJECT_KEY}`,
+        "https://issuer.com/claims/project_key": `${config.CTP_PROJECT_KEY}`,
       }),
     });
 
     const accessToken = await response.json();
 
     const res = await fetch(
-      `${config.VITE_PROCESSOR_URL}/operations/payment-components`,
+      `${config.PROCESSOR_URL}/operations/payment-components`,
       {
         method: "GET",
         headers: {
@@ -88,7 +88,7 @@ export const __setup = () => {
       const selectedPaymentMethod = paymentMethodSelect.value;
 
       const enabler = new Enabler({
-        processorUrl: config.VITE_PROCESSOR_URL,
+        processorUrl: config.PROCESSOR_URL,
         sessionId: sessionId,
         // @ts-expect-error
         currency: "EUR",
