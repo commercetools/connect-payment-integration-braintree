@@ -5,6 +5,7 @@ import {
   TransactionType,
   TransactionState,
 } from '@commercetools/connect-payments-sdk';
+import type { CustomFieldsData } from '@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type';
 import {
   CancelPaymentRequest,
   CapturePaymentRequest,
@@ -219,7 +220,13 @@ export class MockPaymentService extends AbstractPaymentService {
     });
 
     const pspReference = randomUUID().toString();
-
+    const customFields: CustomFieldsData = {
+      typeKey: launchpadPurchaseOrderCustomType.key,
+      fields: {
+        [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
+        [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,
+      },
+    };
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       pspReference: pspReference,
@@ -231,16 +238,7 @@ export class MockPaymentService extends AbstractPaymentService {
         state: this.convertPaymentResultCode(request.data.paymentOutcome),
       },
       ...(request.data.paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && {
-        customFields: {
-          type: {
-            key: launchpadPurchaseOrderCustomType.key,
-            typeId: 'type',
-          },
-          fields: {
-            [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
-            [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,
-          },
-        },
+        customFields,
       }),
     });
 
