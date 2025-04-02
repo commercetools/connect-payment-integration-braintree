@@ -232,7 +232,10 @@ export class MockPaymentService extends AbstractPaymentService {
       },
       ...(request.data.paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && {
         customFields: {
-          typeKey: launchpadPurchaseOrderCustomType.key,
+          type: {
+            key: launchpadPurchaseOrderCustomType.key,
+            typeId: 'type',
+          },
           fields: {
             [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
             [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,
