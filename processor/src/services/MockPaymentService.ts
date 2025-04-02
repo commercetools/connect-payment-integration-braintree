@@ -5,7 +5,7 @@ import {
   TransactionType,
   TransactionState,
 } from '@commercetools/connect-payments-sdk';
-import type { CustomFieldsData } from '@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type';
+import type { CustomFieldsDraft } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
   CapturePaymentRequest,
@@ -220,8 +220,11 @@ export class MockPaymentService extends AbstractPaymentService {
     });
 
     const pspReference = randomUUID().toString();
-    const customFields: CustomFieldsData = {
-      typeKey: launchpadPurchaseOrderCustomType.key,
+    const customFields: CustomFieldsDraft = {
+      type: {
+        typeId: 'type',
+        key: launchpadPurchaseOrderCustomType.key,
+      },
       fields: {
         [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
         [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,
