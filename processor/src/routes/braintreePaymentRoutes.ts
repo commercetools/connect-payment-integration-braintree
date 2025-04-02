@@ -6,19 +6,19 @@ import {
   PaymentResponseSchema,
   PaymentResponseSchemaDTO,
 } from '../dtos/payment';
-import { MockPaymentService } from '../services/MockPaymentService';
+import { BraintreePaymentService } from '../services/BraintreePaymentService';
 
 type PaymentRoutesOptions = {
-  paymentService: MockPaymentService;
+  paymentService: BraintreePaymentService;
   sessionHeaderAuthHook: SessionHeaderAuthenticationHook;
 };
 
-export const mockPaymentRoutes = async (
+export const braintreePaymentRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
-  fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
-    '/payments',
+  fastify.get<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
+    '/payment-methods',
     {
       preHandler: [opts.sessionHeaderAuthHook.authenticate()],
       schema: {
@@ -33,7 +33,7 @@ export const mockPaymentRoutes = async (
         data: request.body,
       });
 
-      return reply.status(200).send(resp);
+      return reply.status(418).send(resp);
     },
   );
 };

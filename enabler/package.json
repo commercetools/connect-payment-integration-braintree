@@ -4,7 +4,7 @@
   "version": "4.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n VITE,TSC -c magenta,cyan \"vite --port 3000\" \"npm run tsc:dev\"",
+    "dev": "concurrently -n VITE,TSC -c magenta,cyan \"vite --host 0.0.0.0 --port 3000\" \"npm run tsc:dev\"",
     "tsc:dev": "tsc --noEmit --watch --preserveWatchOutput --pretty",
     "start": "serve public -l 8080 --cors",
     "test": "jest --detectOpenHandles",
