@@ -12,7 +12,6 @@ services:
       - start
     ports:
       - 9000:9000
-
   enabler:
     image: node:20
     volumes:
@@ -25,10 +24,9 @@ services:
     env_file:
       - ./enabler/.env
     environment:
-      - VITE_PROCESSOR_URL=http://localhost:8080
+      - PROCESSOR_URL=http://localhost:8080
     ports:
       - 3000:3000
-
   processor:
     image: node:20
     volumes:
