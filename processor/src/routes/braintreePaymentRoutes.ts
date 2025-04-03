@@ -17,8 +17,8 @@ export const braintreePaymentRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
-  fastify.get<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
-    '/payment-methods',
+  fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
+    '/payment',
     {
       preHandler: [opts.sessionHeaderAuthHook.authenticate()],
       schema: {
@@ -32,8 +32,11 @@ export const braintreePaymentRoutes = async (
       const resp = await opts.paymentService.createPayment({
         data: request.body,
       });
-
-      return reply.status(418).send(resp);
+      if (resp.paymentReference) {
+        return reply.status(200).send(resp);
+      } else {
+        return reply.status(500).send();
+      }
     },
   );
 };
