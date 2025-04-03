@@ -6,9 +6,9 @@ import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/com
 import { mockGetPaymentResult, mockUpdatePaymentResult } from '../utils/mock-payment-results';
 import { mockGetCartResult } from '../utils/mock-cart-data';
 import * as Config from '../../src/config';
-import { CreatePaymentRequest, MockPaymentServiceOptions } from '../../src/services/types/payment';
+import { CreatePaymentRequest, BraintreePaymentServiceOptions } from '../../src/services/types/payment';
 import { AbstractPaymentService } from '../../src/services/AbstractPaymentService';
-import { MockPaymentService } from '../../src/services/MockPaymentService';
+import { BraintreePaymentService } from '../../src/services/BraintreePaymentService';
 import * as FastifyContext from '../../src/libs/fastify/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
@@ -30,13 +30,13 @@ function setupMockConfig(keysAndValues: Record<string, string>) {
   jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig as any);
 }
 
-describe(MockPaymentService.name, () => {
-  const opts: MockPaymentServiceOptions = {
+describe(BraintreePaymentService.name, () => {
+  const opts: BraintreePaymentServiceOptions = {
     ctCartService: paymentSDK.ctCartService,
     ctPaymentService: paymentSDK.ctPaymentService,
   };
-  const paymentService: AbstractPaymentService = new MockPaymentService(opts);
-  const mockPaymentService: MockPaymentService = new MockPaymentService(opts);
+  const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
+  const mockPaymentService: BraintreePaymentService = new BraintreePaymentService(opts);
   beforeEach(() => {
     jest.setTimeout(10000);
     jest.resetAllMocks();
@@ -78,7 +78,7 @@ describe(MockPaymentService.name, () => {
     };
 
     jest.spyOn(StatusHandler, 'healthCheckCommercetoolsPermissions').mockReturnValue(mockHealthCheckFunction);
-    const paymentService: AbstractPaymentService = new MockPaymentService(opts);
+    const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
     const result: StatusResponse = await paymentService.status();
 
     expect(result?.status).toBeDefined();
