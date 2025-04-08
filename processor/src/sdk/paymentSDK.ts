@@ -1,5 +1,5 @@
 import { RequestContextData, setupPaymentSDK } from '@commercetools/connect-payments-sdk';
-import { getConfig } from '../config';
+import { getConfig } from '../dev-utils/getConfig';
 import { getRequestContext, updateRequestContext } from '../libs/fastify/context';
 import { appLogger } from '../libs/logger/appLogger';
 

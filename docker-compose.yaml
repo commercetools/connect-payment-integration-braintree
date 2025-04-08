@@ -20,7 +20,7 @@ services:
     working_dir: /home/node/app
     depends_on:
       - processor
-    command: /bin/sh -c 'npm install && npm run dev'
+    command: /bin/sh -c 'npm install && npm run docker:dev'
     env_file:
       - ./enabler/.env
     environment:

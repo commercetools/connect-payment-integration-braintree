@@ -10,11 +10,24 @@ import { AbstractPaymentService } from './AbstractPaymentService';
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations';
 import { PaymentMethodType, PaymentResponseSchemaDTO } from '../dtos/payment';
 import { BraintreePaymentServiceOptions } from './types/payment/BraintreePaymentServiceOptions';
-import { CreatePaymentRequest } from './types/payment';
+import { BraintreeInitResponse, CreatePaymentRequest } from './types/payment';
+import braintree from 'braintree';
+import { getConfig } from '../dev-utils/getConfig';
+
+const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
+  private braintreeGateway: braintree.BraintreeGateway;
+
   constructor(opts: BraintreePaymentServiceOptions) {
     super(opts.ctCartService, opts.ctPaymentService);
+
+    this.braintreeGateway = new braintree.BraintreeGateway({
+      environment: braintree.Environment.Sandbox,
+      merchantId: config.braintreeMerchantId,
+      publicKey: config.braintreePublicKey,
+      privateKey: config.braintreePrivateKey,
+    });
   }
 
   /**
@@ -26,7 +39,25 @@ export class BraintreePaymentService extends AbstractPaymentService {
    * @returns Promise with mocking object containing configuration information
    */
   public async config(): Promise<ConfigResponse> {
-    // TODO
+    throw new Error('Not yet implemented');
+  }
+
+  /**
+   * Initialize session
+   *
+   * @remarks
+   * Implementation to initialize Braintree payment session
+   *
+   * @returns Promise returning Braintree client token
+   */
+  public async init(customerId: string): Promise<BraintreeInitResponse> {
+    try {
+      const response = await this.braintreeGateway.clientToken.generate({ customerId });
+      return { clientToken: response.clientToken };
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   /**
@@ -50,6 +81,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing a list of supported payment components
    */
   public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
+    // TODO get from braintree
     return {
       dropins: [],
       components: [

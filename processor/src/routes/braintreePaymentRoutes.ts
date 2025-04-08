@@ -1,6 +1,10 @@
 import { SessionHeaderAuthenticationHook } from '@commercetools/connect-payments-sdk';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import {
+  BraintreeInitRequestSchema,
+  BraintreeInitRequestSchemaDTO,
+  BraintreeInitResponseSchema,
+  BraintreeInitResponseSchemaDTO,
   PaymentRequestSchema,
   PaymentRequestSchemaDTO,
   PaymentResponseSchema,
@@ -17,6 +21,25 @@ export const braintreePaymentRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
+  fastify.post<{ Body: BraintreeInitRequestSchemaDTO; Reply: BraintreeInitResponseSchemaDTO }>(
+    '/init',
+    {
+      preHandler: [opts.sessionHeaderAuthHook.authenticate()],
+      schema: {
+        body: BraintreeInitRequestSchema,
+        response: {
+          200: BraintreeInitResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const response = await opts.paymentService.init(request.body.customerId);
+      if (response) {
+        return reply.status(200).send(response);
+      }
+      return reply.code(500).send();
+    },
+  );
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
     '/payment',
     {
@@ -29,11 +52,11 @@ export const braintreePaymentRoutes = async (
       },
     },
     async (request, reply) => {
-      const resp = await opts.paymentService.createPayment({
+      const response = await opts.paymentService.createPayment({
         data: request.body,
       });
-      if (resp.paymentReference) {
-        return reply.status(200).send(resp);
+      if (response.paymentReference) {
+        return reply.status(200).send(response);
       } else {
         return reply.status(500).send();
       }

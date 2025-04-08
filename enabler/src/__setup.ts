@@ -1,13 +1,15 @@
 import { MockPaymentEnabler as Enabler } from "./payment-enabler";
 import { getSessionId } from "../dev-utils/getSessionId";
 import { getConfig } from "../dev-utils/getConfig";
+// @ts-expect-error - usage is temporarily commented out
+import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
 const config = getConfig();
 
-export const __setup = () => {
+export const __setup = function (): void {
   document.addEventListener("DOMContentLoaded", async () => {
     const paymentMethodSelect = document.getElementById("paymentMethod");
-    const response = await fetch("http://localhost:9000/jwt/token", {
+    const tokenResponse = await fetch("http://localhost:9000/jwt/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,9 +21,9 @@ export const __setup = () => {
       }),
     });
 
-    const accessToken = await response.json();
+    const accessToken = await tokenResponse.json();
 
-    const res = await fetch(
+    const paymentMethodsResponse = await fetch(
       `${config.PROCESSOR_URL}/operations/payment-components`,
       {
         method: "GET",
@@ -41,7 +43,7 @@ export const __setup = () => {
           subtypes?: string[] | undefined;
           type: string;
         }[];
-      } = await res.json();
+      } = await paymentMethodsResponse.json();
 
       paymentMethods.components.forEach((component) => {
         const option = document.createElement("option");
@@ -163,5 +165,8 @@ export const __setup = () => {
         'Cannot create checkout component, element with ID "createCheckout" not found.'
       );
     }
+
+    // TODO: GET CUSTOMER ID
+    // setupBraintreeDropin(accessToken.token, "");
   });
 };
