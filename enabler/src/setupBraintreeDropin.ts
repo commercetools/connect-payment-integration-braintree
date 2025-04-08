@@ -4,8 +4,7 @@ import { getConfig } from "../dev-utils/getConfig";
 const config = getConfig();
 
 export const setupBraintreeDropin = async function (
-  accessToken: string,
-  customerId: string
+  accessToken: string
 ): Promise<void> {
   const submitButton = document.querySelector("#braintree-submit-button");
 
@@ -22,9 +21,7 @@ export const setupBraintreeDropin = async function (
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        customerId,
-      }),
+      body: JSON.stringify({}),
     });
   } catch (error) {
     console.log("error: ", error);
@@ -33,6 +30,12 @@ export const setupBraintreeDropin = async function (
 
   const token: { clientToken: string } = await response.json();
 
+  if (!token.clientToken) {
+    console.error(
+      "Couldn't create Braintree dropin container, client token is undefined"
+    );
+    return;
+  }
   create(
     {
       authorization: token.clientToken,

@@ -21,6 +21,7 @@ export const braintreePaymentRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
+  //TODO remove customer ID from request
   fastify.post<{ Body: BraintreeInitRequestSchemaDTO; Reply: BraintreeInitResponseSchemaDTO }>(
     '/init',
     {
@@ -32,12 +33,14 @@ export const braintreePaymentRoutes = async (
         },
       },
     },
-    async (request, reply) => {
-      const response = await opts.paymentService.init(request.body.customerId);
-      if (response) {
+    async (_, reply) => {
+      try {
+        const response = await opts.paymentService.init();
         return reply.status(200).send(response);
+      } catch (error) {
+        console.error('Error in /init: ', error);
+        return reply.code(500).send();
       }
-      return reply.code(500).send();
     },
   );
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(

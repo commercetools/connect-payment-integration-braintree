@@ -7,7 +7,7 @@ import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
  *
  * Usage:
  *    const enabler = new Enabler({
- *      processorUrl: __PROCESSOR_URL__,
+ *      processorUrl: __VITE_PROCESSOR_URL__,
  *      sessionId: sessionId,
  *      config: {
  *

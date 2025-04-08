@@ -1,7 +1,6 @@
 import { MockPaymentEnabler as Enabler } from "./payment-enabler";
 import { getSessionId } from "../dev-utils/getSessionId";
 import { getConfig } from "../dev-utils/getConfig";
-// @ts-expect-error - usage is temporarily commented out
 import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
 const config = getConfig();
@@ -167,6 +166,6 @@ export const __setup = function (): void {
     }
 
     // TODO: GET CUSTOMER ID
-    // setupBraintreeDropin(accessToken.token, "");
+    setupBraintreeDropin(accessToken.token);
   });
 };
