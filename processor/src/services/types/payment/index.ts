@@ -1,4 +1,5 @@
+import { BraintreeInitResponse } from './BraintreeInitResponse';
+import { BraintreePaymentServiceOptions } from './BraintreePaymentServiceOptions';
 import { CreatePaymentRequest } from './CreatePaymentRequest';
-import { MockPaymentServiceOptions } from './MockPaymentServiceOptions';
 
-export { type CreatePaymentRequest, type MockPaymentServiceOptions };
+export { type BraintreeInitResponse, type BraintreePaymentServiceOptions, type CreatePaymentRequest };

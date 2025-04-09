@@ -35,7 +35,16 @@ deployAs:
           description: JWT Issuer for jwt validation (example - https://mc-api.europe-west1.gcp.commercetools.com)
           required: true
           default: https://mc-api.europe-west1.gcp.commercetools.com
+        - key: BRAINTREE_MERCHANT_ID
+          description: Braintree merchant ID
+          required: true
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: commercetools client secret
+          required: true
+        - key: BRAINTREE_PUBLIC_KEY
+          description: Braintree public key
+          required: true
+        - key: BRAINTREE_PRIVATE_KEY
+          description: Braintree private key
           required: true

@@ -10,7 +10,6 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "noImplicitAny": true,
-
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -26,6 +25,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
+  },
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval"
   },
   "include": ["src", "decs.d.ts"],
   "exclude": ["node_modules", "tests/**/*.ts", "**/*.spec.ts"],

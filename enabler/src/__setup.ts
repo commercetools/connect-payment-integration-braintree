@@ -1,13 +1,14 @@
 import { MockPaymentEnabler as Enabler } from "./payment-enabler";
 import { getSessionId } from "../dev-utils/getSessionId";
 import { getConfig } from "../dev-utils/getConfig";
+import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
 const config = getConfig();
 
-export const __setup = () => {
+export const __setup = function (): void {
   document.addEventListener("DOMContentLoaded", async () => {
     const paymentMethodSelect = document.getElementById("paymentMethod");
-    const response = await fetch("http://localhost:9000/jwt/token", {
+    const tokenResponse = await fetch("http://localhost:9000/jwt/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -15,14 +16,14 @@ export const __setup = () => {
       body: JSON.stringify({
         iss: "https://issuer.com",
         sub: "test-sub",
-        "https://issuer.com/claims/project_key": `${config.VITE_CTP_PROJECT_KEY}`,
+        "https://issuer.com/claims/project_key": `${config.CTP_PROJECT_KEY}`,
       }),
     });
 
-    const accessToken = await response.json();
+    const accessToken = await tokenResponse.json();
 
-    const res = await fetch(
-      `${config.VITE_PROCESSOR_URL}/operations/payment-components`,
+    const paymentMethodsResponse = await fetch(
+      `${config.PROCESSOR_URL}/operations/payment-components`,
       {
         method: "GET",
         headers: {
@@ -41,7 +42,7 @@ export const __setup = () => {
           subtypes?: string[] | undefined;
           type: string;
         }[];
-      } = await res.json();
+      } = await paymentMethodsResponse.json();
 
       paymentMethods.components.forEach((component) => {
         const option = document.createElement("option");
@@ -54,114 +55,117 @@ export const __setup = () => {
         'Cannot populate payment method selection, select with ID "paymentMethod" not found.'
       );
     }
-  });
 
-  const createCheckoutElement = document.getElementById("createCheckout");
-  if (createCheckoutElement) {
-    createCheckoutElement.addEventListener("click", async (event) => {
-      event.preventDefault();
-      const cartIdInput = document.getElementById(
-        "cartId"
-      ) as HTMLInputElement | null;
-      if (!cartIdInput) {
-        console.error(
-          'Cannot get cart Id, input element with ID "cartId" not found.'
-        );
-        return;
-      }
-      const cartId = cartIdInput.value;
-      if (!cartId) {
-        console.error("Cart ID field is empty.");
-        return;
-      }
-      const sessionId = await getSessionId(cartId);
-
-      const paymentMethodSelect = document.getElementById(
-        "paymentMethod"
-      ) as HTMLSelectElement | null;
-      if (!paymentMethodSelect) {
-        console.error(
-          'Cannot get payment method selection, select with ID "paymentMethod" not found.'
-        );
-        return;
-      }
-      const selectedPaymentMethod = paymentMethodSelect.value;
-
-      const enabler = new Enabler({
-        processorUrl: config.VITE_PROCESSOR_URL,
-        sessionId: sessionId,
-        // @ts-expect-error
-        currency: "EUR",
-        onComplete: (result) => {
-          console.log("onComplete", result);
-        },
-        onError: (err) => {
-          console.error("onError", err);
-        },
-      });
-
-      const builder = await enabler.createComponentBuilder(
-        selectedPaymentMethod
-      );
-      const component = await builder.build({
-        showPayButton: !builder.componentHasSubmit,
-        ...(builder.componentHasSubmit
-          ? {}
-          : {
-              onPayButtonClick: async () => {
-                // to be used for validation
-                const termsChecked = (
-                  document.getElementById("termsCheckbox") as HTMLInputElement
-                )?.checked;
-                if (!termsChecked) {
-                  event.preventDefault();
-                  alert("You must agree to the terms and conditions.");
-                  return Promise.reject("error-occurred");
-                }
-                return Promise.resolve(); // change to true, to test payment flow
-              },
-            }),
-      });
-
-      if (builder.componentHasSubmit) {
-        if (
-          selectedPaymentMethod === "card" ||
-          selectedPaymentMethod === "purchaseorder"
-        ) {
-          component.mount("#container--external");
-        }
-
-        const customButton = document.createElement("button");
-        customButton.textContent = "Pay with " + selectedPaymentMethod;
-        customButton.className = "btn btn-lg btn-primary btn-block";
-        customButton.addEventListener("click", () => {
-          const termsChecked = (
-            document.getElementById("termsCheckbox") as HTMLInputElement
-          )?.checked;
-          if (!termsChecked) {
-            event.preventDefault();
-            alert("You must agree to the terms and conditions.");
-            return;
-          }
-          component.submit();
-        });
-        const internalContainer = document.getElementById(
-          "container--internal"
-        );
-        if (!internalContainer) {
+    const createCheckoutElement = document.getElementById("createCheckout");
+    if (createCheckoutElement) {
+      createCheckoutElement.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const cartIdInput = document.getElementById(
+          "cartId"
+        ) as HTMLInputElement | null;
+        if (!cartIdInput) {
           console.error(
-            'Cannot append component submit button, element with ID "container--internal" not found.'
+            'Cannot get cart Id, input element with ID "cartId" not found.'
           );
           return;
         }
-        internalContainer.appendChild(customButton);
-      } else {
-        component.mount("#container--external");
-      }
-    });
-  } else {
-    console.error(
-      'Cannot create checkout component, element with ID "createCheckout" not found.'
-    );
-  }
+        const cartId = cartIdInput.value;
+        if (!cartId) {
+          console.error("Cart ID field is empty.");
+          return;
+        }
+        const sessionId = await getSessionId(cartId);
+
+        const paymentMethodSelect = document.getElementById(
+          "paymentMethod"
+        ) as HTMLSelectElement | null;
+        if (!paymentMethodSelect) {
+          console.error(
+            'Cannot get payment method selection, select with ID "paymentMethod" not found.'
+          );
+          return;
+        }
+        const selectedPaymentMethod = paymentMethodSelect.value;
+
+        const enabler = new Enabler({
+          processorUrl: config.PROCESSOR_URL,
+          sessionId: sessionId,
+          // @ts-expect-error
+          currency: "EUR",
+          onComplete: (result) => {
+            console.log("onComplete", result);
+          },
+          onError: (err) => {
+            console.error("onError", err);
+          },
+        });
+
+        const builder = await enabler.createComponentBuilder(
+          selectedPaymentMethod
+        );
+        const component = await builder.build({
+          showPayButton: !builder.componentHasSubmit,
+          ...(builder.componentHasSubmit
+            ? {}
+            : {
+                onPayButtonClick: async () => {
+                  // to be used for validation
+                  const termsChecked = (
+                    document.getElementById("termsCheckbox") as HTMLInputElement
+                  )?.checked;
+                  if (!termsChecked) {
+                    event.preventDefault();
+                    alert("You must agree to the terms and conditions.");
+                    return Promise.reject("error-occurred");
+                  }
+                  return Promise.resolve(); // change to true, to test payment flow
+                },
+              }),
+        });
+
+        if (builder.componentHasSubmit) {
+          if (
+            selectedPaymentMethod === "card" ||
+            selectedPaymentMethod === "purchaseorder"
+          ) {
+            component.mount("#container--external");
+          }
+
+          const customButton = document.createElement("button");
+          customButton.textContent = "Pay with " + selectedPaymentMethod;
+          customButton.className = "btn btn-lg btn-primary btn-block";
+          customButton.addEventListener("click", () => {
+            const termsChecked = (
+              document.getElementById("termsCheckbox") as HTMLInputElement
+            )?.checked;
+            if (!termsChecked) {
+              event.preventDefault();
+              alert("You must agree to the terms and conditions.");
+              return;
+            }
+            component.submit();
+          });
+          const internalContainer = document.getElementById(
+            "container--internal"
+          );
+          if (!internalContainer) {
+            console.error(
+              'Cannot append component submit button, element with ID "container--internal" not found.'
+            );
+            return;
+          }
+          internalContainer.appendChild(customButton);
+        } else {
+          component.mount("#container--external");
+        }
+      });
+    } else {
+      console.error(
+        'Cannot create checkout component, element with ID "createCheckout" not found.'
+      );
+    }
+
+    // TODO: GET CUSTOMER ID
+    setupBraintreeDropin(accessToken.token);
+  });
 };
