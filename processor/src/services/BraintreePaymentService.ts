@@ -50,9 +50,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
    *
    * @returns Promise returning Braintree client token
    */
-  public async init(): Promise<BraintreeInitResponse> {
+  public async init(customerId?: string): Promise<BraintreeInitResponse> {
     try {
-      const response = await this.braintreeGateway.clientToken.generate({});
+      const response = await this.braintreeGateway.clientToken.generate({ customerId });
       return { clientToken: response.clientToken };
     } catch (error) {
       console.error('Error in BraintreePaymentService init: ', error);
