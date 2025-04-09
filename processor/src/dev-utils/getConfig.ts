@@ -22,4 +22,10 @@ const config = {
   returnUrl: process.env.RETURN_URL,
 };
 
+for (const key in config) {
+  if (!config[key as keyof typeof config]) {
+    console.warn(`Config parameter "${key}" is undefined.`);
+  }
+}
+
 export const getConfig = () => config;
