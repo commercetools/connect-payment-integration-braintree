@@ -165,7 +165,6 @@ export const __setup = function (): void {
       );
     }
 
-    // TODO: GET CUSTOMER ID
     setupBraintreeDropin(accessToken.token);
   });
 };

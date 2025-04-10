@@ -3,13 +3,25 @@ import { getConfig } from "../dev-utils/getConfig";
 
 const config = getConfig();
 
+const braintreeContainerId = "braintree-container";
+const dropinContainerId = "braintree-dropin-container";
+const purchaseButtonId = "braintree-submit-button";
+
 export const setupBraintreeDropin = async function (
   accessToken: string
 ): Promise<void> {
-  const submitButton = document.querySelector("#braintree-submit-button");
-
-  if (!submitButton) {
-    console.error();
+  const dropinContainer = createDropinContainer();
+  if (!dropinContainer) {
+    console.error(
+      "Error setting up Braintree dropin, couldn't create dropin container."
+    );
+    return;
+  }
+  const purchaseButton = createPurchaseButton();
+  if (!purchaseButton) {
+    console.error(
+      "Error setting up Braintree dropin, couldn't create purchase button."
+    );
     return;
   }
 
@@ -36,10 +48,11 @@ export const setupBraintreeDropin = async function (
     );
     return;
   }
+
   create(
     {
       authorization: token.clientToken,
-      container: "#braintree-dropin-container",
+      container: `#${dropinContainerId}`,
     },
     function (error, dropinInstance) {
       if (error) {
@@ -47,7 +60,7 @@ export const setupBraintreeDropin = async function (
         console.error(error);
         return;
       }
-      submitButton.addEventListener("click", function () {
+      purchaseButton.addEventListener("click", function () {
         dropinInstance!.requestPaymentMethod(function (error, payload) {
           if (error) {
             console.error(error);
@@ -59,4 +72,37 @@ export const setupBraintreeDropin = async function (
       });
     }
   );
+};
+
+const createDropinContainer = function (): Element | null {
+  const braintreeContainer = document.getElementById(braintreeContainerId);
+  if (!braintreeContainer) {
+    console.error(
+      `Couldn't find Braintree container with ID ${braintreeContainerId}.`
+    );
+    return null;
+  }
+
+  const dropinContainer = document.createElement("div");
+  dropinContainer.setAttribute("id", dropinContainerId);
+  braintreeContainer.appendChild(dropinContainer);
+
+  return dropinContainer;
+};
+
+const createPurchaseButton = function (): Element | null {
+  const braintreeContainer = document.getElementById(braintreeContainerId);
+  if (!braintreeContainer) {
+    console.error(
+      `Couldn't find Braintree container with ID ${braintreeContainerId}.`
+    );
+    return null;
+  }
+
+  const submitButton = document.createElement("button");
+  submitButton.setAttribute("id", purchaseButtonId);
+  submitButton.appendChild(document.createTextNode("Purchase"));
+  braintreeContainer.appendChild(submitButton);
+
+  return submitButton;
 };
