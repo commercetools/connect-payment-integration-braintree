@@ -1,6 +1,6 @@
-# connect-payment-integration-template
+# connect-payment-integration-braintree-template
 
-This repository provides a [connect](https://docs.commercetools.com/connect) template for payment integration connector. This boilerplate code acts as a starting point for integration with external payment service provider.
+This repository provides a [connect](https://docs.commercetools.com/connect) template for payment integration braintree connector. This boilerplate code acts as a starting point for integration with external payment service provider.
 
 ## Template Features
 
@@ -56,7 +56,7 @@ Follow guidelines [here](https://docs.commercetools.com/connect/getting-started)
 ## Deployment Configuration
 
 In order to deploy your customized connector application on commercetools Connect, it needs to be published. For details, please refer to [documentation about commercetools Connect](https://docs.commercetools.com/connect/concepts)
-In addition, in order to support connect, the tax integration connector template has a folder structure as listed below
+In addition, in order to support connect, the payment integration braintree connector template has a folder structure as listed below
 
 ```
 ├── enabler
