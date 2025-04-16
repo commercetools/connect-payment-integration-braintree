@@ -1,4 +1,4 @@
 import cartStore from "./CartStore";
-import cocoSessionStore from "./CoCoSessionStore";
+import cocoSessionStore from "./stores/CoCoSessionStore";
 
 export { cocoSessionStore, cartStore };

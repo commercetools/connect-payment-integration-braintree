@@ -1,5 +1,5 @@
-import { exhaustiveMatchingGuard } from "./exhaustiveMatchingGuard";
-import { Store } from "./Store";
+import { exhaustiveMatchingGuard } from "../exhaustiveMatchingGuard";
+import { Store } from "../Store";
 
 type ACTION =
   | {

@@ -32,31 +32,13 @@ const getAccessToken = async function (): Promise<string> {
   return accessToken.token;
 };
 
-const setupPaymentMethods = async function (accessToken: string) {
+const setupPaymentMethods = async function (
+  accessToken: string
+): Promise<void> {
   const paymentMethodSelect = document.getElementById("paymentMethod");
 
-  const paymentMethodsResponse = await fetch(
-    `${config.PROCESSOR_URL}/operations/payment-components`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
   if (paymentMethodSelect) {
-    // type of processor SupportedPaymentComponentsSchemaDTO
-    const paymentMethods: {
-      dropins: {
-        type: "embedded" | "hpp";
-      }[];
-      components: {
-        subtypes?: string[] | undefined;
-        type: string;
-      }[];
-    } = await paymentMethodsResponse.json();
-
+    const paymentMethods = await getPaymentMethods(accessToken);
     paymentMethods.components.forEach((component) => {
       const option = document.createElement("option");
       option.value = component.type;
@@ -68,6 +50,44 @@ const setupPaymentMethods = async function (accessToken: string) {
       'Cannot populate payment method selection, select with ID "paymentMethod" not found.'
     );
   }
+};
+
+// type of processor SupportedPaymentComponentsSchemaDTO
+type SupportedPaymentComponents = {
+  dropins: {
+    type: "embedded" | "hpp";
+  }[];
+  components: {
+    subtypes?: string[] | undefined;
+    type: string;
+  }[];
+};
+
+const getPaymentMethods = async function (
+  accessToken: string
+): Promise<SupportedPaymentComponents> {
+  const paymentMethodsResponse = await fetch(
+    `${config.PROCESSOR_URL}/operations/payment-components`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  // type of processor SupportedPaymentComponentsSchemaDTO
+  const paymentMethods: {
+    dropins: {
+      type: "embedded" | "hpp";
+    }[];
+    components: {
+      subtypes?: string[] | undefined;
+      type: string;
+    }[];
+  } = await paymentMethodsResponse.json();
+
+  return paymentMethods;
 };
 
 const createCheckout = async function () {

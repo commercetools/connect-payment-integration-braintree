@@ -1,6 +1,6 @@
-import { createSession, removeSession } from "./actions/CoCoSessionActions";
+import { createSession, removeSession } from "../actions/CoCoSessionActions";
 import cartStore from "./CartStore";
-import { Store } from "./Store";
+import { Store } from "../Store";
 
 type Session =
   | {

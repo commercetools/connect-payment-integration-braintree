@@ -1,11 +1,12 @@
 import { create } from "braintree-web-drop-in";
 import { getConfig } from "../dev-utils/getConfig";
+import {
+  braintreeContainerId,
+  braintreeDropinContainerId,
+  braintreePurchaseButtonId,
+} from "./constants";
 
 const config = getConfig();
-
-const braintreeContainerId = "braintree-container";
-const dropinContainerId = "braintree-dropin-container";
-const purchaseButtonId = "braintree-submit-button";
 
 export const setupBraintreeDropin = async function (
   accessToken: string
@@ -45,7 +46,7 @@ export const setupBraintreeDropin = async function (
   create(
     {
       authorization: token.clientToken,
-      container: `#${dropinContainerId}`,
+      container: `#${braintreeDropinContainerId}`,
     },
     function (error, dropinInstance) {
       if (error) {
@@ -79,7 +80,7 @@ const createDropinContainer = function (): Element | null {
   }
 
   const dropinContainer = document.createElement("div");
-  dropinContainer.setAttribute("id", dropinContainerId);
+  dropinContainer.setAttribute("id", braintreeDropinContainerId);
   braintreeContainer.appendChild(dropinContainer);
 
   return dropinContainer;
@@ -89,7 +90,7 @@ const createPurchaseButton = function (): Element {
   const braintreeContainer = document.getElementById(braintreeContainerId);
   const submitButton = document.createElement("button");
 
-  submitButton.setAttribute("id", purchaseButtonId);
+  submitButton.setAttribute("id", braintreePurchaseButtonId);
   submitButton.appendChild(document.createTextNode("Purchase"));
   braintreeContainer!.appendChild(submitButton);
 
