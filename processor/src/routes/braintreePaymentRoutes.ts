@@ -21,7 +21,6 @@ export const braintreePaymentRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
-  //TODO remove customer ID from request?
   fastify.post<{ Body: BraintreeInitRequestSchemaDTO; Reply: BraintreeInitResponseSchemaDTO }>(
     '/init',
     {

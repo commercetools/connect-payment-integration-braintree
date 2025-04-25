@@ -41,7 +41,7 @@ const CreditCardCreateRequestSchema = Type.Object({
 export const CreateCustomerRequestSchema = Type.Object({
   company: Type.Optional(Type.String()),
   creditCard: Type.Optional(CreditCardCreateRequestSchema),
-  customFields: Type.Any(),
+  customFields: Type.Optional(Type.Any()),
   deviceData: Type.Optional(Type.String()),
   email: Type.Optional(Type.String()),
   fax: Type.Optional(Type.String()),
