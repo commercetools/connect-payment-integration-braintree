@@ -1,5 +1,5 @@
 import { Type } from '@sinclair/typebox';
 
 export const BraintreeInitRequestSchema = Type.Object({
-  customerId: Type.String(),
+  customerId: Type.Optional(Type.String()),
 });
