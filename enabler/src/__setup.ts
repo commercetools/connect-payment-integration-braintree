@@ -1,8 +1,7 @@
-import { MockPaymentEnabler as Enabler } from "./payment-enabler";
+import { BraintreePaymentEnabler } from "./payment-enabler";
 import { getSessionId } from "../dev-utils/getSessionId";
 import { getConfig } from "../dev-utils/getConfig";
-import { setupBraintreeDropin } from "./setupBraintreeDropin";
-import { createCheckoutButtonId } from "./constants";
+import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 
 const config = getConfig();
 
@@ -12,7 +11,6 @@ export const __setup = function async(): void {
 
     await setupPaymentMethods(accessToken);
     await createCheckout();
-    setupBraintreeDropin(accessToken);
   });
 };
 
@@ -123,10 +121,9 @@ const createCheckout = async function () {
       }
       const selectedPaymentMethod = paymentMethodSelect.value;
 
-      const enabler = new Enabler({
+      const braintreeEnabler = new BraintreePaymentEnabler({
         processorUrl: config.PROCESSOR_URL,
         sessionId: sessionId,
-        // @ts-expect-error
         currency: "EUR",
         onComplete: (result) => {
           console.log("onComplete", result);
@@ -136,7 +133,7 @@ const createCheckout = async function () {
         },
       });
 
-      const builder = await enabler.createComponentBuilder(
+      const builder = await braintreeEnabler.createComponentBuilder(
         selectedPaymentMethod
       );
       const component = await builder.build({
@@ -159,41 +156,7 @@ const createCheckout = async function () {
             }),
       });
 
-      if (builder.componentHasSubmit) {
-        if (
-          selectedPaymentMethod === "card" ||
-          selectedPaymentMethod === "purchaseorder"
-        ) {
-          component.mount("#container--external");
-        }
-
-        const customButton = document.createElement("button");
-        customButton.textContent = "Pay with " + selectedPaymentMethod;
-        customButton.className = "btn btn-lg btn-primary btn-block";
-        customButton.addEventListener("click", () => {
-          const termsChecked = (
-            document.getElementById("termsCheckbox") as HTMLInputElement
-          )?.checked;
-          if (!termsChecked) {
-            event.preventDefault();
-            alert("You must agree to the terms and conditions.");
-            return;
-          }
-          component.submit();
-        });
-        const internalContainer = document.getElementById(
-          "container--internal"
-        );
-        if (!internalContainer) {
-          console.error(
-            'Cannot append component submit button, element with ID "container--internal" not found.'
-          );
-          return;
-        }
-        internalContainer.appendChild(customButton);
-      } else {
-        component.mount("#container--external");
-      }
+      component.mount(braintreeContainerId);
     });
   } else {
     console.error(

@@ -1,4 +1,3 @@
-import { FakeSdk } from "../sdk/FakeSdk";
 import {
   type BaseOptions,
   type ComponentOptions,
@@ -6,6 +5,7 @@ import {
   PaymentMethod,
   type PaymentResult,
 } from "../payment-enabler";
+import { BasePaymentSdk } from "../sdk";
 
 export type ElementOptions = {
   paymentMethod: PaymentMethod;
@@ -16,7 +16,7 @@ export type ElementOptions = {
  */
 export abstract class BaseComponent implements PaymentComponent {
   protected paymentMethod: ElementOptions["paymentMethod"];
-  protected sdk: FakeSdk;
+  protected sdk: BasePaymentSdk;
   protected processorUrl: BaseOptions["processorUrl"];
   protected sessionId: BaseOptions["sessionId"];
   protected environment: BaseOptions["environment"];

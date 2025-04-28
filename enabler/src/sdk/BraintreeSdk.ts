@@ -10,7 +10,7 @@ export class BraintreeSdk extends BasePaymentSdk {
    */
   constructor(options: BasePaymentSdkOptions) {
     super(options);
-    console.log("FakeSdk constructor", this.environment);
+    console.log("BraintreeSdk constructor", this.environment);
   }
 
   /**

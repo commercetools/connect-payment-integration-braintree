@@ -1,4 +1,5 @@
 import { type BaseOptions } from "./BaseOptions";
+import { BraintreePaymentEnabler } from "./BraintreePaymentEnabler";
 import { type ComponentOptions } from "./ComponentOptions";
 import { type DropinComponent } from "./DropinComponent";
 import { type DropinOptions } from "./DropinOptions";
@@ -14,6 +15,7 @@ import { type PaymentResult } from "./PaymentResult";
 
 export {
   type BaseOptions,
+  BraintreePaymentEnabler,
   type ComponentOptions,
   type DropinComponent,
   type DropinOptions,

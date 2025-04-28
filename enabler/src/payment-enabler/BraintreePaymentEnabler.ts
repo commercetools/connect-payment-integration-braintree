@@ -1,6 +1,3 @@
-import { CardBuilder } from "../components/payment-methods/card";
-import { InvoiceBuilder } from "../components/payment-methods/invoice";
-import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order";
 import { type PaymentEnabler } from "./PaymentEnabler";
 import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
 import { type BaseOptions } from "./BaseOptions";
@@ -9,6 +6,7 @@ import { type EnablerOptions } from "./EnablerOptions";
 import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
 import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 import { BraintreeSdk } from "../sdk";
+import { BraintreeDropinContainerBuilder } from "../components/payment-methods/braintree/BraintreeDropinContainerBuilder";
 
 export class BraintreePaymentEnabler implements PaymentEnabler {
   setupData: Promise<{ baseOptions: BaseOptions }>;
@@ -52,9 +50,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
     const { baseOptions } = await this.setupData;
 
     const supportedMethods = {
-      card: CardBuilder,
-      invoice: InvoiceBuilder,
-      purchaseorder: PurchaseOrderBuilder,
+      card: BraintreeDropinContainerBuilder,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {
@@ -65,8 +61,11 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
       );
     }
 
-    // @ts-expect-error - Supported methods are checked above
-    return new supportedMethods[type](baseOptions);
+    return new supportedMethods[
+      type as keyof {
+        card: BraintreeDropinContainerBuilder;
+      }
+    ](baseOptions);
   }
 
   async createDropinBuilder(
