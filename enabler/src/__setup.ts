@@ -2,6 +2,7 @@ import { MockPaymentEnabler as Enabler } from "./payment-enabler";
 import { getSessionId } from "../dev-utils/getSessionId";
 import { getConfig } from "../dev-utils/getConfig";
 import { setupBraintreeDropin } from "./setupBraintreeDropin";
+import { createCheckoutButtonId } from "./constants";
 
 const config = getConfig();
 
@@ -91,7 +92,7 @@ const getPaymentMethods = async function (
 };
 
 const createCheckout = async function () {
-  const createCheckoutButton = document.getElementById("createCheckout");
+  const createCheckoutButton = document.getElementById(createCheckoutButtonId);
   if (createCheckoutButton) {
     createCheckoutButton.addEventListener("click", async (event) => {
       event.preventDefault();
