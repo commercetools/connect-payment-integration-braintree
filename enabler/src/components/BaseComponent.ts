@@ -1,4 +1,4 @@
-import { FakeSdk } from "../FakeSdk";
+import { FakeSdk } from "../sdk/FakeSdk";
 import {
   type BaseOptions,
   type ComponentOptions,

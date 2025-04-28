@@ -15,7 +15,7 @@ function createToken() {
         }`
       )}`,
     },
-  }).then((res) => res.json());
+  }).then((response) => response.json());
 }
 
 async function createSession(cartId: string) {
@@ -38,7 +38,7 @@ async function createSession(cartId: string) {
         },
       }),
     }
-  ).then((r) => r.json());
+  ).then((response) => response.json());
 }
 
 async function removeSession(sessionId: string) {

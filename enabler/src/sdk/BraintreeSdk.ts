@@ -1,15 +1,15 @@
+import { BasePaymentSdk, type BasePaymentSdkOptions } from "./BasePaymentSdk";
+
 /**
  * Represents a fake SDK.
  */
-export class FakeSdk {
-  private environment: string;
-
+export class BraintreeSdk extends BasePaymentSdk {
   /**
    * Creates an instance of FakeSdk.
    * @param environment - The environment for the SDK.
    */
-  constructor({ environment }: { environment: string }) {
-    this.environment = environment;
+  constructor(options: BasePaymentSdkOptions) {
+    super(options);
     console.log("FakeSdk constructor", this.environment);
   }
 
@@ -18,6 +18,6 @@ export class FakeSdk {
    * @param opts - The options for initializing the SDK.
    */
   init(opts: any) {
-    console.log("FakeSdk init", opts);
+    console.log("BraintreeSdk init", opts);
   }
 }
