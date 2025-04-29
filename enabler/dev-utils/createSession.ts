@@ -1,9 +1,10 @@
 import { getConfig } from "./getConfig";
 import { fetchAdminToken } from "./fetchAdminToken";
+import { cocoSessionStore } from "../src/store";
 
 const config = getConfig();
 
-export const getSessionId = async (cartId: string) => {
+export const createSession = async (cartId: string): Promise<string> => {
   const accessToken = await fetchAdminToken();
 
   const sessionMetadata = {
@@ -36,5 +37,18 @@ export const getSessionId = async (cartId: string) => {
   }
 
   console.log("Session created:", data);
+
+  cocoSessionStore.dispatch({
+    type: "SET_SESSION",
+    session: {
+      id: data.id,
+      activeCart: {
+        cartRef: {
+          id: cartId,
+        },
+      },
+    },
+  });
+
   return data.id;
 };
