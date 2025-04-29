@@ -1,5 +1,5 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
-import { getSessionId } from "../dev-utils/getSessionId";
+import { createSession } from "../dev-utils/createSession";
 import { getConfig } from "../dev-utils/getConfig";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 
@@ -108,7 +108,8 @@ const createCheckout = async function () {
         console.error("Cart ID field is empty.");
         return;
       }
-      const sessionId = await getSessionId(cartId);
+
+      const sessionId = await createSession(cartId);
 
       const paymentMethodSelect = document.getElementById(
         "paymentMethod"
@@ -123,7 +124,7 @@ const createCheckout = async function () {
 
       const braintreeEnabler = new BraintreePaymentEnabler({
         processorUrl: config.PROCESSOR_URL,
-        sessionId: sessionId,
+        sessionId,
         currency: "EUR",
         onComplete: (result) => {
           console.log("onComplete", result);
