@@ -8,13 +8,74 @@ import {
   customerPageId,
   submitCreateCustomerId,
 } from "../src/constants";
+import { cocoSessionStore } from "../src/store";
+import { createSession } from "../dev-utils/createSession";
 
 export const __setup = function () {
   createCustomerPage();
 };
 
 const createCustomerPage = function () {
-  createCreateCustomerForm();
+  if (!cocoSessionStore.getSnapshot()?.id) {
+    createSessionIdFields();
+  } else {
+    createCreateCustomerForm();
+  }
+};
+
+const createSessionIdFields = function () {
+  const customerPage = document.getElementById(customerPageId);
+  const sessionContainer = document.createElement("div");
+  const sessionContainerId = "sessionContainer";
+  sessionContainer.setAttribute("id", sessionContainerId);
+  const cartIdInputId = "cartIdInput";
+
+  const cartIdInputLabel = createLabelElement({
+    id: cartIdInputId,
+    label: "Cart ID:",
+    labelStyle: "margin-right: 5px",
+  });
+
+  const cartIdInput = createInputElement({
+    id: cartIdInputId,
+    value: "Submit",
+  });
+
+  const createSessionButton = createInputElement({
+    id: submitCreateCustomerId,
+    type: "submit",
+    value: "Create Session",
+  });
+
+  createSessionButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const cartId = (document.getElementById(cartIdInputId) as HTMLInputElement)
+      ?.value;
+    if (!cartId) {
+      window.alert("Cart Id missing");
+      return;
+    }
+
+    createSession(cartId)
+      .then((sessionId) => {
+        window.alert(`Session created, ID: ${sessionId}`);
+        const sessionContainer = document.getElementById(sessionContainerId);
+        if (sessionContainer) {
+          sessionContainer.innerHTML = "";
+        }
+        createCreateCustomerForm();
+      })
+      .catch((error) => {
+        window.alert(`There was an error creating the session: ${error}`);
+      });
+  });
+
+  sessionContainer.appendChild(cartIdInputLabel);
+  sessionContainer.appendChild(cartIdInput);
+  sessionContainer.appendChild(document.createElement("br"));
+  sessionContainer.appendChild(createSessionButton);
+  customerPage?.appendChild(sessionContainer);
 };
 
 const createCreateCustomerForm = function () {
@@ -68,26 +129,38 @@ const createCreateCustomerForm = function () {
       return;
     }
 
+    const sessionId = cocoSessionStore.getSnapshot()?.id;
+    if (!sessionId) {
+      window.alert("Session not active");
+      return;
+    }
+
     let response!: Response;
     try {
       response = await fetch(`${getConfig().PROCESSOR_URL}/customer/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Session-Id": sessionId,
         },
         body: JSON.stringify(createCustomerBody),
       });
+
+      const customer = await response.json();
+      console.log("response: ", customer);
+      window.alert(`Customer created, ID: ${customer.id}`);
     } catch (error) {
       console.log("error: ", error);
       console.log("response: ", response);
+      return;
     }
-    console.log("response: ", response);
   });
 
   createCustomerForm.appendChild(submitButton);
   customerPage?.appendChild(createCustomerForm);
 };
 
+// TODO refactor into project-level reusable methods
 const createInputElement = function ({
   id,
   type = "text",
@@ -105,6 +178,7 @@ const createInputElement = function ({
   return inputElement;
 };
 
+// TODO refactor into project-level reusable methods
 const createLabelElement = function ({
   id,
   label,
