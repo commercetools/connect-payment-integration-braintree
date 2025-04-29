@@ -4,7 +4,7 @@ import {
   PaymentMethod,
 } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
-import { setupBraintreeDropin } from "../../../setupBraintreeDropin";
+import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
 export class BraintreeDropinContainer extends BaseComponent {
   private showPayButton: boolean;
