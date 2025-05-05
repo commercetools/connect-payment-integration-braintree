@@ -1,8 +1,8 @@
-import { FakeSdk } from "../FakeSdk";
+import type { BasePaymentSdk } from "../sdk";
 import { type PaymentResult } from "./PaymentResult";
 
 export type BaseOptions = {
-  sdk: FakeSdk;
+  sdk: BasePaymentSdk;
   processorUrl: string;
   sessionId: string;
   environment: string;

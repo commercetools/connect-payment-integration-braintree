@@ -1,17 +1,17 @@
 import { create } from "braintree-web-drop-in";
-import { getConfig } from "../dev-utils/getConfig";
+import { getConfig } from "../../../../dev-utils/getConfig";
 import {
-  braintreeContainerId,
   braintreeDropinContainerId,
   braintreePurchaseButtonId,
-} from "./constants";
+} from "../../../constants";
 
 const config = getConfig();
 
 export const setupBraintreeDropin = async function (
-  accessToken: string
+  braintreeContainerId: string,
+  sessionId: string
 ): Promise<void> {
-  const dropinContainer = createDropinContainer();
+  const dropinContainer = createDropinContainer(braintreeContainerId);
   if (!dropinContainer) {
     console.error(
       "Error setting up Braintree dropin, couldn't create dropin container."
@@ -25,7 +25,7 @@ export const setupBraintreeDropin = async function (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        "X-Session-Id": sessionId,
       },
       body: JSON.stringify({}),
     });
@@ -55,7 +55,7 @@ export const setupBraintreeDropin = async function (
         return;
       }
 
-      const purchaseButton = createPurchaseButton();
+      const purchaseButton = createPurchaseButton(braintreeContainerId);
       purchaseButton.addEventListener("click", function () {
         dropinInstance!.requestPaymentMethod(function (error, payload) {
           if (error) {
@@ -70,7 +70,9 @@ export const setupBraintreeDropin = async function (
   );
 };
 
-const createDropinContainer = function (): Element | null {
+const createDropinContainer = function (
+  braintreeContainerId: string
+): Element | null {
   const braintreeContainer = document.getElementById(braintreeContainerId);
   if (!braintreeContainer) {
     console.error(
@@ -86,7 +88,7 @@ const createDropinContainer = function (): Element | null {
   return dropinContainer;
 };
 
-const createPurchaseButton = function (): Element {
+const createPurchaseButton = function (braintreeContainerId: string): Element {
   const braintreeContainer = document.getElementById(braintreeContainerId);
   const submitButton = document.createElement("button");
 

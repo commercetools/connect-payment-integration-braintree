@@ -1,7 +1,3 @@
-import { CardBuilder } from "../components/payment-methods/card";
-import { InvoiceBuilder } from "../components/payment-methods/invoice";
-import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order";
-import { FakeSdk } from "../sdk/FakeSdk";
 import { type PaymentEnabler } from "./PaymentEnabler";
 import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
 import { type BaseOptions } from "./BaseOptions";
@@ -9,12 +5,14 @@ import { DropinType } from "./DropinType";
 import { type EnablerOptions } from "./EnablerOptions";
 import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
 import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
+import { BraintreeSdk } from "../sdk";
+import { BraintreeDropinContainerBuilder } from "../components/payment-methods/braintree/BraintreeDropinContainerBuilder";
 
-export class MockPaymentEnabler implements PaymentEnabler {
+export class BraintreePaymentEnabler implements PaymentEnabler {
   setupData: Promise<{ baseOptions: BaseOptions }>;
 
   constructor(options: EnablerOptions) {
-    this.setupData = MockPaymentEnabler._Setup(options);
+    this.setupData = BraintreePaymentEnabler._Setup(options);
   }
 
   private static _Setup = async (
@@ -36,7 +34,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
     return Promise.resolve({
       baseOptions: {
-        sdk: new FakeSdk(sdkOptions),
+        sdk: new BraintreeSdk(sdkOptions),
         processorUrl: options.processorUrl,
         sessionId: options.sessionId,
         environment: sdkOptions.environment,
@@ -52,9 +50,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
     const { baseOptions } = await this.setupData;
 
     const supportedMethods = {
-      card: CardBuilder,
-      invoice: InvoiceBuilder,
-      purchaseorder: PurchaseOrderBuilder,
+      card: BraintreeDropinContainerBuilder,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {
@@ -65,8 +61,11 @@ export class MockPaymentEnabler implements PaymentEnabler {
       );
     }
 
-    // @ts-expect-error - Supported methods are checked above
-    return new supportedMethods[type](baseOptions);
+    return new supportedMethods[
+      type as keyof {
+        card: BraintreeDropinContainerBuilder;
+      }
+    ](baseOptions);
   }
 
   async createDropinBuilder(
