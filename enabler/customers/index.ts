@@ -10,8 +10,6 @@ import { createSession } from "../dev-utils/createSession";
 import {
   addLabelledInputToParent,
   createButtonElement,
-  createInputElement,
-  createLabelElement,
 } from "../src/helpers/elements";
 
 export const __setup = function () {
