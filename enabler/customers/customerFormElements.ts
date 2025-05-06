@@ -1,15 +1,11 @@
-export type SubsetInputData = {
+import { type LabelledInputData } from "../src/helpers/elements";
+
+export type CustomerFormData = LabelledInputData & {
   isOptional?: boolean;
-  id: string;
   parameterName?: string;
-  label?: string;
-  value?: string;
-  inputStyle?: string;
-  labelStyle?: string;
-  type?: string;
 };
 
-export const customerFormElementsData: SubsetInputData[] = [
+export const customerFormElementsData: CustomerFormData[] = [
   {
     id: "customerFirstName",
     parameterName: "firstName",
