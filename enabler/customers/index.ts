@@ -28,20 +28,19 @@ const createCustomerPage = function () {
 
 const createSessionIdFields = function () {
   const customerPage = document.getElementById(customerPageId);
-  const sessionContainer = document.createElement("div");
+  let sessionContainer = document.createElement("div");
   const sessionContainerId = "sessionContainer";
   sessionContainer.setAttribute("id", sessionContainerId);
   const cartIdInputId = "cartIdInput";
 
-  const cartIdInputLabel = createLabelElement({
-    id: cartIdInputId,
-    label: "Cart ID:",
-    style: "margin-right: 5px",
-  });
-
-  const cartIdInput = createInputElement({
-    id: cartIdInputId,
-  });
+  sessionContainer = addLabelledInputToParent(
+    {
+      id: cartIdInputId,
+      label: "Cart ID:",
+      labelStyle: "margin-right: 5px",
+    },
+    sessionContainer
+  );
 
   const createSessionButton = createButtonElement({
     id: submitCreateCustomerId,
@@ -72,9 +71,6 @@ const createSessionIdFields = function () {
     },
   });
 
-  sessionContainer.appendChild(cartIdInputLabel);
-  sessionContainer.appendChild(cartIdInput);
-  sessionContainer.appendChild(document.createElement("br"));
   sessionContainer.appendChild(createSessionButton);
   customerPage?.appendChild(sessionContainer);
 };
