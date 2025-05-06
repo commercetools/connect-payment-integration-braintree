@@ -1,8 +1,5 @@
 import { getConfig } from "../dev-utils/getConfig";
-import {
-  customerFormElementsData,
-  type SubsetInputData,
-} from "./customerFormElements";
+import { customerFormElementsData } from "./customerFormElements";
 import {
   createCustomerFormId,
   customerPageId,
@@ -10,6 +7,12 @@ import {
 } from "../src/constants";
 import { cocoSessionStore } from "../src/store";
 import { createSession } from "../dev-utils/createSession";
+import {
+  addLabelledInputToParent,
+  createButtonElement,
+  createInputElement,
+  createLabelElement,
+} from "../src/helpers/elements";
 
 export const __setup = function () {
   createCustomerPage();
@@ -33,42 +36,40 @@ const createSessionIdFields = function () {
   const cartIdInputLabel = createLabelElement({
     id: cartIdInputId,
     label: "Cart ID:",
-    labelStyle: "margin-right: 5px",
+    style: "margin-right: 5px",
   });
 
   const cartIdInput = createInputElement({
     id: cartIdInputId,
-    value: "Submit",
   });
 
-  const createSessionButton = createInputElement({
+  const createSessionButton = createButtonElement({
     id: submitCreateCustomerId,
-    type: "submit",
     value: "Create Session",
-  });
+    onClick: async (event: MouseEvent) => {
+      event.preventDefault();
 
-  createSessionButton.addEventListener("click", async (event) => {
-    event.preventDefault();
+      const cartId = (
+        document.getElementById(cartIdInputId) as HTMLInputElement
+      )?.value;
+      if (!cartId) {
+        window.alert("Cart Id missing");
+        return;
+      }
 
-    const cartId = (document.getElementById(cartIdInputId) as HTMLInputElement)
-      ?.value;
-    if (!cartId) {
-      window.alert("Cart Id missing");
-      return;
-    }
-
-    createSession(cartId)
-      .then((sessionId) => {
-        window.alert(`Session created, ID: ${sessionId}`);
-        const sessionContainer = document.getElementById(sessionContainerId);
-        if (sessionContainer) {
-          sessionContainer.innerHTML = "";
-        }
-        createCreateCustomerForm();
-      })
-      .catch((error) => {
-        window.alert(`There was an error creating the session: ${error}`);
-      });
+      createSession(cartId)
+        .then((sessionId) => {
+          window.alert(`Session created, ID: ${sessionId}`);
+          const sessionContainer = document.getElementById(sessionContainerId);
+          if (sessionContainer) {
+            sessionContainer.innerHTML = "";
+          }
+          createCreateCustomerForm();
+        })
+        .catch((error) => {
+          window.alert(`There was an error creating the session: ${error}`);
+        });
+    },
   });
 
   sessionContainer.appendChild(cartIdInputLabel);
@@ -80,120 +81,81 @@ const createSessionIdFields = function () {
 
 const createCreateCustomerForm = function () {
   const customerPage = document.getElementById(customerPageId);
-  const createCustomerForm = document.createElement("form");
+  let createCustomerForm = document.createElement("form");
   createCustomerForm.setAttribute("id", createCustomerFormId);
 
   customerFormElementsData.forEach((inputData) => {
-    createCustomerForm.appendChild(createLabelElement(inputData));
-    createCustomerForm.appendChild(createInputElement(inputData));
-    createCustomerForm.appendChild(document.createElement("br"));
+    createCustomerForm = addLabelledInputToParent(
+      inputData,
+      createCustomerForm
+    );
   });
 
-  const submitButton = createInputElement({
+  const submitButton = createButtonElement({
     id: submitCreateCustomerId,
-    type: "submit",
-    value: "Submit",
-  });
+    value: "Create Customer",
+    onClick: async (event: MouseEvent) => {
+      event.preventDefault();
 
-  submitButton.addEventListener("click", async (event) => {
-    event.preventDefault();
+      let createCustomerBody = {};
+      let missingRequiredParams: string[] = [];
+      customerFormElementsData.forEach((elementData) => {
+        const element = document.getElementById(
+          elementData.id
+        ) as HTMLInputElement;
+        if (!element) {
+          console.error(
+            `Element with id ${elementData.id} not found when creating customer`
+          );
+          return;
+        }
+        if (!element.value) {
+          if (!elementData.isOptional) {
+            missingRequiredParams.push(elementData.id);
+          }
+          return;
+        }
+        createCustomerBody[elementData.parameterName ?? elementData.id] =
+          element.value;
+      });
 
-    let createCustomerBody = {};
-    let missingRequiredParams: string[] = [];
-    customerFormElementsData.forEach((elementData) => {
-      const element = document.getElementById(
-        elementData.id
-      ) as HTMLInputElement;
-      if (!element) {
+      if (missingRequiredParams.length > 0) {
         console.error(
-          `Element with id ${elementData.id} not found when creating cusetomer`
+          `Cannot submit, missing required params ${missingRequiredParams.join(
+            ", "
+          )}`
         );
         return;
       }
-      if (!element.value) {
-        if (!elementData.isOptional) {
-          missingRequiredParams.push(elementData.id);
-        }
+
+      const sessionId = cocoSessionStore.getSnapshot()?.id;
+      if (!sessionId) {
+        window.alert("Session not active");
         return;
       }
-      createCustomerBody[elementData.parameterName ?? elementData.id] =
-        element.value;
-    });
 
-    if (missingRequiredParams.length > 0) {
-      console.error(
-        `Cannot submit, missing required params ${missingRequiredParams.join(
-          ", "
-        )}`
-      );
-      return;
-    }
+      let response!: Response;
+      try {
+        response = await fetch(`${getConfig().PROCESSOR_URL}/customer/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Session-Id": sessionId,
+          },
+          body: JSON.stringify(createCustomerBody),
+        });
 
-    const sessionId = cocoSessionStore.getSnapshot()?.id;
-    if (!sessionId) {
-      window.alert("Session not active");
-      return;
-    }
-
-    let response!: Response;
-    try {
-      response = await fetch(`${getConfig().PROCESSOR_URL}/customer/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Session-Id": sessionId,
-        },
-        body: JSON.stringify(createCustomerBody),
-      });
-
-      const customer = await response.json();
-      console.log("response: ", customer);
-      window.alert(`Customer created, ID: ${customer.id}`);
-    } catch (error) {
-      console.log("error: ", error);
-      console.log("response: ", response);
-      return;
-    }
+        const customer = await response.json();
+        console.log("response: ", customer);
+        window.alert(`Customer created, ID: ${customer.id}`);
+      } catch (error) {
+        console.log("error: ", error);
+        console.log("response: ", response);
+        return;
+      }
+    },
   });
 
   createCustomerForm.appendChild(submitButton);
   customerPage?.appendChild(createCustomerForm);
-};
-
-// TODO refactor into project-level reusable methods
-const createInputElement = function ({
-  id,
-  type = "text",
-  inputStyle,
-}: SubsetInputData): HTMLInputElement {
-  const inputElement = document.createElement("input");
-  if (id) {
-    inputElement.setAttribute("id", id);
-  }
-  inputElement.setAttribute("type", type);
-  if (inputStyle) {
-    inputElement.setAttribute("style", inputStyle);
-  }
-
-  return inputElement;
-};
-
-// TODO refactor into project-level reusable methods
-const createLabelElement = function ({
-  id,
-  label,
-  labelStyle,
-}: SubsetInputData): HTMLLabelElement {
-  const labelElement = document.createElement("label");
-  if (id) {
-    labelElement.setAttribute("for", id);
-  }
-  if (labelStyle) {
-    labelElement.setAttribute("style", labelStyle);
-  }
-  if (label) {
-    labelElement.appendChild(document.createTextNode(label));
-  }
-
-  return labelElement;
 };
