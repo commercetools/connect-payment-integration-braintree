@@ -1,11 +1,11 @@
 import { type LabelledInputData } from "../src/helpers/elements";
 
-export type CustomerFormData = LabelledInputData & {
+export type CreateCustomerFormData = LabelledInputData & {
   isOptional?: boolean;
   parameterName?: string;
 };
 
-export const customerFormElementsData: CustomerFormData[] = [
+export const createCustomerFormElements: CreateCustomerFormData[] = [
   {
     id: "customerFirstName",
     parameterName: "firstName",
