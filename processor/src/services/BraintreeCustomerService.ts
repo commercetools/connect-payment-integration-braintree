@@ -25,7 +25,37 @@ export class BraintreeCustomerService {
   }
 
   /**
-   * Crreate customer
+   * Find customer
+   *
+   * @remarks
+   * Implementation to find a Braintree customer by ID
+   *
+   * @param customerId - the ID of the customer to be found
+   * @returns Promise with Braintree customer with specified ID
+   */
+  public async findCustomer(customerId: string): Promise<braintree.Customer> {
+    const customer = await this.braintreeGateway.customer.find(customerId);
+    if (!customer) {
+      console.log(`Error in BraintreePaymentService findCustomer: customer with ID ${customerId} not found`);
+    }
+    return customer;
+  }
+
+  /**
+   * Delete customer
+   *
+   * @remarks
+   * Implementation to delete a Braintree customer by ID
+   *
+   * @param customerId - the ID of the customer to be found
+   * @returns Void
+   */
+  public async deleteCustomer(customerId: string): Promise<void> {
+    await this.braintreeGateway.customer.delete(customerId);
+  }
+
+  /**
+   * Create customer
    *
    * @remarks
    * Implementation to create a customer with Braintree
