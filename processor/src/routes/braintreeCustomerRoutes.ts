@@ -57,7 +57,7 @@ export const braintreeCustomerRoutes = async (
     },
     async (request, reply) => {
       try {
-        const response = await opts.customerService.findCustomer(request.body);
+        const response = await opts.customerService.findCustomer(request.body.customerId);
         return reply.status(200).send(response);
       } catch (error) {
         console.error('Error in find customer: ', error);
@@ -80,7 +80,7 @@ export const braintreeCustomerRoutes = async (
     },
     async (request, reply) => {
       try {
-        await opts.customerService.deleteCustomer(request.body);
+        await opts.customerService.deleteCustomer(request.body.customerId);
         return reply.status(204).send();
       } catch (error) {
         console.error('Error in delete customer: ', error);

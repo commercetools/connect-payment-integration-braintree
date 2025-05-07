@@ -1,3 +1,3 @@
 import { Type } from '@sinclair/typebox';
 
-export const FindCustomerRequestSchema = Type.String();
+export const FindCustomerRequestSchema = Type.Object({ customerId: Type.String() });

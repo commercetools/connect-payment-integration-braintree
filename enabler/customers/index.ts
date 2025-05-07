@@ -1,5 +1,5 @@
 import { getConfig } from "../dev-utils/getConfig";
-import { customerFormElementsData } from "./customerFormElements";
+import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
   createCustomerFormId,
   customerPageId,
@@ -10,18 +10,21 @@ import { createSession } from "../dev-utils/createSession";
 import {
   addLabelledInputToParent,
   createButtonElement,
+  createHeaderElement,
 } from "../src/helpers/elements";
 
 export const __setup = function () {
-  createCustomerPage();
-};
-
-const createCustomerPage = function () {
   if (!cocoSessionStore.getSnapshot()?.id) {
     createSessionIdFields();
   } else {
-    createCreateCustomerForm();
+    createCustomerPage();
   }
+};
+
+const createCustomerPage = function () {
+  createCreateCustomerForm();
+  createFindCustomerFields();
+  createDeleteCustomerFields();
 };
 
 const createSessionIdFields = function () {
@@ -61,7 +64,7 @@ const createSessionIdFields = function () {
           if (sessionContainer) {
             sessionContainer.innerHTML = "";
           }
-          createCreateCustomerForm();
+          createCustomerPage();
         })
         .catch((error) => {
           window.alert(`There was an error creating the session: ${error}`);
@@ -75,10 +78,13 @@ const createSessionIdFields = function () {
 
 const createCreateCustomerForm = function () {
   const customerPage = document.getElementById(customerPageId);
+  customerPage?.appendChild(
+    createHeaderElement({ type: "h4", text: "Create Customer" })
+  );
   let createCustomerForm = document.createElement("form");
   createCustomerForm.setAttribute("id", createCustomerFormId);
 
-  customerFormElementsData.forEach((inputData) => {
+  createCustomerFormElements.forEach((inputData) => {
     createCustomerForm = addLabelledInputToParent(
       inputData,
       createCustomerForm
@@ -93,7 +99,7 @@ const createCreateCustomerForm = function () {
 
       let createCustomerBody = {};
       let missingRequiredParams: string[] = [];
-      customerFormElementsData.forEach((elementData) => {
+      createCustomerFormElements.forEach((elementData) => {
         const element = document.getElementById(
           elementData.id
         ) as HTMLInputElement;
@@ -143,8 +149,8 @@ const createCreateCustomerForm = function () {
         console.log("response: ", customer);
         window.alert(`Customer created, ID: ${customer.id}`);
       } catch (error) {
-        console.log("error: ", error);
-        console.log("response: ", response);
+        console.log("Create customer error: ", error);
+        console.log("Create customer response: ", response);
         return;
       }
     },
@@ -152,4 +158,142 @@ const createCreateCustomerForm = function () {
 
   createCustomerForm.appendChild(submitButton);
   customerPage?.appendChild(createCustomerForm);
+  customerPage?.appendChild(document.createElement("br"));
+};
+
+const createFindCustomerFields = function () {
+  const customerPage = document.getElementById(customerPageId);
+  let findCustomerContainer = document.createElement("div");
+  findCustomerContainer?.appendChild(
+    createHeaderElement({ type: "h4", text: "Find Customer" })
+  );
+
+  const findCustomerInputId = "findCustomerInputId";
+
+  findCustomerContainer = addLabelledInputToParent(
+    {
+      id: findCustomerInputId,
+      label: "Customer ID:",
+      labelStyle: "margin-right: 5px",
+    },
+    findCustomerContainer
+  );
+
+  findCustomerContainer.appendChild(
+    createButtonElement({
+      id: submitCreateCustomerId,
+      value: "Find Customer",
+      onClick: async (event: MouseEvent) => {
+        event.preventDefault();
+
+        const customerId = (
+          document.getElementById(findCustomerInputId) as HTMLInputElement
+        )?.value;
+        if (!customerId) {
+          window.alert("Customer Id missing");
+          return;
+        }
+
+        const sessionId = cocoSessionStore.getSnapshot()?.id;
+        if (!sessionId) {
+          window.alert("Session not active");
+          return;
+        }
+
+        let response!: Response;
+        try {
+          response = await fetch(`${getConfig().PROCESSOR_URL}/customer/find`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Id": sessionId,
+            },
+            body: JSON.stringify({ customerId: customerId }),
+          });
+
+          const customer = await response.json();
+          console.log("response: ", customer);
+          window.alert(`Customer found, ID: ${customer.id}`);
+        } catch (error) {
+          console.log("Find customer error: ", error);
+          console.log("Find customer response: ", response);
+          return;
+        }
+      },
+    })
+  );
+
+  customerPage?.appendChild(findCustomerContainer);
+  customerPage?.appendChild(document.createElement("br"));
+};
+
+const createDeleteCustomerFields = function () {
+  const customerPage = document.getElementById(customerPageId);
+  let deleteCustomerContainer = document.createElement("div");
+  deleteCustomerContainer?.appendChild(
+    createHeaderElement({ type: "h4", text: "Delete Customer" })
+  );
+
+  const deleteCustomerInputId = "deleteCustomerInputId";
+
+  deleteCustomerContainer = addLabelledInputToParent(
+    {
+      id: deleteCustomerInputId,
+      label: "Customer ID:",
+      labelStyle: "margin-right: 5px",
+    },
+    deleteCustomerContainer
+  );
+
+  deleteCustomerContainer.appendChild(
+    createButtonElement({
+      id: submitCreateCustomerId,
+      value: "Delete Customer",
+      onClick: async (event: MouseEvent) => {
+        event.preventDefault();
+
+        const customerId = (
+          document.getElementById(deleteCustomerInputId) as HTMLInputElement
+        )?.value;
+        if (!customerId) {
+          window.alert("Customer Id missing");
+          return;
+        }
+
+        const sessionId = cocoSessionStore.getSnapshot()?.id;
+        if (!sessionId) {
+          window.alert("Session not active");
+          return;
+        }
+
+        let response!: Response;
+        try {
+          response = await fetch(
+            `${getConfig().PROCESSOR_URL}/customer/delete`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Session-Id": sessionId,
+              },
+              body: JSON.stringify({ customerId: customerId }),
+            }
+          );
+          if (response.ok) {
+            window.alert(`Customer deleted, ID: ${customerId}`);
+          } else {
+            console.log("Delete customer response: ", response);
+            window.alert(`Error deleting customer, ID: ${customerId}`);
+          }
+        } catch (error) {
+          console.log("Delete customer error: ", error);
+          console.log("Delete customer response: ", response);
+          return;
+        }
+      },
+    })
+  );
+
+  customerPage?.appendChild(deleteCustomerContainer);
+  customerPage?.appendChild(document.createElement("br"));
 };

@@ -7,6 +7,10 @@ import {
   createButtonElement,
 } from "./createButtonElement";
 import {
+  type HeaderElementData,
+  createHeaderElement,
+} from "./createHeaderElement";
+import {
   type InputElementData,
   createInputElement,
 } from "./createInputElement";
@@ -20,6 +24,8 @@ export {
   addLabelledInputToParent,
   type ButtonElementData,
   createButtonElement,
+  type HeaderElementData,
+  createHeaderElement,
   type InputElementData,
   createInputElement,
   type LabelElementData,
