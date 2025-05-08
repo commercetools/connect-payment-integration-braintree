@@ -1,6 +1,12 @@
 import { getConfig } from "./getConfig";
 import { fetchAdminToken } from "./fetchAdminToken";
 import { cocoSessionStore } from "../src/store";
+import {
+  ACTIVE_CART_COOKIE_KEY,
+  COCO_SESSION_COOKIE_KEY,
+  cookieHandler,
+} from "./cookieHandling";
+import type { Session } from "../src/store/stores/CoCoSessionStore";
 
 const config = getConfig();
 
@@ -36,18 +42,28 @@ export const createSession = async (cartId: string): Promise<string> => {
     throw new Error("Not able to create session");
   }
 
-  console.log("Session created:", data);
+  const currentCartId = cookieHandler.getCookie(ACTIVE_CART_COOKIE_KEY);
+  if (currentCartId !== cartId) {
+    cookieHandler.setCookie(ACTIVE_CART_COOKIE_KEY, cartId);
+  }
+
+  const session: Session = {
+    id: data.id,
+    expires: Date.now() + 1000 * 60 * 60,
+    activeCart: {
+      cartRef: {
+        id: cartId,
+      },
+    },
+  };
+
+  console.log("Session created:", session);
+
+  cookieHandler.setCookie(COCO_SESSION_COOKIE_KEY, JSON.stringify(session));
 
   cocoSessionStore.dispatch({
     type: "SET_SESSION",
-    session: {
-      id: data.id,
-      activeCart: {
-        cartRef: {
-          id: cartId,
-        },
-      },
-    },
+    session,
   });
 
   return data.id;
