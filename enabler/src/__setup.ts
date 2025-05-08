@@ -1,6 +1,5 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
-import { createSession } from "../dev-utils/createSession";
-import { getConfig } from "../dev-utils/getConfig";
+import { createSession, getConfig } from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 
 const config = getConfig();

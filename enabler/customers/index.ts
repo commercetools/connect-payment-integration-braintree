@@ -1,4 +1,4 @@
-import { getConfig } from "../dev-utils/getConfig";
+import { createSession, getConfig } from "../dev-utils";
 import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
   createCustomerFormId,
@@ -6,7 +6,6 @@ import {
   submitCreateCustomerId,
 } from "../src/constants";
 import { cocoSessionStore } from "../src/store";
-import { createSession } from "../dev-utils/createSession";
 import {
   addLabelledInputToParent,
   createButtonElement,
