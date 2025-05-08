@@ -1,4 +1,8 @@
-import { createSession, getConfig } from "../dev-utils";
+import {
+  createSession,
+  getConfig,
+  tryUpdateSessionFromLocalStorage,
+} from "../dev-utils";
 import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
   createCustomerFormId,
@@ -13,11 +17,13 @@ import {
 } from "../src/helpers/elements";
 
 export const __setup = function () {
-  if (!cocoSessionStore.getSnapshot()?.id) {
-    createSessionIdFields();
-  } else {
-    createCustomerPage();
-  }
+  tryUpdateSessionFromLocalStorage().then(() => {
+    if (!cocoSessionStore.getSnapshot()?.id) {
+      createSessionIdFields();
+    } else {
+      createCustomerPage();
+    }
+  });
 };
 
 const createCustomerPage = function () {

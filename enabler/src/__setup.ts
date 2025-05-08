@@ -1,11 +1,21 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
-import { createSession, getConfig } from "../dev-utils";
+import {
+  createSession,
+  getConfig,
+  tryUpdateSessionFromLocalStorage,
+} from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
+import { cocoSessionStore } from "./store";
+import {
+  ACTIVE_CART_COOKIE_KEY,
+  cookieHandler,
+} from "../dev-utils/cookieHandling";
 
 const config = getConfig();
 
 export const __setup = function async(): void {
   document.addEventListener("DOMContentLoaded", async () => {
+    await tryUpdateSessionFromLocalStorage();
     const accessToken = await getAccessToken();
 
     await setupPaymentMethods(accessToken);
@@ -89,16 +99,23 @@ const getPaymentMethods = async function (
 };
 
 const createCheckout = async function () {
+  const cartIdInputId = "cartId";
+  const cartId = cookieHandler.getCookie(ACTIVE_CART_COOKIE_KEY) as string;
+  if (cartId) {
+    (document.getElementById(cartIdInputId) as HTMLInputElement)!.value =
+      cartId;
+  }
+
   const createCheckoutButton = document.getElementById(createCheckoutButtonId);
   if (createCheckoutButton) {
     createCheckoutButton.addEventListener("click", async (event) => {
       event.preventDefault();
       const cartIdInput = document.getElementById(
-        "cartId"
+        cartIdInputId
       ) as HTMLInputElement | null;
       if (!cartIdInput) {
         console.error(
-          'Cannot get cart Id, input element with ID "cartId" not found.'
+          `Cannot get cart Id, input element with ID ${cartIdInputId} not found.`
         );
         return;
       }
@@ -108,7 +125,19 @@ const createCheckout = async function () {
         return;
       }
 
-      const sessionId = await createSession(cartId);
+      const currentActiveCartId = cookieHandler.getCookie(
+        ACTIVE_CART_COOKIE_KEY
+      ) as string;
+      if (currentActiveCartId !== cartId) {
+        cookieHandler.setCookie(ACTIVE_CART_COOKIE_KEY, cartId);
+        tryUpdateSessionFromLocalStorage();
+      }
+
+      const session = cocoSessionStore.getSnapshot();
+      let sessionId = session?.id ?? "";
+      if (session?.activeCart.cartRef.id !== cartId) {
+        sessionId = await createSession(cartId);
+      }
 
       const paymentMethodSelect = document.getElementById(
         "paymentMethod"
