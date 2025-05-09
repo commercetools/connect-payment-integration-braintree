@@ -1,3 +1,4 @@
+import { CookieHelpers } from "../../helpers/CookieHelpers";
 import { Store } from "../Store";
 
 export type Session =
@@ -12,12 +13,23 @@ export type Session =
     }
   | undefined;
 
-type Action = { type: "SET_SESSION"; session?: Session };
+type Action =
+  | { type: "SET_SESSION"; session: Session }
+  | { type: "CLEAR_SESSION" };
 
 const cocoSessionStore = new Store<Session, Action>(
   (action, _state, setState) => {
-    if (action.type === "SET_SESSION") {
-      setState(action.session);
+    switch (action.type) {
+      case "SET_SESSION":
+        CookieHelpers.setSession(action.session);
+        setState(action.session);
+        break;
+      case "CLEAR_SESSION":
+        CookieHelpers.clearSession();
+        setState(undefined);
+        break;
+      default:
+        break;
     }
   },
   undefined

@@ -6,10 +6,6 @@ import {
 } from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 import { cocoSessionStore } from "./store";
-import {
-  ACTIVE_CART_COOKIE_KEY,
-  cookieHandler,
-} from "../dev-utils/cookieHandling";
 
 const config = getConfig();
 
@@ -100,7 +96,7 @@ const getPaymentMethods = async function (
 
 const createCheckout = async function () {
   const cartIdInputId = "cartId";
-  const cartId = cookieHandler.getCookie(ACTIVE_CART_COOKIE_KEY) as string;
+  const cartId = cocoSessionStore.getSnapshot()?.activeCart.cartRef.id;
   if (cartId) {
     (document.getElementById(cartIdInputId) as HTMLInputElement)!.value =
       cartId;
@@ -125,18 +121,10 @@ const createCheckout = async function () {
         return;
       }
 
-      const currentActiveCartId = cookieHandler.getCookie(
-        ACTIVE_CART_COOKIE_KEY
-      ) as string;
-      if (currentActiveCartId !== cartId) {
-        cookieHandler.setCookie(ACTIVE_CART_COOKIE_KEY, cartId);
-        tryUpdateSessionFromLocalStorage();
-      }
-
-      const session = cocoSessionStore.getSnapshot();
-      let sessionId = session?.id ?? "";
+      let session = cocoSessionStore.getSnapshot();
       if (session?.activeCart.cartRef.id !== cartId) {
-        sessionId = await createSession(cartId);
+        await createSession(cartId);
+        session = cocoSessionStore.getSnapshot();
       }
 
       const paymentMethodSelect = document.getElementById(
@@ -152,7 +140,7 @@ const createCheckout = async function () {
 
       const braintreeEnabler = new BraintreePaymentEnabler({
         processorUrl: config.PROCESSOR_URL,
-        sessionId,
+        sessionId: session!.id,
         currency: "EUR",
         onComplete: (result) => {
           console.log("onComplete", result);
