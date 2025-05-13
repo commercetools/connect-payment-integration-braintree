@@ -4,13 +4,15 @@ export type DeleteBraintreeCustomerRequest = {
   customerId: string;
 };
 
+const config = getConfig();
+
 export const deleteCustomer = async function (
   sessionId: string,
   request: DeleteBraintreeCustomerRequest
 ): Promise<boolean> {
   let response!: Response;
   try {
-    response = await fetch(`${getConfig().PROCESSOR_URL}/customer/delete`, {
+    response = await fetch(`${config.PROCESSOR_URL}/customer/delete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

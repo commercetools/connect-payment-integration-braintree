@@ -10,13 +10,15 @@ type FindBraintreeCustomerResponse = CreateBraintreeCustomerRequest & {
   id: string;
 };
 
+const config = getConfig();
+
 export const findCustomer = async function (
   sessionId: string,
   request: FindBraintreeCustomerRequest
 ): Promise<FindBraintreeCustomerResponse | false> {
   let response!: Response;
   try {
-    response = await fetch(`${getConfig().PROCESSOR_URL}/customer/find`, {
+    response = await fetch(`${config.PROCESSOR_URL}/customer/find`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
