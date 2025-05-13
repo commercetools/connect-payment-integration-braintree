@@ -1,10 +1,6 @@
+import { createSession, tryUpdateSessionFromLocalStorage } from "../dev-utils";
 import {
-  createSession,
-  getConfig,
-  tryUpdateSessionFromLocalStorage,
-} from "../dev-utils";
-import {
-  CreateBraintreeCustomerRequest,
+  type CreateBraintreeCustomerRequest,
   createCustomer,
   deleteCustomer,
   findCustomer,
