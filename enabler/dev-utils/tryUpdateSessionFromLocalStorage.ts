@@ -4,23 +4,24 @@ import { createSession } from "./createSession";
 
 export const tryUpdateSessionFromLocalStorage = async function () {
   const session = CookieHelpers.getSession();
-  console.log(
-    "tryUpdateSessionFromLocalStorage running, cache session: ",
-    session
-  );
 
   if (!session?.activeCart.cartRef.id) {
     return;
   }
 
-  // if session expires within 5 minutes
+  // if session is expired or will within 5 minutes
   if (session.expires - Date.now() < 1000 * 60 * 5) {
+    console.log(
+      `Session has expired, or will within 5 minutes. Creating new session with cart ID: ${session.activeCart.cartRef.id}`
+    );
     await createSession(session.activeCart.cartRef.id);
     return;
+  } else {
+    cocoSessionStore.dispatch({ type: "SET_SESSION", session });
+    console.log(
+      `Session expires in ${
+        (session.expires - Date.now()) / 1000 / 60
+      } minutes.`
+    );
   }
-
-  cocoSessionStore.dispatch({ type: "SET_SESSION", session });
-  window.alert(
-    `Session expires in ${(session.expires - Date.now()) / 1000} seconds.`
-  );
 };
