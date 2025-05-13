@@ -1,4 +1,6 @@
-import { Static } from '@sinclair/typebox';
-import { DeleteCustomerRequestSchema } from './DeleteCustomerRequestSchema';
+import { Static } from "@sinclair/typebox";
+import { DeleteCustomerRequestSchema } from "./DeleteCustomerRequestSchema";
 
-export type DeleteCustomerRequestSchemaDTO = Static<typeof DeleteCustomerRequestSchema>;
+export type DeleteCustomerRequestSchemaDTO = Static<
+	typeof DeleteCustomerRequestSchema
+>;

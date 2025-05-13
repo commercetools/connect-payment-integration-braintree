@@ -1,6 +1,6 @@
-import { Type } from '@sinclair/typebox';
+import { Type } from "@sinclair/typebox";
 
 export const AmountSchema = Type.Object({
-  centAmount: Type.Integer(),
-  currencyCode: Type.String(),
+	centAmount: Type.Integer(),
+	currencyCode: Type.String(),
 });

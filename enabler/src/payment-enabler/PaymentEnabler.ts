@@ -32,23 +32,23 @@ import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
  *      })
  */
 export interface PaymentEnabler {
-  /**
-   * Creates a payment component builder of the specified type.
-   * @param type - The type of the payment component builder.
-   * @returns A promise that resolves to the payment component builder.
-   * @throws {Error} If the payment component builder cannot be created.
-   */
-  createComponentBuilder: (
-    type: string
-  ) => Promise<PaymentComponentBuilder | never>;
+	/**
+	 * Creates a payment component builder of the specified type.
+	 * @param type - The type of the payment component builder.
+	 * @returns A promise that resolves to the payment component builder.
+	 * @throws {Error} If the payment component builder cannot be created.
+	 */
+	createComponentBuilder: (
+		type: string,
+	) => Promise<PaymentComponentBuilder | never>;
 
-  /**
-   * Creates a payment drop-in builder of the specified type.
-   * @param type - The type of the payment drop-in builder.
-   * @returns A promise that resolves to the payment drop-in builder.
-   * @throws {Error} If the payment drop-in builder cannot be created.
-   */
-  createDropinBuilder: (
-    type: DropinType
-  ) => Promise<PaymentDropinBuilder | never>;
+	/**
+	 * Creates a payment drop-in builder of the specified type.
+	 * @param type - The type of the payment drop-in builder.
+	 * @returns A promise that resolves to the payment drop-in builder.
+	 * @throws {Error} If the payment drop-in builder cannot be created.
+	 */
+	createDropinBuilder: (
+		type: DropinType,
+	) => Promise<PaymentDropinBuilder | never>;
 }

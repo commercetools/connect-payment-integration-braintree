@@ -1,3 +1,3 @@
-import { createLaunchpadPurchaseOrderNumberCustomType } from './createLaunchpadPurchaseOrderNumberCustomType.ts';
+import { createLaunchpadPurchaseOrderNumberCustomType } from "./createLaunchpadPurchaseOrderNumberCustomType.ts";
 
 export { createLaunchpadPurchaseOrderNumberCustomType };

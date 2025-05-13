@@ -1,3 +1,3 @@
 export type TmpCookiesObj =
-  | { [key: string]: string }
-  | Partial<{ [key: string]: string }>;
+	| { [key: string]: string }
+	| Partial<{ [key: string]: string }>;

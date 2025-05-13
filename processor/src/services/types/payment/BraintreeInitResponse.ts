@@ -1,3 +1,3 @@
-import { BraintreeInitResponseSchemaDTO } from '../../../dtos/payment';
+import { BraintreeInitResponseSchemaDTO } from "../../../dtos/payment";
 
 export type BraintreeInitResponse = BraintreeInitResponseSchemaDTO;

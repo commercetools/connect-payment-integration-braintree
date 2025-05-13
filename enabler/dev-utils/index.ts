@@ -5,9 +5,9 @@ import { getConfig } from "./getConfig";
 import { tryUpdateSessionFromLocalStorage } from "./tryUpdateSessionFromLocalStorage";
 
 export {
-  createSession,
-  fetchAccessToken,
-  fetchAdminToken,
-  getConfig,
-  tryUpdateSessionFromLocalStorage,
+	createSession,
+	fetchAccessToken,
+	fetchAdminToken,
+	getConfig,
+	tryUpdateSessionFromLocalStorage,
 };

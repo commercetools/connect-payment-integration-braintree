@@ -1,6 +1,6 @@
 export function exhaustiveMatchingGuard(
-  value: never,
-  overrideMessage?: string
+	value: never,
+	overrideMessage?: string,
 ): never {
-  throw new Error(overrideMessage ?? `Unhandled case: ${value}`);
+	throw new Error(overrideMessage ?? `Unhandled case: ${value}`);
 }

@@ -1,36 +1,36 @@
 import {
-  createInputElement,
-  type InputElementData,
+	createInputElement,
+	type InputElementData,
 } from "./createInputElement";
 import {
-  createLabelElement,
-  type LabelElementData,
+	createLabelElement,
+	type LabelElementData,
 } from "./createLabelElement";
 
 export type LabelledInputData = Omit<
-  InputElementData & LabelElementData,
-  "style"
+	InputElementData & LabelElementData,
+	"style"
 > & { id: string; labelStyle?: string; inputStyle?: string };
 
 export const addLabelledInputToParent = function <
-  ParentElement extends HTMLElement
+	ParentElement extends HTMLElement,
 >(
-  labelledInputData: LabelledInputData,
-  parentElement: ParentElement
+	labelledInputData: LabelledInputData,
+	parentElement: ParentElement,
 ): ParentElement {
-  parentElement.appendChild(
-    createLabelElement({
-      ...labelledInputData,
-      ...{ style: labelledInputData.labelStyle },
-    })
-  );
-  parentElement.appendChild(
-    createInputElement({
-      ...labelledInputData,
-      ...{ style: labelledInputData.inputStyle },
-    })
-  );
-  parentElement.appendChild(document.createElement("br"));
+	parentElement.appendChild(
+		createLabelElement({
+			...labelledInputData,
+			...{ style: labelledInputData.labelStyle },
+		}),
+	);
+	parentElement.appendChild(
+		createInputElement({
+			...labelledInputData,
+			...{ style: labelledInputData.inputStyle },
+		}),
+	);
+	parentElement.appendChild(document.createElement("br"));
 
-  return parentElement;
+	return parentElement;
 };

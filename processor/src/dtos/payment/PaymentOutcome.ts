@@ -1,4 +1,4 @@
 export enum PaymentOutcome {
-  AUTHORIZED = 'Authorized',
-  REJECTED = 'Rejected',
+	AUTHORIZED = "Authorized",
+	REJECTED = "Rejected",
 }

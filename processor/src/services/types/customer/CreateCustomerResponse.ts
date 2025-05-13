@@ -1,3 +1,3 @@
-import { Customer } from 'braintree';
+import { Customer } from "braintree";
 
 export type CreateCustomerResponse = Customer;
