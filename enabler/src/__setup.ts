@@ -1,39 +1,24 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
 import {
   createSession,
+  fetchAccessToken,
   getConfig,
   tryUpdateSessionFromLocalStorage,
 } from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 import { cocoSessionStore } from "./store";
+import { getPaymentMethods } from "./integrations/braintree/operations";
 
 const config = getConfig();
 
 export const __setup = function async(): void {
   document.addEventListener("DOMContentLoaded", async () => {
     await tryUpdateSessionFromLocalStorage();
-    const accessToken = await getAccessToken();
+    const accessToken = await fetchAccessToken();
 
     await setupPaymentMethods(accessToken);
     await createCheckout();
   });
-};
-
-const getAccessToken = async function (): Promise<string> {
-  const tokenResponse = await fetch("http://localhost:9000/jwt/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      iss: "https://issuer.com",
-      sub: "test-sub",
-      "https://issuer.com/claims/project_key": `${config.CTP_PROJECT_KEY}`,
-    }),
-  });
-
-  const accessToken = await tokenResponse.json();
-  return accessToken.token;
 };
 
 const setupPaymentMethods = async function (
@@ -54,44 +39,6 @@ const setupPaymentMethods = async function (
       'Cannot populate payment method selection, select with ID "paymentMethod" not found.'
     );
   }
-};
-
-// type of processor SupportedPaymentComponentsSchemaDTO
-type SupportedPaymentComponents = {
-  dropins: {
-    type: "embedded" | "hpp";
-  }[];
-  components: {
-    subtypes?: string[] | undefined;
-    type: string;
-  }[];
-};
-
-const getPaymentMethods = async function (
-  accessToken: string
-): Promise<SupportedPaymentComponents> {
-  const paymentMethodsResponse = await fetch(
-    `${config.PROCESSOR_URL}/operations/payment-components`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-  // type of processor SupportedPaymentComponentsSchemaDTO
-  const paymentMethods: {
-    dropins: {
-      type: "embedded" | "hpp";
-    }[];
-    components: {
-      subtypes?: string[] | undefined;
-      type: string;
-    }[];
-  } = await paymentMethodsResponse.json();
-
-  return paymentMethods;
 };
 
 const createCheckout = async function () {
