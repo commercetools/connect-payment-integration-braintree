@@ -48,12 +48,7 @@ class CookieHandler {
   }
 
   hasCookie(key: string): boolean {
-    if (!key) {
-      return false;
-    }
-
-    const cookie = this.getCookies();
-    return cookie.hasOwnProperty(key);
+    return this.getCookies().hasOwnProperty(key);
   }
 
   setCookie(key: string, data: any): void {
