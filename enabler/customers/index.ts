@@ -252,8 +252,8 @@ const createDeleteCustomerFields = function () {
           window.alert("Session not active");
           return;
         }
-
-        const successResponse = await deleteCustomer(sessionId, {
+        const applicationUrl = '';
+        const successResponse = await deleteCustomer(applicationUrl, sessionId, {
           customerId: customerId,
         });
         if (!successResponse) {
