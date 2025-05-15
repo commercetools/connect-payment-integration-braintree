@@ -14,17 +14,17 @@ const config = getConfig();
 
 export const findCustomer = async function (
   sessionId: string,
-  request: FindBraintreeCustomerRequest
+  
 ): Promise<FindBraintreeCustomerResponse | false> {
   let response!: Response;
   try {
     response = await fetch(`${config.PROCESSOR_URL}/customer/find`, {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         "X-Session-Id": sessionId,
       },
-      body: JSON.stringify(request),
+ 
     });
 
     const customer = await response.json();
