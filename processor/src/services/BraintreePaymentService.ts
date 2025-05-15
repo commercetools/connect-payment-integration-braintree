@@ -113,8 +113,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	// @ts-expect-error - unused parameter
 	public async capturePayment(
+		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest,
 	): Promise<PaymentProviderModificationResponse> {
 		throw new Error("Not yet implemented");
@@ -129,8 +129,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	// @ts-expect-error - unused parameter
 	public async cancelPayment(
+		// @ts-expect-error - unused parameter
 		request: CancelPaymentRequest,
 	): Promise<PaymentProviderModificationResponse> {
 		throw new Error("Not yet implemented");
@@ -145,8 +145,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	// @ts-expect-error - unused parameter
 	public async refundPayment(
+		// @ts-expect-error - unused parameter
 		request: RefundPaymentRequest,
 	): Promise<PaymentProviderModificationResponse> {
 		throw new Error("Not yet implemented");
@@ -161,15 +161,15 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains paymentType defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	// @ts-expect-error - unused parameter
 	public async createPayment(
+		// @ts-expect-error - unused parameter
 		request: CreatePaymentRequest,
 	): Promise<PaymentResponseSchemaDTO> {
 		throw new Error("Not yet implemented");
 	}
 
-	// @ts-expect-error - unused parameter
 	public async handleTransaction(
+		// @ts-expect-error - unused parameter
 		transactionDraft: TransactionDraftDTO,
 	): Promise<TransactionResponseDTO> {
 		throw new Error("Not yet implemented");
