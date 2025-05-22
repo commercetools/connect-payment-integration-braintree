@@ -23,7 +23,6 @@ export const findCustomer = async function (
       {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
           "X-Session-Id": sessionId,
         },
       }

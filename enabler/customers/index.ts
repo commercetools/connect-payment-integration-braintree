@@ -4,7 +4,7 @@ import {
   createCustomer,
   deleteCustomer,
   findCustomer,
-} from "../src/integrations/braintree/customer";
+} from "../dev-utils/integrations/braintree/customer";
 import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
   createCustomerFormId,
