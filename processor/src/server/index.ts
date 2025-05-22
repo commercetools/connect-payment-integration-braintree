@@ -30,6 +30,7 @@ export const setupFastify = async () => {
   await server.register(cors, {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Request-ID', 'X-Session-ID'],
     origin: '*',
+    methods: ['GET', 'POST', 'DELETE'],
   });
 
   // Add content type parser for the content type application/x-www-form-urlencoded

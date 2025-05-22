@@ -12,14 +12,15 @@ export const deleteCustomer = async function (
 ): Promise<boolean> {
   let response!: Response;
   try {
-    response = await fetch(`${config.PROCESSOR_URL}/customer/delete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Session-Id": sessionId,
-      },
-      body: JSON.stringify(request),
-    });
+    response = await fetch(
+      `${config.PROCESSOR_URL}/customer/delete/${request.customerId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "X-Session-Id": sessionId,
+        },
+      }
+    );
     if (response.ok) {
       return true;
     } else {

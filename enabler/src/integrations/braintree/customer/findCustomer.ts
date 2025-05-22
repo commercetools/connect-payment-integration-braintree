@@ -18,14 +18,16 @@ export const findCustomer = async function (
 ): Promise<FindBraintreeCustomerResponse | false> {
   let response!: Response;
   try {
-    response = await fetch(`${config.PROCESSOR_URL}/customer/find`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Session-Id": sessionId,
-      },
-      body: JSON.stringify(request),
-    });
+    response = await fetch(
+      `${config.PROCESSOR_URL}/customer/find/${request.customerId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-Id": sessionId,
+        },
+      }
+    );
 
     const customer = await response.json();
     return customer;

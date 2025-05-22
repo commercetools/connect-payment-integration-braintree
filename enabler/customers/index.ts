@@ -65,8 +65,7 @@ const createSessionIdFields = function () {
       }
 
       createSession(cartId)
-        .then((sessionId) => {
-          window.alert(`Session created, ID: ${sessionId}`);
+        .then(() => {
           const sessionContainer = document.getElementById(sessionContainerId);
           if (sessionContainer) {
             sessionContainer.innerHTML = "";
