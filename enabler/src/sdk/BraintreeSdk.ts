@@ -1,11 +1,11 @@
 import { BasePaymentSdk, type BasePaymentSdkOptions } from "./BasePaymentSdk";
 
 /**
- * Represents a fake SDK.
+ * Represents a Braintree SDK.
  */
 export class BraintreeSdk extends BasePaymentSdk {
   /**
-   * Creates an instance of FakeSdk.
+   * Creates an instance of BraintreeSdk.
    * @param environment - The environment for the SDK.
    */
   constructor(options: BasePaymentSdkOptions) {

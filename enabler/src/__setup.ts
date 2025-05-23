@@ -1,34 +1,24 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
-import { createSession } from "../dev-utils/createSession";
-import { getConfig } from "../dev-utils/getConfig";
+import {
+  createSession,
+  fetchAccessToken,
+  getConfig,
+  tryUpdateSessionFromLocalStorage,
+} from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
+import { cocoSessionStore } from "./store";
+import { getPaymentMethods } from "./integrations/braintree/operations";
 
 const config = getConfig();
 
 export const __setup = function async(): void {
   document.addEventListener("DOMContentLoaded", async () => {
-    const accessToken = await getAccessToken();
+    await tryUpdateSessionFromLocalStorage();
+    const accessToken = await fetchAccessToken();
 
     await setupPaymentMethods(accessToken);
     await createCheckout();
   });
-};
-
-const getAccessToken = async function (): Promise<string> {
-  const tokenResponse = await fetch("http://localhost:9000/jwt/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      iss: "https://issuer.com",
-      sub: "test-sub",
-      "https://issuer.com/claims/project_key": `${config.CTP_PROJECT_KEY}`,
-    }),
-  });
-
-  const accessToken = await tokenResponse.json();
-  return accessToken.token;
 };
 
 const setupPaymentMethods = async function (
@@ -51,55 +41,24 @@ const setupPaymentMethods = async function (
   }
 };
 
-// type of processor SupportedPaymentComponentsSchemaDTO
-type SupportedPaymentComponents = {
-  dropins: {
-    type: "embedded" | "hpp";
-  }[];
-  components: {
-    subtypes?: string[] | undefined;
-    type: string;
-  }[];
-};
-
-const getPaymentMethods = async function (
-  accessToken: string
-): Promise<SupportedPaymentComponents> {
-  const paymentMethodsResponse = await fetch(
-    `${config.PROCESSOR_URL}/operations/payment-components`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-  // type of processor SupportedPaymentComponentsSchemaDTO
-  const paymentMethods: {
-    dropins: {
-      type: "embedded" | "hpp";
-    }[];
-    components: {
-      subtypes?: string[] | undefined;
-      type: string;
-    }[];
-  } = await paymentMethodsResponse.json();
-
-  return paymentMethods;
-};
-
 const createCheckout = async function () {
+  const cartIdInputId = "cartId";
+  const cartId = cocoSessionStore.getSnapshot()?.activeCart.cartRef.id;
+  if (cartId) {
+    (document.getElementById(cartIdInputId) as HTMLInputElement)!.value =
+      cartId;
+  }
+
   const createCheckoutButton = document.getElementById(createCheckoutButtonId);
   if (createCheckoutButton) {
     createCheckoutButton.addEventListener("click", async (event) => {
       event.preventDefault();
       const cartIdInput = document.getElementById(
-        "cartId"
+        cartIdInputId
       ) as HTMLInputElement | null;
       if (!cartIdInput) {
         console.error(
-          'Cannot get cart Id, input element with ID "cartId" not found.'
+          `Cannot get cart Id, input element with ID ${cartIdInputId} not found.`
         );
         return;
       }
@@ -109,7 +68,11 @@ const createCheckout = async function () {
         return;
       }
 
-      const sessionId = await createSession(cartId);
+      let session = cocoSessionStore.getSnapshot();
+      if (session?.activeCart.cartRef.id !== cartId) {
+        await createSession(cartId);
+        session = cocoSessionStore.getSnapshot();
+      }
 
       const paymentMethodSelect = document.getElementById(
         "paymentMethod"
@@ -124,7 +87,7 @@ const createCheckout = async function () {
 
       const braintreeEnabler = new BraintreePaymentEnabler({
         processorUrl: config.PROCESSOR_URL,
-        sessionId,
+        sessionId: session!.id,
         currency: "EUR",
         onComplete: (result) => {
           console.log("onComplete", result);

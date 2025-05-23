@@ -1,4 +1,10 @@
-import { getConfig } from "../dev-utils/getConfig";
+import { createSession, tryUpdateSessionFromLocalStorage } from "../dev-utils";
+import {
+  type CreateBraintreeCustomerRequest,
+  createCustomer,
+  deleteCustomer,
+  findCustomer,
+} from "../dev-utils/integrations/braintree/customer";
 import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
   createCustomerFormId,
@@ -6,7 +12,6 @@ import {
   submitCreateCustomerId,
 } from "../src/constants";
 import { cocoSessionStore } from "../src/store";
-import { createSession } from "../dev-utils/createSession";
 import {
   addLabelledInputToParent,
   createButtonElement,
@@ -14,11 +19,13 @@ import {
 } from "../src/helpers/elements";
 
 export const __setup = function () {
-  if (!cocoSessionStore.getSnapshot()?.id) {
-    createSessionIdFields();
-  } else {
-    createCustomerPage();
-  }
+  tryUpdateSessionFromLocalStorage().then(() => {
+    if (!cocoSessionStore.getSnapshot()?.id) {
+      createSessionIdFields();
+    } else {
+      createCustomerPage();
+    }
+  });
 };
 
 const createCustomerPage = function () {
@@ -58,8 +65,7 @@ const createSessionIdFields = function () {
       }
 
       createSession(cartId)
-        .then((sessionId) => {
-          window.alert(`Session created, ID: ${sessionId}`);
+        .then(() => {
           const sessionContainer = document.getElementById(sessionContainerId);
           if (sessionContainer) {
             sessionContainer.innerHTML = "";
@@ -97,7 +103,11 @@ const createCreateCustomerForm = function () {
     onClick: async (event: MouseEvent) => {
       event.preventDefault();
 
-      let createCustomerBody = {};
+      let createCustomerBody: CreateBraintreeCustomerRequest = {
+        firstName: "",
+        lastName: "",
+        email: "",
+      };
       let missingRequiredParams: string[] = [];
       createCustomerFormElements.forEach((elementData) => {
         const element = document.getElementById(
@@ -134,25 +144,13 @@ const createCreateCustomerForm = function () {
         return;
       }
 
-      let response!: Response;
-      try {
-        response = await fetch(`${getConfig().PROCESSOR_URL}/customer/create`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Session-Id": sessionId,
-          },
-          body: JSON.stringify(createCustomerBody),
-        });
-
-        const customer = await response.json();
-        console.log("response: ", customer);
-        window.alert(`Customer created, ID: ${customer.id}`);
-      } catch (error) {
-        console.log("Create customer error: ", error);
-        console.log("Create customer response: ", response);
+      const customer = await createCustomer(sessionId, createCustomerBody);
+      if (!customer) {
+        window.alert("Create customer failed.");
         return;
       }
+
+      window.alert(`Customer created, ID: ${customer.id}`);
     },
   });
 
@@ -200,25 +198,13 @@ const createFindCustomerFields = function () {
           return;
         }
 
-        let response!: Response;
-        try {
-          response = await fetch(`${getConfig().PROCESSOR_URL}/customer/find`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Session-Id": sessionId,
-            },
-            body: JSON.stringify({ customerId: customerId }),
-          });
-
-          const customer = await response.json();
-          console.log("response: ", customer);
-          window.alert(`Customer found, ID: ${customer.id}`);
-        } catch (error) {
-          console.log("Find customer error: ", error);
-          console.log("Find customer response: ", response);
+        const customer = await findCustomer(sessionId, {
+          customerId: customerId,
+        });
+        if (!customer) {
           return;
         }
+        window.alert(`Customer found, ID: ${customer.id}`);
       },
     })
   );
@@ -266,30 +252,14 @@ const createDeleteCustomerFields = function () {
           return;
         }
 
-        let response!: Response;
-        try {
-          response = await fetch(
-            `${getConfig().PROCESSOR_URL}/customer/delete`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Session-Id": sessionId,
-              },
-              body: JSON.stringify({ customerId: customerId }),
-            }
-          );
-          if (response.ok) {
-            window.alert(`Customer deleted, ID: ${customerId}`);
-          } else {
-            console.log("Delete customer response: ", response);
-            window.alert(`Error deleting customer, ID: ${customerId}`);
-          }
-        } catch (error) {
-          console.log("Delete customer error: ", error);
-          console.log("Delete customer response: ", response);
+        const successResponse = await deleteCustomer(sessionId, {
+          customerId: customerId,
+        });
+        if (!successResponse) {
+          window.alert(`Error deleting customer, ID: ${customerId}`);
           return;
         }
+        window.alert(`Customer deleted, ID: ${customerId}`);
       },
     })
   );

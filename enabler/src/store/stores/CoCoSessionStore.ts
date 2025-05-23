@@ -1,66 +1,10 @@
-import cartStore from "./CartStore";
-import loadingStore from "./LoadingStore";
+import { CookieHelpers } from "../../helpers/CookieHelpers";
 import { Store } from "../Store";
 
-function createToken() {
-  return fetch(`${import.meta.env.VITE_CTP_AUTH_URL}/oauth/token`, {
-    method: "POST",
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-    }),
-    headers: {
-      authorization: `Basic ${btoa(
-        `${import.meta.env.VITE_CTP_CLIENT_ID}:${
-          import.meta.env.VITE_CTP_CLIENT_SECRET
-        }`
-      )}`,
-    },
-  }).then((response) => response.json());
-}
-
-async function createSession(cartId: string) {
-  const token = await createToken();
-  return fetch(
-    `${import.meta.env.VITE_CTP_SESSION_URL}/${
-      import.meta.env.VITE_CTP_PROJECT_KEY
-    }/sessions`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token.access_token}`,
-      },
-      body: JSON.stringify({
-        cart: {
-          cartRef: {
-            id: cartId,
-          },
-        },
-      }),
-    }
-  ).then((response) => response.json());
-}
-
-async function removeSession(sessionId: string) {
-  const token = await createToken();
-  return fetch(
-    `${import.meta.env.VITE_CTP_SESSION_URL}/${
-      import.meta.env.VITE_CTP_PROJECT_KEY
-    }/sessions/${sessionId}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token.access_token}`,
-      },
-      body: JSON.stringify({ actions: [{ action: "revoke" }] }),
-    }
-  ).then((r) => r.json());
-}
-
-type Session =
+export type Session =
   | {
       id: string;
+      expires: number;
       activeCart: {
         cartRef: {
           id: string;
@@ -69,48 +13,26 @@ type Session =
     }
   | undefined;
 
-type Action = { type: "SET_SESSION"; session?: Session };
-
-const cocoSession: string = localStorage.getItem("cocoSession") || "";
-const initialState = cocoSession ? JSON.parse(cocoSession) : undefined;
+type Action =
+  | { type: "SET_SESSION"; session: Session }
+  | { type: "CLEAR_SESSION" };
 
 const cocoSessionStore = new Store<Session, Action>(
   (action, _state, setState) => {
-    if (action.type === "SET_SESSION") {
-      setState(action.session);
+    switch (action.type) {
+      case "SET_SESSION":
+        CookieHelpers.setSession(action.session);
+        setState(action.session);
+        break;
+      case "CLEAR_SESSION":
+        CookieHelpers.clearSession();
+        setState(undefined);
+        break;
+      default:
+        break;
     }
   },
-  initialState
+  undefined
 );
-
-cartStore.subscribe(() => {
-  const cart = cartStore.getSnapshot();
-  if (
-    cocoSessionStore.getSnapshot()?.activeCart?.cartRef?.id !==
-    cartStore.getSnapshot()?.id
-  ) {
-    if (!cart && cocoSessionStore.getSnapshot()) {
-      loadingStore.dispatch("START_LOADING");
-      removeSession(cocoSessionStore.getSnapshot()!.id)
-        .catch((e) => console.error(e))
-        .finally(() => {
-          loadingStore.dispatch("DONE");
-          localStorage.removeItem("cocoSession");
-          cocoSessionStore.dispatch({
-            type: "SET_SESSION",
-            session: undefined,
-          });
-        });
-    } else {
-      loadingStore.dispatch("START_LOADING");
-      createSession(cart!.id)
-        .then((session) => {
-          localStorage.setItem("cocoSession", JSON.stringify(session));
-          cocoSessionStore.dispatch({ type: "SET_SESSION", session: session });
-        })
-        .finally(() => loadingStore.dispatch("DONE"));
-    }
-  }
-});
 
 export default cocoSessionStore;

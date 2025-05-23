@@ -1,4 +1,5 @@
+import { Store } from "./Store";
 import cartStore from "./stores/CartStore";
 import cocoSessionStore from "./stores/CoCoSessionStore";
 
-export { cocoSessionStore, cartStore };
+export { Store, cocoSessionStore, cartStore };

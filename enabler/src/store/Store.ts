@@ -16,7 +16,7 @@ export class Store<State, Action> {
   private setState(state: State) {
     if (state !== this.state) {
       this.state = state;
-      this.listeners.forEach((l) => l());
+      this.listeners.forEach((listener) => listener());
     }
   }
 
