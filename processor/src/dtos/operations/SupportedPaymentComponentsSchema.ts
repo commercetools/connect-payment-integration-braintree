@@ -1,6 +1,6 @@
-import { Type } from '@sinclair/typebox';
-import { SupportedPaymentComponentsData } from './SupportedPaymentComponentsData';
-import { SupportedPaymentDropinsData } from './SupportedPaymentDropinsData';
+import { Type } from "@sinclair/typebox";
+import { SupportedPaymentComponentsData } from "./SupportedPaymentComponentsData";
+import { SupportedPaymentDropinsData } from "./SupportedPaymentDropinsData";
 
 /**
  * Supported payment components schema.
@@ -23,6 +23,6 @@ import { SupportedPaymentDropinsData } from './SupportedPaymentDropinsData';
  * }
  */
 export const SupportedPaymentComponentsSchema = Type.Object({
-  dropins: Type.Array(SupportedPaymentDropinsData),
-  components: Type.Array(SupportedPaymentComponentsData),
+	dropins: Type.Array(SupportedPaymentDropinsData),
+	components: Type.Array(SupportedPaymentComponentsData),
 });

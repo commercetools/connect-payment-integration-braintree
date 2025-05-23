@@ -1,6 +1,6 @@
-import { Payment } from '@commercetools/connect-payments-sdk/dist/commercetools';
+import { Payment } from "@commercetools/connect-payments-sdk/dist/commercetools";
 
 export type CancelPaymentRequest = {
-  payment: Payment;
-  merchantReference?: string;
+	payment: Payment;
+	merchantReference?: string;
 };

@@ -1,5 +1,5 @@
-import { PaymentRequestSchemaDTO } from '../../../dtos/payment';
+import { PaymentRequestSchemaDTO } from "../../../dtos/payment";
 
 export type CreatePaymentRequest = {
-  data: PaymentRequestSchemaDTO;
+	data: PaymentRequestSchemaDTO;
 };

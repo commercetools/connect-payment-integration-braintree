@@ -1,3 +1,3 @@
-import { BraintreeCustomer } from '../basic-types';
+import { BraintreeCustomer } from "../basic-types";
 
 export const GetCustomerResponseSchema = BraintreeCustomer;

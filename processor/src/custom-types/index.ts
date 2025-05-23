@@ -1,3 +1,3 @@
-import { launchpadPurchaseOrderCustomType } from './launchpadPurchaseOrderCustomType';
+import { launchpadPurchaseOrderCustomType } from "./launchpadPurchaseOrderCustomType";
 
 export { launchpadPurchaseOrderCustomType };

@@ -1,17 +1,17 @@
 import {
-  type BaseOptions,
-  type ComponentOptions,
-  type PaymentComponent,
-  type PaymentComponentBuilder,
+	type BaseOptions,
+	type ComponentOptions,
+	type PaymentComponent,
+	type PaymentComponentBuilder,
 } from "../../../payment-enabler";
 import { Card } from "./Card";
 
 export class CardBuilder implements PaymentComponentBuilder {
-  public componentHasSubmit = true;
+	public componentHasSubmit = true;
 
-  constructor(private baseOptions: BaseOptions) {}
+	constructor(private baseOptions: BaseOptions) {}
 
-  build(config: ComponentOptions): PaymentComponent {
-    return new Card(this.baseOptions, config);
-  }
+	build(config: ComponentOptions): PaymentComponent {
+		return new Card(this.baseOptions, config);
+	}
 }
