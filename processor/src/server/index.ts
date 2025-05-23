@@ -36,6 +36,7 @@ export const setupFastify = async () => {
 			"X-Session-ID",
 		],
 		origin: "*",
+		methods: ["GET", "POST", "DELETE"],
 	});
 
 	// Add content type parser for the content type application/x-www-form-urlencoded

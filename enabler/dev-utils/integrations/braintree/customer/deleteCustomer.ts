@@ -1,4 +1,4 @@
-import { getConfig } from "../../../../dev-utils";
+import { getConfig } from "../../../getConfig";
 
 export type DeleteBraintreeCustomerRequest = {
 	customerId: string;
@@ -12,14 +12,15 @@ export const deleteCustomer = async function (
 ): Promise<boolean> {
 	let response!: Response;
 	try {
-		response = await fetch(`${config.PROCESSOR_URL}/customer/delete`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"X-Session-Id": sessionId,
+		response = await fetch(
+			`${config.PROCESSOR_URL}/customer/delete/${request.customerId}`,
+			{
+				method: "DELETE",
+				headers: {
+					"X-Session-Id": sessionId,
+				},
 			},
-			body: JSON.stringify(request),
-		});
+		);
 		if (response.ok) {
 			return true;
 		} else {

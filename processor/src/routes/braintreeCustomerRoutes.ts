@@ -6,13 +6,8 @@ import {
 	CreateCustomerRequestSchemaDTO,
 	CreateCustomerResponseSchema,
 	CreateCustomerResponseSchemaDTO,
-	DeleteCustomerRequestSchema,
-	DeleteCustomerRequestSchemaDTO,
-	FindCustomerRequestSchema,
-	FindCustomerRequestSchemaDTO,
-	FindCustomerResponseSchema,
-	FindCustomerResponseSchemaDTO,
 } from "../dtos/customer";
+import { Type } from "@sinclair/typebox";
 
 type PaymentRoutesOptions = {
 	customerService: BraintreeCustomerService;
@@ -49,24 +44,31 @@ export const braintreeCustomerRoutes = async (
 			}
 		},
 	);
-	fastify.post<{
-		Body: FindCustomerRequestSchemaDTO;
-		Reply: FindCustomerResponseSchemaDTO;
+	fastify.get<{
+		Params: { customerId: string };
+		Reply: CreateCustomerResponseSchemaDTO;
 	}>(
-		"/find",
+		"/find/:customerId",
 		{
 			preHandler: [opts.sessionHeaderAuthHook.authenticate()],
 			schema: {
-				body: FindCustomerRequestSchema,
+				params: {
+					$id: "paramsSchema",
+					type: "object",
+					properties: {
+						customerId: Type.String(),
+					},
+					required: ["customerId"],
+				},
 				response: {
-					200: FindCustomerResponseSchema,
+					200: CreateCustomerResponseSchema,
 				},
 			},
 		},
 		async (request, reply) => {
 			try {
 				const response = await opts.customerService.findCustomer(
-					request.body.customerId,
+					request.params.customerId,
 				);
 				return reply.status(200).send(response);
 			} catch (error) {
@@ -75,12 +77,19 @@ export const braintreeCustomerRoutes = async (
 			}
 		},
 	);
-	fastify.post<{ Body: DeleteCustomerRequestSchemaDTO }>(
-		"/delete",
+	fastify.delete<{ Params: { customerId: string } }>(
+		"/delete/:customerId",
 		{
 			preHandler: [opts.sessionHeaderAuthHook.authenticate()],
 			schema: {
-				body: DeleteCustomerRequestSchema,
+				params: {
+					$id: "paramsSchema",
+					type: "object",
+					properties: {
+						customerId: Type.String(),
+					},
+					required: ["customerId"],
+				},
 				response: {
 					204: {
 						description: "Successfully deleted customer",
@@ -91,7 +100,7 @@ export const braintreeCustomerRoutes = async (
 		async (request, reply) => {
 			try {
 				await opts.customerService.deleteCustomer(
-					request.body.customerId,
+					request.params.customerId,
 				);
 				return reply.status(204).send();
 			} catch (error) {

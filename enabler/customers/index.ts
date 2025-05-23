@@ -4,7 +4,7 @@ import {
 	createCustomer,
 	deleteCustomer,
 	findCustomer,
-} from "../src/integrations/braintree/customer";
+} from "../dev-utils/integrations/braintree/customer";
 import { createCustomerFormElements } from "./createCustomerFormElements";
 import {
 	createCustomerFormId,
@@ -65,8 +65,7 @@ const createSessionIdFields = function () {
 			}
 
 			createSession(cartId)
-				.then((sessionId) => {
-					window.alert(`Session created, ID: ${sessionId}`);
+				.then(() => {
 					const sessionContainer =
 						document.getElementById(sessionContainerId);
 					if (sessionContainer) {

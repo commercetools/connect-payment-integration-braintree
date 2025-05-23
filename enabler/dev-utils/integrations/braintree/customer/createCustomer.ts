@@ -1,4 +1,4 @@
-import { getConfig } from "../../../../dev-utils";
+import { getConfig } from "../../../getConfig";
 
 export type CreateBraintreeCustomerRequest = {
 	firstName: string;

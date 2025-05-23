@@ -9,6 +9,7 @@ import {
 	CreateCustomerRequest,
 	CreateCustomerResponse,
 } from "./types/customer";
+import { appLogger } from "../libs/logger";
 
 const config = getConfig();
 
@@ -42,7 +43,8 @@ export class BraintreeCustomerService {
 	public async findCustomer(customerId: string): Promise<braintree.Customer> {
 		const customer = await this.braintreeGateway.customer.find(customerId);
 		if (!customer) {
-			console.log(
+			appLogger.info(
+				{},
 				`Error in BraintreePaymentService findCustomer: customer with ID ${customerId} not found`,
 			);
 		}
