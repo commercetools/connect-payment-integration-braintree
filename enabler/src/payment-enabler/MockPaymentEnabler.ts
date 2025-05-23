@@ -17,9 +17,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 		this.setupData = MockPaymentEnabler._Setup(options);
 	}
 
-	private static _Setup = async (
-		options: EnablerOptions,
-	): Promise<{ baseOptions: BaseOptions }> => {
+	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
 		// Fetch SDK config from processor if needed, for example:
 
 		// const configResponse = await fetch(instance.processorUrl + '/config', {
@@ -46,9 +44,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 		});
 	};
 
-	async createComponentBuilder(
-		type: string,
-	): Promise<PaymentComponentBuilder | never> {
+	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
@@ -59,9 +55,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
 		if (!Object.keys(supportedMethods).includes(type)) {
 			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(
-					supportedMethods,
-				).join(", ")}`,
+				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
 			);
 		}
 
@@ -69,9 +63,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 		return new supportedMethods[type](baseOptions);
 	}
 
-	async createDropinBuilder(
-		type: DropinType,
-	): Promise<PaymentDropinBuilder | never> {
+	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
@@ -81,9 +73,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
 		if (!Object.keys(supportedMethods).includes(type)) {
 			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(
-					supportedMethods,
-				).join(", ")}`,
+				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
 			);
 		}
 

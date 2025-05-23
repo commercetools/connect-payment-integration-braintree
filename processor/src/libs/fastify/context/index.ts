@@ -1,8 +1,5 @@
 import * as paymentSdk from "@commercetools/connect-payments-sdk";
-import {
-	fastifyRequestContext,
-	requestContext,
-} from "@fastify/request-context";
+import { fastifyRequestContext, requestContext } from "@fastify/request-context";
 import { randomUUID } from "crypto";
 import { FastifyInstance, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
@@ -49,9 +46,7 @@ export const getCartIdFromContext = (): string => {
 
 export const getAllowedPaymentMethodsFromContext = (): string[] => {
 	const contextData = getRequestContext() as ContextData;
-	return paymentSdk.getAllowedPaymentMethodsFromContext(
-		contextData,
-	) as string[];
+	return paymentSdk.getAllowedPaymentMethodsFromContext(contextData) as string[];
 };
 
 export const getPaymentInterfaceFromContext = (): string | undefined => {
@@ -80,9 +75,7 @@ export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {
 
 	// Propagate the correlationId from the request header to the request object
 	fastify.addHook("onRequest", (req, _, done) => {
-		req.correlationId = req.headers["x-correlation-id"]
-			? (req.headers["x-correlation-id"] as string)
-			: undefined;
+		req.correlationId = req.headers["x-correlation-id"] ? (req.headers["x-correlation-id"] as string) : undefined;
 		done();
 	});
 

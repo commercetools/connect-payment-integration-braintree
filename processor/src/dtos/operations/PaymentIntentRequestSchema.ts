@@ -20,11 +20,7 @@ import { ActionRefundPaymentSchema } from "./ActionRefundPaymentSchema";
  */
 export const PaymentIntentRequestSchema = Type.Object({
 	actions: Type.Array(
-		Type.Union([
-			ActionCapturePaymentSchema,
-			ActionRefundPaymentSchema,
-			ActionCancelPaymentSchema,
-		]),
+		Type.Union([ActionCapturePaymentSchema, ActionRefundPaymentSchema, ActionCancelPaymentSchema]),
 		{
 			maxItems: 1,
 		},

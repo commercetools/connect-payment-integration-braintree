@@ -78,8 +78,7 @@ export const operationsRoutes = async (
 			},
 		},
 		async (_, reply) => {
-			const result =
-				await opts.paymentService.getSupportedPaymentComponents();
+			const result = await opts.paymentService.getSupportedPaymentComponents();
 			reply.code(200).send(result);
 		},
 	);
@@ -93,10 +92,7 @@ export const operationsRoutes = async (
 		{
 			preHandler: [
 				opts.oauth2AuthHook.authenticate(),
-				opts.authorizationHook.authorize(
-					"manage_project",
-					"manage_checkout_payment_intents",
-				),
+				opts.authorizationHook.authorize("manage_project", "manage_checkout_payment_intents"),
 			],
 			schema: {
 				params: {
@@ -130,10 +126,7 @@ export const operationsRoutes = async (
 		{
 			preHandler: [
 				opts.oauth2AuthHook.authenticate(),
-				opts.authorizationHook.authorize(
-					"manage_project",
-					"manage_checkout_transactions",
-				),
+				opts.authorizationHook.authorize("manage_project", "manage_checkout_transactions"),
 			],
 			schema: {
 				body: TransactionDraft,
@@ -143,9 +136,7 @@ export const operationsRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			const result = await opts.paymentService.handleTransaction(
-				request.body,
-			);
+			const result = await opts.paymentService.handleTransaction(request.body);
 			return reply.status(201).send(result);
 		},
 	);

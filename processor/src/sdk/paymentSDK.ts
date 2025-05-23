@@ -1,12 +1,6 @@
-import {
-	RequestContextData,
-	setupPaymentSDK,
-} from "@commercetools/connect-payments-sdk";
+import { RequestContextData, setupPaymentSDK } from "@commercetools/connect-payments-sdk";
 import { getConfig } from "../dev-utils/getConfig";
-import {
-	getRequestContext,
-	updateRequestContext,
-} from "../libs/fastify/context";
+import { getRequestContext, updateRequestContext } from "../libs/fastify/context";
 import { appLogger } from "../libs/logger/appLogger";
 
 const config = getConfig();
@@ -21,8 +15,7 @@ export const paymentSDK = setupPaymentSDK({
 	jwksUrl: config.jwksUrl,
 	jwtIssuer: config.jwtIssuer,
 	getContextFn: (): RequestContextData => {
-		const { correlationId, requestId, authentication } =
-			getRequestContext();
+		const { correlationId, requestId, authentication } = getRequestContext();
 		return {
 			correlationId: correlationId || "",
 			requestId: requestId || "",
@@ -32,13 +25,9 @@ export const paymentSDK = setupPaymentSDK({
 	updateContextFn: (context: Partial<RequestContextData>) => {
 		const requestContext = Object.assign(
 			{},
-			context.correlationId
-				? { correlationId: context.correlationId }
-				: {},
+			context.correlationId ? { correlationId: context.correlationId } : {},
 			context.requestId ? { requestId: context.requestId } : {},
-			context.authentication
-				? { authentication: context.authentication }
-				: {},
+			context.authentication ? { authentication: context.authentication } : {},
 		);
 		updateRequestContext(requestContext);
 	},

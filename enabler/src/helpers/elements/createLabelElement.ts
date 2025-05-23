@@ -4,11 +4,7 @@ export type LabelElementData = {
 	style?: string;
 };
 
-export const createLabelElement = function ({
-	id,
-	label,
-	style,
-}: LabelElementData): HTMLLabelElement {
+export const createLabelElement = function ({ id, label, style }: LabelElementData): HTMLLabelElement {
 	const labelElement = document.createElement("label");
 	if (id) {
 		labelElement.setAttribute("for", id);

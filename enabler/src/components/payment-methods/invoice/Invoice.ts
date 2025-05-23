@@ -1,8 +1,4 @@
-import {
-	type BaseOptions,
-	type ComponentOptions,
-	PaymentMethod,
-} from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
@@ -17,17 +13,13 @@ export class Invoice extends BaseComponent {
 	}
 
 	mount(selector: string) {
-		document
-			.querySelector(selector)!
-			.insertAdjacentHTML("afterbegin", this._getTemplate());
+		document.querySelector(selector)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 
 		if (this.showPayButton) {
-			document
-				.querySelector("#invoiceForm-paymentButton")!
-				.addEventListener("click", (e) => {
-					e.preventDefault();
-					this.submit();
-				});
+			document.querySelector("#invoiceForm-paymentButton")!.addEventListener("click", (e) => {
+				e.preventDefault();
+				this.submit();
+			});
 		}
 	}
 

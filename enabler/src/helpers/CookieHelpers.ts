@@ -1,7 +1,4 @@
-import {
-	COCO_SESSION_COOKIE_KEY,
-	cookieHandler,
-} from "../../dev-utils/cookieHandling";
+import { COCO_SESSION_COOKIE_KEY, cookieHandler } from "../../dev-utils/cookieHandling";
 import type { Session } from "../store/stores/CoCoSessionStore";
 
 export class CookieHelpers {
@@ -14,10 +11,7 @@ export class CookieHelpers {
 	}
 
 	static setSession(session: Session): void {
-		cookieHandler.setCookie(
-			COCO_SESSION_COOKIE_KEY,
-			JSON.stringify(session),
-		);
+		cookieHandler.setCookie(COCO_SESSION_COOKIE_KEY, JSON.stringify(session));
 	}
 
 	static clearSession(): void {

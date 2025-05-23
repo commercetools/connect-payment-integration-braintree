@@ -12,9 +12,7 @@ export class DropinComponents implements DropinComponent {
 	}
 
 	mount(selector: string) {
-		document!
-			.querySelector(selector)!
-			.insertAdjacentHTML("afterbegin", "Dropin Embedded");
+		document!.querySelector(selector)!.insertAdjacentHTML("afterbegin", "Dropin Embedded");
 	}
 
 	submit(): void {

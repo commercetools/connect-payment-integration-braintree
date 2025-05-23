@@ -1,10 +1,5 @@
 import { BraintreePaymentEnabler } from "./payment-enabler";
-import {
-	createSession,
-	fetchAccessToken,
-	getConfig,
-	tryUpdateSessionFromLocalStorage,
-} from "../dev-utils";
+import { createSession, fetchAccessToken, getConfig, tryUpdateSessionFromLocalStorage } from "../dev-utils";
 import { braintreeContainerId, createCheckoutButtonId } from "./constants";
 import { cocoSessionStore } from "./store";
 import { getPaymentMethods } from "./integrations/braintree/operations";
@@ -21,9 +16,7 @@ export const __setup = function async(): void {
 	});
 };
 
-const setupPaymentMethods = async function (
-	accessToken: string,
-): Promise<void> {
+const setupPaymentMethods = async function (accessToken: string): Promise<void> {
 	const paymentMethodSelect = document.getElementById("paymentMethod");
 
 	if (paymentMethodSelect) {
@@ -35,9 +28,7 @@ const setupPaymentMethods = async function (
 			paymentMethodSelect.appendChild(option);
 		});
 	} else {
-		console.error(
-			'Cannot populate payment method selection, select with ID "paymentMethod" not found.',
-		);
+		console.error('Cannot populate payment method selection, select with ID "paymentMethod" not found.');
 	}
 };
 
@@ -45,23 +36,16 @@ const createCheckout = async function () {
 	const cartIdInputId = "cartId";
 	const cartId = cocoSessionStore.getSnapshot()?.activeCart.cartRef.id;
 	if (cartId) {
-		(document.getElementById(cartIdInputId) as HTMLInputElement)!.value =
-			cartId;
+		(document.getElementById(cartIdInputId) as HTMLInputElement)!.value = cartId;
 	}
 
-	const createCheckoutButton = document.getElementById(
-		createCheckoutButtonId,
-	);
+	const createCheckoutButton = document.getElementById(createCheckoutButtonId);
 	if (createCheckoutButton) {
 		createCheckoutButton.addEventListener("click", async (event) => {
 			event.preventDefault();
-			const cartIdInput = document.getElementById(
-				cartIdInputId,
-			) as HTMLInputElement | null;
+			const cartIdInput = document.getElementById(cartIdInputId) as HTMLInputElement | null;
 			if (!cartIdInput) {
-				console.error(
-					`Cannot get cart Id, input element with ID ${cartIdInputId} not found.`,
-				);
+				console.error(`Cannot get cart Id, input element with ID ${cartIdInputId} not found.`);
 				return;
 			}
 			const cartId = cartIdInput.value;
@@ -76,13 +60,9 @@ const createCheckout = async function () {
 				session = cocoSessionStore.getSnapshot();
 			}
 
-			const paymentMethodSelect = document.getElementById(
-				"paymentMethod",
-			) as HTMLSelectElement | null;
+			const paymentMethodSelect = document.getElementById("paymentMethod") as HTMLSelectElement | null;
 			if (!paymentMethodSelect) {
-				console.error(
-					'Cannot get payment method selection, select with ID "paymentMethod" not found.',
-				);
+				console.error('Cannot get payment method selection, select with ID "paymentMethod" not found.');
 				return;
 			}
 			const selectedPaymentMethod = paymentMethodSelect.value;
@@ -99,9 +79,7 @@ const createCheckout = async function () {
 				},
 			});
 
-			const builder = await braintreeEnabler.createComponentBuilder(
-				selectedPaymentMethod,
-			);
+			const builder = await braintreeEnabler.createComponentBuilder(selectedPaymentMethod);
 			const component = await builder.build({
 				showPayButton: !builder.componentHasSubmit,
 				...(builder.componentHasSubmit
@@ -109,16 +87,11 @@ const createCheckout = async function () {
 					: {
 							onPayButtonClick: async () => {
 								// to be used for validation
-								const termsChecked = (
-									document.getElementById(
-										"termsCheckbox",
-									) as HTMLInputElement
-								)?.checked;
+								const termsChecked = (document.getElementById("termsCheckbox") as HTMLInputElement)
+									?.checked;
 								if (!termsChecked) {
 									event.preventDefault();
-									alert(
-										"You must agree to the terms and conditions.",
-									);
+									alert("You must agree to the terms and conditions.");
 									return Promise.reject("error-occurred");
 								}
 								return Promise.resolve(); // change to true, to test payment flow
@@ -129,8 +102,6 @@ const createCheckout = async function () {
 			component.mount(braintreeContainerId);
 		});
 	} else {
-		console.error(
-			'Cannot create checkout component, element with ID "createCheckout" not found.',
-		);
+		console.error('Cannot create checkout component, element with ID "createCheckout" not found.');
 	}
 };

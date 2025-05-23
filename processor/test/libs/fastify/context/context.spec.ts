@@ -1,15 +1,5 @@
-import {
-	describe,
-	test,
-	expect,
-	afterEach,
-	jest,
-	beforeEach,
-} from "@jest/globals";
-import {
-	SessionAuthentication,
-	SessionPrincipal,
-} from "@commercetools/connect-payments-sdk";
+import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
+import { SessionAuthentication, SessionPrincipal } from "@commercetools/connect-payments-sdk";
 import * as Context from "../../../../src/libs/fastify/context";
 
 describe("context", () => {
@@ -22,8 +12,7 @@ describe("context", () => {
 		merchantReturnUrl: "https://merchant.return.url",
 	};
 
-	const mockSessionAuthentication: SessionAuthentication =
-		new SessionAuthentication(sessionId, principal);
+	const mockSessionAuthentication: SessionAuthentication = new SessionAuthentication(sessionId, principal);
 
 	beforeEach(() => {
 		jest.setTimeout(10000);
@@ -38,9 +27,7 @@ describe("context", () => {
 		const mockRequestContext = {
 			authentication: mockSessionAuthentication,
 		};
-		jest.spyOn(Context, "getRequestContext").mockReturnValue(
-			mockRequestContext,
-		);
+		jest.spyOn(Context, "getRequestContext").mockReturnValue(mockRequestContext);
 		const result = Context.getCtSessionIdFromContext();
 		expect(result).toStrictEqual(sessionId);
 	});
@@ -49,9 +36,7 @@ describe("context", () => {
 		const mockRequestContext = {
 			authentication: mockSessionAuthentication,
 		};
-		jest.spyOn(Context, "getRequestContext").mockReturnValue(
-			mockRequestContext,
-		);
+		jest.spyOn(Context, "getRequestContext").mockReturnValue(mockRequestContext);
 		const result = Context.getAllowedPaymentMethodsFromContext();
 		expect(result).toHaveLength(0);
 	});
@@ -60,9 +45,7 @@ describe("context", () => {
 		const mockRequestContext = {
 			authentication: mockSessionAuthentication,
 		};
-		jest.spyOn(Context, "getRequestContext").mockReturnValue(
-			mockRequestContext,
-		);
+		jest.spyOn(Context, "getRequestContext").mockReturnValue(mockRequestContext);
 		const result = Context.getCartIdFromContext();
 		expect(result).toStrictEqual("123456");
 	});
@@ -71,9 +54,7 @@ describe("context", () => {
 		const mockRequestContext = {
 			authentication: mockSessionAuthentication,
 		};
-		jest.spyOn(Context, "getRequestContext").mockReturnValue(
-			mockRequestContext,
-		);
+		jest.spyOn(Context, "getRequestContext").mockReturnValue(mockRequestContext);
 		const result = Context.getMerchantReturnUrlFromContext();
 		expect(result).toStrictEqual("https://merchant.return.url");
 	});
@@ -82,9 +63,7 @@ describe("context", () => {
 		const mockRequestContext = {
 			authentication: mockSessionAuthentication,
 		};
-		jest.spyOn(Context, "getRequestContext").mockReturnValue(
-			mockRequestContext,
-		);
+		jest.spyOn(Context, "getRequestContext").mockReturnValue(mockRequestContext);
 		const result = Context.getProcessorUrlFromContext();
 		expect(result).toStrictEqual("http://127.0.0.1");
 	});

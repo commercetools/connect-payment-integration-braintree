@@ -13,28 +13,17 @@ export default defineConfig({
 	},
 	plugins: [
 		cssInjectedByJsPlugin({
-			injectCodeFunction: function injectCodeCustomRunTimeFunction(
-				cssCode: string,
-				options,
-			) {
+			injectCodeFunction: function injectCodeCustomRunTimeFunction(cssCode: string, options) {
 				try {
 					if (typeof document != "undefined") {
 						var elementStyle = document.createElement("style");
 						// this attribute will allow the client application using this connector to
 						// identify the style tag and remove it if needed for cleanup purposes
-						elementStyle.setAttribute(
-							"data-ctc-connector-styles",
-							"",
-						);
+						elementStyle.setAttribute("data-ctc-connector-styles", "");
 						for (const attribute in options.attributes) {
-							elementStyle.setAttribute(
-								attribute,
-								options.attributes[attribute],
-							);
+							elementStyle.setAttribute(attribute, options.attributes[attribute]);
 						}
-						elementStyle.appendChild(
-							document.createTextNode(cssCode),
-						);
+						elementStyle.appendChild(document.createTextNode(cssCode));
 						document.head.appendChild(elementStyle);
 					}
 				} catch (e) {

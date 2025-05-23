@@ -15,9 +15,7 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
 		.execute();
 
 	if (getRes.body.results.length) {
-		logger.info(
-			"Launchpad purchase order number custom type already exists. Skipping creation.",
-		);
+		logger.info("Launchpad purchase order number custom type already exists. Skipping creation.");
 		return;
 	}
 
@@ -56,8 +54,5 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
 		})
 		.execute();
 
-	logger.info(
-		"Launchpad purchase order number custom type created successfully",
-		postRes.body?.id,
-	);
+	logger.info("Launchpad purchase order number custom type created successfully", postRes.body?.id);
 }

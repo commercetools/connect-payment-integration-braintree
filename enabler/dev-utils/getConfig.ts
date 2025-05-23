@@ -7,8 +7,7 @@ const config = {
 	CTP_PROJECT_KEY: import.meta.env.VITE_CTP_PROJECT_KEY as string,
 	PROCESSOR_URL: import.meta.env.VITE_PROCESSOR_URL as string,
 	// can be used for anonamous payments
-	BRAINTREE_TOKENIZATION_KEY: import.meta.env
-		.VITE_BRAINTREE_TOKENIZATION_KEY as string,
+	BRAINTREE_TOKENIZATION_KEY: import.meta.env.VITE_BRAINTREE_TOKENIZATION_KEY as string,
 };
 
 for (const key in config) {

@@ -1,14 +1,8 @@
-import {
-	CommercetoolsCartService,
-	CommercetoolsPaymentService,
-} from "@commercetools/connect-payments-sdk";
+import { CommercetoolsCartService, CommercetoolsPaymentService } from "@commercetools/connect-payments-sdk";
 import { BraintreeCustomerServiceOptions } from "./types/payment/BraintreeCustomerServiceOptions";
 import braintree from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
-import {
-	CreateCustomerRequest,
-	CreateCustomerResponse,
-} from "./types/customer";
+import { CreateCustomerRequest, CreateCustomerResponse } from "./types/customer";
 import { appLogger } from "../libs/logger";
 
 const config = getConfig();
@@ -73,15 +67,10 @@ export class BraintreeCustomerService {
 	 * @param request - contains the information of the new customer to be created
 	 * @returns Promise with new customer created with Braintree
 	 */
-	public async createCustomer(
-		request: CreateCustomerRequest,
-	): Promise<CreateCustomerResponse> {
+	public async createCustomer(request: CreateCustomerRequest): Promise<CreateCustomerResponse> {
 		const response = await this.braintreeGateway.customer.create(request);
 		if (!response.success) {
-			console.error(
-				"Error in BraintreePaymentService createCustomer: ",
-				response.errors,
-			);
+			console.error("Error in BraintreePaymentService createCustomer: ", response.errors);
 			throw new Error("Error in BraintreePaymentService createCustomer");
 		}
 		return response.customer;

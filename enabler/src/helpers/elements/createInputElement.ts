@@ -4,11 +4,7 @@ export type InputElementData = {
 	style?: string;
 };
 
-export const createInputElement = function ({
-	id,
-	type = "text",
-	style,
-}: InputElementData): HTMLInputElement {
+export const createInputElement = function ({ id, type = "text", style }: InputElementData): HTMLInputElement {
 	const inputElement = document.createElement("input");
 	if (id) {
 		inputElement.setAttribute("id", id);

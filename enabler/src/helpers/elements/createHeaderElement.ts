@@ -4,11 +4,7 @@ export type HeaderElementData = {
 	style?: string;
 };
 
-export const createHeaderElement = function ({
-	type,
-	text,
-	style,
-}: HeaderElementData): HTMLHeadingElement {
+export const createHeaderElement = function ({ type, text, style }: HeaderElementData): HTMLHeadingElement {
 	const headerElement = document.createElement(type);
 	headerElement.innerText = text;
 	if (style) {

@@ -1,11 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "@jest/globals";
 import Fastify, { type FastifyInstance, FastifyError } from "fastify";
 import { errorHandler } from "../../../src/libs/fastify/errorHandler";
-import {
-	ErrorAuthErrorResponse,
-	Errorx,
-	ErrorxAdditionalOpts,
-} from "@commercetools/connect-payments-sdk";
+import { ErrorAuthErrorResponse, Errorx, ErrorxAdditionalOpts } from "@commercetools/connect-payments-sdk";
 import { requestContextPlugin } from "../../../src/libs/fastify/context";
 import { FastifySchemaValidationError } from "fastify/types/schema";
 
@@ -144,8 +140,7 @@ describe("errorHandler", () => {
 			skipLog: true,
 			cause: undefined,
 		};
-		const authErrorResponse: ErrorAuthErrorResponse =
-			new ErrorAuthErrorResponse("someMessage", opts, "401");
+		const authErrorResponse: ErrorAuthErrorResponse = new ErrorAuthErrorResponse("someMessage", opts, "401");
 
 		fastify.get("/", () => {
 			throw authErrorResponse;

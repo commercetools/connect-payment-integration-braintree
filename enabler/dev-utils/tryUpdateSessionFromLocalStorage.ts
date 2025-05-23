@@ -18,10 +18,6 @@ export const tryUpdateSessionFromLocalStorage = async function () {
 		return;
 	} else {
 		cocoSessionStore.dispatch({ type: "SET_SESSION", session });
-		console.log(
-			`Session expires in ${
-				(session.expires - Date.now()) / 1000 / 60
-			} minutes.`,
-		);
+		console.log(`Session expires in ${(session.expires - Date.now()) / 1000 / 60} minutes.`);
 	}
 };

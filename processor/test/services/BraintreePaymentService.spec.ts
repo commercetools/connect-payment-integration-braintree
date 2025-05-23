@@ -1,23 +1,12 @@
-import {
-	describe,
-	test,
-	expect,
-	afterEach,
-	jest,
-	beforeEach,
-} from "@jest/globals";
-import {
-	ConfigResponse /* ModifyPayment, StatusResponse*/,
-} from "../../src/services/types/operations";
+import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
+import { ConfigResponse /* ModifyPayment, StatusResponse*/ } from "../../src/services/types/operations";
 import { paymentSDK } from "../../src/sdk/paymentSDK";
 // import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 // import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
 // import { mockGetPaymentResult, mockUpdatePaymentResult } from '../utils/mock-payment-results';
 // import { mockGetCartResult } from '../utils/mock-cart-data';
 // import * as Config from '../../src/dev-utils/getConfig';
-import {
-	/* CreatePaymentRequest, */ BraintreePaymentServiceOptions,
-} from "../../src/services/types/payment";
+import { /* CreatePaymentRequest, */ BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
 // import * as FastifyContext from '../../src/libs/fastify/context';
@@ -46,9 +35,7 @@ describe(BraintreePaymentService.name, () => {
 		ctCartService: paymentSDK.ctCartService,
 		ctPaymentService: paymentSDK.ctPaymentService,
 	};
-	const paymentService: AbstractPaymentService = new BraintreePaymentService(
-		opts,
-	);
+	const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
 	// const mockPaymentService: BraintreePaymentService = new BraintreePaymentService(opts);
 	beforeEach(() => {
 		jest.setTimeout(10000);
@@ -70,8 +57,7 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("getSupportedPaymentComponents", async () => {
-		const result: ConfigResponse =
-			await paymentService.getSupportedPaymentComponents();
+		const result: ConfigResponse = await paymentService.getSupportedPaymentComponents();
 		expect(result?.components).toHaveLength(3);
 		expect(result?.components[0]?.type).toStrictEqual("card");
 		expect(result?.components[1]?.type).toStrictEqual("invoice");

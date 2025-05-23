@@ -1,21 +1,13 @@
 import { create } from "braintree-web-drop-in";
 import { getConfig } from "../../../../dev-utils";
-import {
-	braintreeDropinContainerId,
-	braintreePurchaseButtonId,
-} from "../../../constants";
+import { braintreeDropinContainerId, braintreePurchaseButtonId } from "../../../constants";
 
 const config = getConfig();
 
-export const setupBraintreeDropin = async function (
-	braintreeContainerId: string,
-	sessionId: string,
-): Promise<void> {
+export const setupBraintreeDropin = async function (braintreeContainerId: string, sessionId: string): Promise<void> {
 	const dropinContainer = createDropinContainer(braintreeContainerId);
 	if (!dropinContainer) {
-		console.error(
-			"Error setting up Braintree dropin, couldn't create dropin container.",
-		);
+		console.error("Error setting up Braintree dropin, couldn't create dropin container.");
 		return;
 	}
 
@@ -37,9 +29,7 @@ export const setupBraintreeDropin = async function (
 	const token: { clientToken: string } = await response.json();
 
 	if (!token.clientToken) {
-		console.error(
-			"Couldn't create Braintree dropin container, client token is undefined",
-		);
+		console.error("Couldn't create Braintree dropin container, client token is undefined");
 		return;
 	}
 
@@ -70,14 +60,10 @@ export const setupBraintreeDropin = async function (
 	);
 };
 
-const createDropinContainer = function (
-	braintreeContainerId: string,
-): Element | null {
+const createDropinContainer = function (braintreeContainerId: string): Element | null {
 	const braintreeContainer = document.getElementById(braintreeContainerId);
 	if (!braintreeContainer) {
-		console.error(
-			`Couldn't find Braintree container with ID ${braintreeContainerId}.`,
-		);
+		console.error(`Couldn't find Braintree container with ID ${braintreeContainerId}.`);
 		return null;
 	}
 

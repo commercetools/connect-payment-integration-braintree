@@ -13,18 +13,13 @@ type SupportedPaymentComponents = {
 	}[];
 };
 
-export const getPaymentMethods = async function (
-	accessToken: string,
-): Promise<SupportedPaymentComponents> {
-	const paymentMethodsResponse = await fetch(
-		`${config.PROCESSOR_URL}/operations/payment-components`,
-		{
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
+export const getPaymentMethods = async function (accessToken: string): Promise<SupportedPaymentComponents> {
+	const paymentMethodsResponse = await fetch(`${config.PROCESSOR_URL}/operations/payment-components`, {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
 		},
-	);
+	});
 
 	return paymentMethodsResponse.json();
 };

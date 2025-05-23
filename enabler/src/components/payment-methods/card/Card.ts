@@ -1,19 +1,9 @@
-import {
-	type BaseOptions,
-	type ComponentOptions,
-	PaymentMethod,
-} from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 import buttonStyles from "../../../style/button.module.scss";
 import inputFieldStyles from "../../../style/inputField.module.scss";
 import styles from "../../../style/style.module.scss";
 import { BaseComponent } from "../../BaseComponent";
-import {
-	addFormFieldsEventListeners,
-	fieldIds,
-	getCardBrand,
-	getInput,
-	validateAllFields,
-} from "./utils";
+import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
 import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Card extends BaseComponent {
@@ -25,16 +15,12 @@ export class Card extends BaseComponent {
 	}
 
 	mount(selector: string) {
-		document
-			.querySelector(selector)!
-			.insertAdjacentHTML("afterbegin", this._getTemplate());
+		document.querySelector(selector)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 		if (this.showPayButton) {
-			document
-				.querySelector("#creditCardForm-paymentButton")!
-				.addEventListener("click", (e) => {
-					e.preventDefault();
-					this.submit();
-				});
+			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
+				e.preventDefault();
+				this.submit();
+			});
 		}
 
 		addFormFieldsEventListeners();
@@ -53,28 +39,17 @@ export class Card extends BaseComponent {
 			const requestData = {
 				paymentMethod: {
 					type: this.paymentMethod,
-					cardNumber: getInput(fieldIds.cardNumber).value.replace(
-						/\s/g,
-						"",
-					),
-					expiryMonth: getInput(fieldIds.expiryDate).value.split(
-						"/",
-					)[0],
-					expiryYear: getInput(fieldIds.expiryDate).value.split(
-						"/",
-					)[1],
+					cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ""),
+					expiryMonth: getInput(fieldIds.expiryDate).value.split("/")[0],
+					expiryYear: getInput(fieldIds.expiryDate).value.split("/")[1],
 					cvc: getInput(fieldIds.cvv).value,
 					holderName: getInput(fieldIds.holderName).value,
 				},
 			};
 
 			// Mock Validation
-			let isAuthorized = this.isCreditCardAllowed(
-				requestData.paymentMethod.cardNumber,
-			);
-			const resultCode = isAuthorized
-				? PaymentOutcome.AUTHORIZED
-				: PaymentOutcome.REJECTED;
+			let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
+			const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
 
 			const request: PaymentRequestSchemaDTO = {
 				paymentMethod: {
@@ -180,11 +155,7 @@ export class Card extends BaseComponent {
 	}
 
 	private isCreditCardAllowed(cardNumber: string) {
-		const allowedCreditCards = [
-			"4111111111111111",
-			"5555555555554444",
-			"341925950237632",
-		];
+		const allowedCreditCards = ["4111111111111111", "5555555555554444", "341925950237632"];
 		return allowedCreditCards.includes(cardNumber);
 	}
 }

@@ -6,17 +6,9 @@ import {
 	findCustomer,
 } from "../dev-utils/integrations/braintree/customer";
 import { createCustomerFormElements } from "./createCustomerFormElements";
-import {
-	createCustomerFormId,
-	customerPageId,
-	submitCreateCustomerId,
-} from "../src/constants";
+import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../src/constants";
 import { cocoSessionStore } from "../src/store";
-import {
-	addLabelledInputToParent,
-	createButtonElement,
-	createHeaderElement,
-} from "../src/helpers/elements";
+import { addLabelledInputToParent, createButtonElement, createHeaderElement } from "../src/helpers/elements";
 
 export const __setup = function () {
 	tryUpdateSessionFromLocalStorage().then(() => {
@@ -56,9 +48,7 @@ const createSessionIdFields = function () {
 		onClick: async (event: MouseEvent) => {
 			event.preventDefault();
 
-			const cartId = (
-				document.getElementById(cartIdInputId) as HTMLInputElement
-			)?.value;
+			const cartId = (document.getElementById(cartIdInputId) as HTMLInputElement)?.value;
 			if (!cartId) {
 				window.alert("Cart Id missing");
 				return;
@@ -66,17 +56,14 @@ const createSessionIdFields = function () {
 
 			createSession(cartId)
 				.then(() => {
-					const sessionContainer =
-						document.getElementById(sessionContainerId);
+					const sessionContainer = document.getElementById(sessionContainerId);
 					if (sessionContainer) {
 						sessionContainer.innerHTML = "";
 					}
 					createCustomerPage();
 				})
 				.catch((error) => {
-					window.alert(
-						`There was an error creating the session: ${error}`,
-					);
+					window.alert(`There was an error creating the session: ${error}`);
 				});
 		},
 	});
@@ -87,17 +74,12 @@ const createSessionIdFields = function () {
 
 const createCreateCustomerForm = function () {
 	const customerPage = document.getElementById(customerPageId);
-	customerPage?.appendChild(
-		createHeaderElement({ type: "h4", text: "Create Customer" }),
-	);
+	customerPage?.appendChild(createHeaderElement({ type: "h4", text: "Create Customer" }));
 	let createCustomerForm = document.createElement("form");
 	createCustomerForm.setAttribute("id", createCustomerFormId);
 
 	createCustomerFormElements.forEach((inputData) => {
-		createCustomerForm = addLabelledInputToParent(
-			inputData,
-			createCustomerForm,
-		);
+		createCustomerForm = addLabelledInputToParent(inputData, createCustomerForm);
 	});
 
 	const submitButton = createButtonElement({
@@ -113,13 +95,9 @@ const createCreateCustomerForm = function () {
 			};
 			let missingRequiredParams: string[] = [];
 			createCustomerFormElements.forEach((elementData) => {
-				const element = document.getElementById(
-					elementData.id,
-				) as HTMLInputElement;
+				const element = document.getElementById(elementData.id) as HTMLInputElement;
 				if (!element) {
-					console.error(
-						`Element with id ${elementData.id} not found when creating customer`,
-					);
+					console.error(`Element with id ${elementData.id} not found when creating customer`);
 					return;
 				}
 				if (!element.value) {
@@ -128,17 +106,11 @@ const createCreateCustomerForm = function () {
 					}
 					return;
 				}
-				createCustomerBody[
-					elementData.parameterName ?? elementData.id
-				] = element.value;
+				createCustomerBody[elementData.parameterName ?? elementData.id] = element.value;
 			});
 
 			if (missingRequiredParams.length > 0) {
-				console.error(
-					`Cannot submit, missing required params ${missingRequiredParams.join(
-						", ",
-					)}`,
-				);
+				console.error(`Cannot submit, missing required params ${missingRequiredParams.join(", ")}`);
 				return;
 			}
 
@@ -148,10 +120,7 @@ const createCreateCustomerForm = function () {
 				return;
 			}
 
-			const customer = await createCustomer(
-				sessionId,
-				createCustomerBody,
-			);
+			const customer = await createCustomer(sessionId, createCustomerBody);
 			if (!customer) {
 				window.alert("Create customer failed.");
 				return;
@@ -169,9 +138,7 @@ const createCreateCustomerForm = function () {
 const createFindCustomerFields = function () {
 	const customerPage = document.getElementById(customerPageId);
 	let findCustomerContainer = document.createElement("div");
-	findCustomerContainer?.appendChild(
-		createHeaderElement({ type: "h4", text: "Find Customer" }),
-	);
+	findCustomerContainer?.appendChild(createHeaderElement({ type: "h4", text: "Find Customer" }));
 
 	const findCustomerInputId = "findCustomerInputId";
 
@@ -191,11 +158,7 @@ const createFindCustomerFields = function () {
 			onClick: async (event: MouseEvent) => {
 				event.preventDefault();
 
-				const customerId = (
-					document.getElementById(
-						findCustomerInputId,
-					) as HTMLInputElement
-				)?.value;
+				const customerId = (document.getElementById(findCustomerInputId) as HTMLInputElement)?.value;
 				if (!customerId) {
 					window.alert("Customer Id missing");
 					return;
@@ -225,9 +188,7 @@ const createFindCustomerFields = function () {
 const createDeleteCustomerFields = function () {
 	const customerPage = document.getElementById(customerPageId);
 	let deleteCustomerContainer = document.createElement("div");
-	deleteCustomerContainer?.appendChild(
-		createHeaderElement({ type: "h4", text: "Delete Customer" }),
-	);
+	deleteCustomerContainer?.appendChild(createHeaderElement({ type: "h4", text: "Delete Customer" }));
 
 	const deleteCustomerInputId = "deleteCustomerInputId";
 
@@ -247,11 +208,7 @@ const createDeleteCustomerFields = function () {
 			onClick: async (event: MouseEvent) => {
 				event.preventDefault();
 
-				const customerId = (
-					document.getElementById(
-						deleteCustomerInputId,
-					) as HTMLInputElement
-				)?.value;
+				const customerId = (document.getElementById(deleteCustomerInputId) as HTMLInputElement)?.value;
 				if (!customerId) {
 					window.alert("Customer Id missing");
 					return;

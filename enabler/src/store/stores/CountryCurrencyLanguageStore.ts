@@ -21,14 +21,11 @@ const initialState = {
 	language: "",
 };
 
-const countryCurrencyLanguageStore = new Store<CCL, Action>(
-	(action, _state, setState) => {
-		if (action.type === "SET_CCL") {
-			setState(action.ccl);
-		}
-	},
-	initialState,
-);
+const countryCurrencyLanguageStore = new Store<CCL, Action>((action, _state, setState) => {
+	if (action.type === "SET_CCL") {
+		setState(action.ccl);
+	}
+}, initialState);
 
 const unsubscribe = cocoProjectSettingsStore.subscribe(() => {
 	const cart = cartStore.getSnapshot();
@@ -43,11 +40,7 @@ const unsubscribe = cocoProjectSettingsStore.subscribe(() => {
 		});
 	} else {
 		const project = cocoProjectSettingsStore.getSnapshot();
-		if (
-			!project?.countries[0] ||
-			!project?.currencies[0] ||
-			!project?.languages[0]
-		) {
+		if (!project?.countries[0] || !project?.currencies[0] || !project?.languages[0]) {
 			console.error("Project is missing counry, currency or language:");
 			throw new Error("Project is not set");
 		}

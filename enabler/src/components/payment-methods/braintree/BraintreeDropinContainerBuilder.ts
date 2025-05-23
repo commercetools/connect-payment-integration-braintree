@@ -6,9 +6,7 @@ import {
 } from "../../../payment-enabler";
 import { BraintreeDropinContainer } from "./BraintreeDropinContainer";
 
-export class BraintreeDropinContainerBuilder
-	implements PaymentComponentBuilder
-{
+export class BraintreeDropinContainerBuilder implements PaymentComponentBuilder {
 	public componentHasSubmit = true;
 
 	constructor(private baseOptions: BaseOptions) {}

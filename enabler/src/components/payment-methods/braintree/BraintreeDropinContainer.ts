@@ -1,8 +1,4 @@
-import {
-	type BaseOptions,
-	type ComponentOptions,
-	PaymentMethod,
-} from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import { setupBraintreeDropin } from "./setupBraintreeDropin";
 

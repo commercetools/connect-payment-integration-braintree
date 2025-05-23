@@ -23,11 +23,7 @@ export abstract class BaseComponent implements PaymentComponent {
 	protected onComplete: (result: PaymentResult) => void;
 	protected onError: (error?: any) => void;
 
-	constructor(
-		paymentMethod: PaymentMethod,
-		baseOptions: BaseOptions,
-		_componentOptions: ComponentOptions,
-	) {
+	constructor(paymentMethod: PaymentMethod, baseOptions: BaseOptions, _componentOptions: ComponentOptions) {
 		this.paymentMethod = paymentMethod;
 		this.sdk = baseOptions.sdk;
 		this.processorUrl = baseOptions.processorUrl;

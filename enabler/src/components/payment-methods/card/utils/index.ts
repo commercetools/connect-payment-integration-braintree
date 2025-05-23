@@ -8,8 +8,7 @@ export const fieldIds = {
 	holderName: "creditCardForm-holderNameLabel",
 };
 
-export const getInput = (field: string) =>
-	document.querySelector(`#${field}`) as HTMLInputElement;
+export const getInput = (field: string) => document.querySelector(`#${field}`) as HTMLInputElement;
 
 const showErrorIfInvalid = (field: string) => {
 	if (!isFieldValid(field)) {
@@ -17,9 +16,7 @@ const showErrorIfInvalid = (field: string) => {
 		if (input.parentElement) {
 			input.parentElement.classList.add(inputFieldStyles.error as string);
 			input.parentElement
-				.querySelector(
-					`#${field} + .${inputFieldStyles.errorField as string}`,
-				)!
+				.querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
 				.classList.remove(styles.hidden as string);
 		}
 	}
@@ -29,13 +26,9 @@ const hideErrorIfValid = (field: string) => {
 	if (isFieldValid(field)) {
 		const input = getInput(field);
 		if (input.parentElement) {
-			input.parentElement.classList.remove(
-				inputFieldStyles.error as string,
-			);
+			input.parentElement.classList.remove(inputFieldStyles.error as string);
 			input.parentElement
-				.querySelector(
-					`#${field} + .${inputFieldStyles.errorField as string}`,
-				)!
+				.querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
 				.classList.add(styles.hidden as string);
 		}
 	}
@@ -57,12 +50,8 @@ const handleFieldValidation = (field: string) => {
 	input.addEventListener("input", () => {
 		if (input.parentElement) {
 			input.value.length > 0
-				? input.parentElement.classList.add(
-						inputFieldStyles.containValue as string,
-					)
-				: input.parentElement.classList.remove(
-						inputFieldStyles.containValue as string,
-					);
+				? input.parentElement.classList.add(inputFieldStyles.containValue as string)
+				: input.parentElement.classList.remove(inputFieldStyles.containValue as string);
 			hideErrorIfValid(field);
 		}
 	});
@@ -70,12 +59,8 @@ const handleFieldValidation = (field: string) => {
 		showErrorIfInvalid(field);
 		if (input.parentElement) {
 			input.value.length > 0
-				? input.parentElement.classList.add(
-						inputFieldStyles.containValue as string,
-					)
-				: input.parentElement.classList.remove(
-						inputFieldStyles.containValue as string,
-					);
+				? input.parentElement.classList.add(inputFieldStyles.containValue as string)
+				: input.parentElement.classList.remove(inputFieldStyles.containValue as string);
 		}
 	});
 };
@@ -199,9 +184,7 @@ const addCardNumberEventListeners = () => {
 		const brand = getCardBrand(cardNumber.value);
 		cardNumber.value = formatCardNumberValue(brand, cardNumber);
 
-		const cardIcons = document.querySelectorAll(
-			`.${styles.cardIcon as string}`,
-		);
+		const cardIcons = document.querySelectorAll(`.${styles.cardIcon as string}`);
 		cardIcons.forEach((icon) => {
 			icon.classList.add(styles.hidden as string);
 		});

@@ -1,20 +1,13 @@
-import {
-	createInputElement,
-	type InputElementData,
-} from "./createInputElement";
-import {
-	createLabelElement,
-	type LabelElementData,
-} from "./createLabelElement";
+import { createInputElement, type InputElementData } from "./createInputElement";
+import { createLabelElement, type LabelElementData } from "./createLabelElement";
 
-export type LabelledInputData = Omit<
-	InputElementData & LabelElementData,
-	"style"
-> & { id: string; labelStyle?: string; inputStyle?: string };
+export type LabelledInputData = Omit<InputElementData & LabelElementData, "style"> & {
+	id: string;
+	labelStyle?: string;
+	inputStyle?: string;
+};
 
-export const addLabelledInputToParent = function <
-	ParentElement extends HTMLElement,
->(
+export const addLabelledInputToParent = function <ParentElement extends HTMLElement>(
 	labelledInputData: LabelledInputData,
 	parentElement: ParentElement,
 ): ParentElement {

@@ -15,9 +15,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		this.setupData = BraintreePaymentEnabler._Setup(options);
 	}
 
-	private static _Setup = async (
-		options: EnablerOptions,
-	): Promise<{ baseOptions: BaseOptions }> => {
+	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
 		// Fetch SDK config from processor if needed, for example:
 
 		// const configResponse = await fetch(instance.processorUrl + '/config', {
@@ -44,9 +42,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		});
 	};
 
-	async createComponentBuilder(
-		type: string,
-	): Promise<PaymentComponentBuilder | never> {
+	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
@@ -55,9 +51,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 
 		if (!Object.keys(supportedMethods).includes(type)) {
 			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(
-					supportedMethods,
-				).join(", ")}`,
+				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
 			);
 		}
 
@@ -68,9 +62,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		](baseOptions);
 	}
 
-	async createDropinBuilder(
-		type: DropinType,
-	): Promise<PaymentDropinBuilder | never> {
+	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
@@ -80,9 +72,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 
 		if (!Object.keys(supportedMethods).includes(type)) {
 			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(
-					supportedMethods,
-				).join(", ")}`,
+				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
 			);
 		}
 

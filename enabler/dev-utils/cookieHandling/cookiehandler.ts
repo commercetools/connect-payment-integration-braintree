@@ -33,9 +33,7 @@ class CookieHandler {
 
 	getCookies(): TmpCookiesObj {
 		const _cookies: TmpCookiesObj = {};
-		const documentCookies = document.cookie
-			? document.cookie.split("; ")
-			: [];
+		const documentCookies = document.cookie ? document.cookie.split("; ") : [];
 
 		for (let i = 0, len = documentCookies.length; i < len; i++) {
 			const cookieParts = documentCookies[i]!.split("=");

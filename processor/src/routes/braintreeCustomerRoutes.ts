@@ -34,9 +34,7 @@ export const braintreeCustomerRoutes = async (
 		},
 		async (request, reply) => {
 			try {
-				const response = await opts.customerService.createCustomer(
-					request.body,
-				);
+				const response = await opts.customerService.createCustomer(request.body);
 				return reply.status(200).send(response);
 			} catch (error) {
 				console.error("Error in create customer: ", error);
@@ -67,9 +65,7 @@ export const braintreeCustomerRoutes = async (
 		},
 		async (request, reply) => {
 			try {
-				const response = await opts.customerService.findCustomer(
-					request.params.customerId,
-				);
+				const response = await opts.customerService.findCustomer(request.params.customerId);
 				return reply.status(200).send(response);
 			} catch (error) {
 				console.error("Error in find customer: ", error);
@@ -99,9 +95,7 @@ export const braintreeCustomerRoutes = async (
 		},
 		async (request, reply) => {
 			try {
-				await opts.customerService.deleteCustomer(
-					request.params.customerId,
-				);
+				await opts.customerService.deleteCustomer(request.params.customerId);
 				return reply.status(204).send();
 			} catch (error) {
 				console.error("Error in delete customer: ", error);

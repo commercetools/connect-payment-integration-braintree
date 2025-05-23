@@ -5,10 +5,7 @@ const config = getConfig();
 export const fetchAdminToken = async () => {
 	const myHeaders = new Headers();
 
-	myHeaders.append(
-		"Authorization",
-		`Basic ${btoa(`${config.CTP_CLIENT_ID}:${config.CTP_CLIENT_SECRET}`)}`,
-	);
+	myHeaders.append("Authorization", `Basic ${btoa(`${config.CTP_CLIENT_ID}:${config.CTP_CLIENT_SECRET}`)}`);
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
 	var urlencoded = new URLSearchParams();

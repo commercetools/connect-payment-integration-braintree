@@ -1,8 +1,4 @@
-import {
-	type BaseOptions,
-	type ComponentOptions,
-	PaymentMethod,
-} from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import inputFieldStyles from "../../../style/inputField.module.scss";
 import styles from "../../../style/style.module.scss";
@@ -20,17 +16,13 @@ export class PurchaseOrder extends BaseComponent {
 	}
 
 	mount(selector: string) {
-		document
-			.querySelector(selector)!
-			.insertAdjacentHTML("afterbegin", this._getTemplate());
+		document.querySelector(selector)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 
 		if (this.showPayButton) {
-			document
-				.querySelector("#purchaseOrderForm-paymentButton")!
-				.addEventListener("click", (e) => {
-					e.preventDefault();
-					this.submit();
-				});
+			document.querySelector("#purchaseOrderForm-paymentButton")!.addEventListener("click", (e) => {
+				e.preventDefault();
+				this.submit();
+			});
 		}
 
 		this.addFormFieldsEventListeners();
@@ -96,30 +88,22 @@ export class PurchaseOrder extends BaseComponent {
     <div class="${styles.wrapper}">
       <form class="${styles.paymentForm}">
         <div class="${inputFieldStyles.inputContainer as string}">
-          <label class="${
-				inputFieldStyles.inputLabel
-			}" for="purchaseOrderForm-poNumber">
+          <label class="${inputFieldStyles.inputLabel}" for="purchaseOrderForm-poNumber">
             PO Number <span aria-hidden="true"> *</span>
           </label>
           <input class="${
 				inputFieldStyles.inputField as string
 			}" type="text" id="purchaseOrderForm-poNumber" name="poNumber" value="">
-          <span class="${styles.hidden as string} ${
-				inputFieldStyles.errorField as string
-			}">Invalid PO number</span>
+          <span class="${styles.hidden as string} ${inputFieldStyles.errorField as string}">Invalid PO number</span>
         </div>
         <div class="${inputFieldStyles.inputContainer}">
-          <label class="${
-				inputFieldStyles.inputLabel
-			}" for="purchaseOrderForm-invoiceMemo">
+          <label class="${inputFieldStyles.inputLabel}" for="purchaseOrderForm-invoiceMemo">
             Invoice memo
           </label>
           <input class="${
 				inputFieldStyles.inputField as string
 			}" type="text" id="purchaseOrderForm-invoiceMemo" name="invoiceMemo" value="">
-          <span class="${styles.hidden as string} ${
-				inputFieldStyles.errorField as string
-			}">Invalid Invoice memo</span>
+          <span class="${styles.hidden as string} ${inputFieldStyles.errorField as string}">Invalid Invoice memo</span>
         </div>
         ${payButton}
       </form>
@@ -155,13 +139,9 @@ export class PurchaseOrder extends BaseComponent {
 		if (!this.isFieldValid(field)) {
 			const input = this.getInput(field);
 			if (input.parentElement) {
-				input.parentElement.classList.add(
-					inputFieldStyles.error as string,
-				);
+				input.parentElement.classList.add(inputFieldStyles.error as string);
 				input.parentElement
-					.querySelector(
-						`#${field} + .${inputFieldStyles.errorField as string}`,
-					)!
+					.querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
 					.classList.remove(styles.hidden as string);
 			}
 		}
@@ -171,13 +151,9 @@ export class PurchaseOrder extends BaseComponent {
 		if (this.isFieldValid(field)) {
 			const input = this.getInput(field);
 			if (input.parentElement) {
-				input.parentElement.classList.remove(
-					inputFieldStyles.error as string,
-				);
+				input.parentElement.classList.remove(inputFieldStyles.error as string);
 				input.parentElement
-					.querySelector(
-						`#${field} + .${inputFieldStyles.errorField as string}`,
-					)!
+					.querySelector(`#${field} + .${inputFieldStyles.errorField as string}`)!
 					.classList.add(styles.hidden as string);
 			}
 		}
@@ -205,12 +181,8 @@ export class PurchaseOrder extends BaseComponent {
 	private manageLabelClass = (input: HTMLInputElement) => {
 		if (input.parentElement) {
 			input.value.length > 0
-				? input.parentElement.classList.add(
-						inputFieldStyles.containValue as string,
-					)
-				: input.parentElement.classList.remove(
-						inputFieldStyles.containValue as string,
-					);
+				? input.parentElement.classList.add(inputFieldStyles.containValue as string)
+				: input.parentElement.classList.remove(inputFieldStyles.containValue as string);
 		}
 	};
 }
