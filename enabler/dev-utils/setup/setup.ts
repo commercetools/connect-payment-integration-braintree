@@ -1,12 +1,12 @@
-import { BraintreePaymentEnabler } from "./payment-enabler";
-import { createSession, fetchAccessToken, getConfig, tryUpdateSessionFromLocalStorage } from "../dev-utils";
-import { braintreeContainerId, createCheckoutButtonId } from "./constants";
-import { cocoSessionStore } from "./store";
-import { getPaymentMethods } from "./integrations/braintree/operations";
+import { BraintreePaymentEnabler } from "../../src/payment-enabler";
+import { createSession, fetchAccessToken, getConfig, tryUpdateSessionFromLocalStorage } from "..";
+import { braintreeContainerId, createCheckoutButtonId } from "../../src/constants";
+import { cocoSessionStore } from "../../src/store";
+import { getPaymentMethods } from "../../src/integrations/braintree/operations";
 
 const config = getConfig();
 
-export const __setup = function async(): void {
+export const setup = function async(): void {
 	document.addEventListener("DOMContentLoaded", async () => {
 		await tryUpdateSessionFromLocalStorage();
 		const accessToken = await fetchAccessToken();
