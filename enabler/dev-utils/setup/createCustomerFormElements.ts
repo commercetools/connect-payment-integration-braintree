@@ -1,4 +1,4 @@
-import { type LabelledInputData } from "../src/helpers/elements";
+import { type LabelledInputData } from "../../src/helpers/elements";
 
 export type CreateCustomerFormData = LabelledInputData & {
 	isOptional?: boolean;

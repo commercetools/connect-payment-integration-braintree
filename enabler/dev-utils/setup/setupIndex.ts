@@ -6,7 +6,7 @@ import { getPaymentMethods } from "../../src/integrations/braintree/operations";
 
 const config = getConfig();
 
-export const setup = function async(): void {
+export const setupIndex = function async(): void {
 	document.addEventListener("DOMContentLoaded", async () => {
 		await tryUpdateSessionFromLocalStorage();
 		const accessToken = await fetchAccessToken();
