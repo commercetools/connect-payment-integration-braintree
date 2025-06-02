@@ -83,9 +83,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing a list of supported payment components
 	 */
 	public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
-		// TODO get from braintree
 		return {
-			dropins: [],
+			dropins: [{ type: "embedded" }],
 			components: [
 				{
 					type: PaymentMethodType.CARD,
