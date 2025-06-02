@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Vite + TS</title>
+		<title>Braintree connector</title>
 		<link
 			rel="stylesheet"
 			href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
@@ -56,8 +56,38 @@
 			<div class="album py-5 bg-light">
 				<div class="container">
 					<script type="module">
-						import { setupIndex } from "/dev-utils/setup";
-						setupIndex();
+						import { getPaymentMethods } from "./src/integrations/braintree/operations";
+						import { setupIndex } from "./dev-utils/setup";
+						import { tryUpdateSessionFromLocalStorage, fetchAccessToken } from "./dev-utils";
+						
+						await tryUpdateSessionFromLocalStorage();
+						const accessToken = await fetchAccessToken();
+
+						
+						// START set up payment methods
+						const paymentMethodSelect = document.getElementById("paymentMethod");
+						if (paymentMethodSelect) {
+							const paymentMethods = await getPaymentMethods(accessToken);
+							paymentMethods.components.forEach((component) => {
+								const option = document.createElement("option");
+								option.value = component.type;
+								option.textContent = component.type;
+								paymentMethodSelect.appendChild(option);
+							});
+							paymentMethods.dropins?.forEach((method) => {
+								const option = document.createElement("option");
+								option.value = `${method.type}`;
+								option.textContent = `dropin-${method.type}`;
+								paymentMethodSelect.appendChild(option);
+							});
+						} else {
+							console.error('Cannot populate payment method selection, select with ID "paymentMethod" not found.');
+						}
+						// END set up payment methods
+
+						await setupIndex();
+
+						
 					</script>
 
 					<div id="braintree-container"></div>
