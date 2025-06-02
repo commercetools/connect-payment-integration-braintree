@@ -1,3 +1,5 @@
-export { setupIndex } from "./setupIndex";
-export { setupCustomerPage } from "./setupCustomerPage";
-export { createCustomerFormElements } from "./createCustomerFormElements";
+import { setupIndex } from "./setupIndex";
+import { setupCustomerPage } from "./setupCustomerPage";
+import { createCustomerFormElements } from "./createCustomerFormElements";
+
+export { setupIndex, setupCustomerPage, createCustomerFormElements };
