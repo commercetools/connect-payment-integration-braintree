@@ -29,6 +29,6 @@
 	"watchOptions": {
 		"watchFile": "fixedPollingInterval"
 	},
-	"include": ["src", "decs.d.ts"],
+	"include": ["src", "decs.d.ts", "dev-utils"],
 	"exclude": ["node_modules", "tests/**/*.ts", "**/*.spec.ts"]
 }
