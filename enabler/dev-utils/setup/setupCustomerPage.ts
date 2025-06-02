@@ -106,7 +106,7 @@ const createCreateCustomerForm = function () {
 					}
 					return;
 				}
-				createCustomerBody[elementData.parameterName ?? elementData.id] = element.value;
+				createCustomerBody[elementData.parameterName] = element.value;
 			});
 
 			if (missingRequiredParams.length > 0) {
