@@ -1,23 +1,15 @@
-import { CreateCustomerRequestSchema } from './CreateCustomerRequestSchema';
-import { CreateCustomerRequestSchemaDTO } from './CreateCustomerRequestSchemaDTO';
-import { CreateCustomerResponseSchema } from './CreateCustomerResponseSchema';
-import { CreateCustomerResponseSchemaDTO } from './CreateCustomerResponseSchemaDTO';
-import { DeleteCustomerRequestSchema } from './DeleteCustomerRequestSchema';
-import { DeleteCustomerRequestSchemaDTO } from './DeleteCustomerRequestSchemaDTO';
-import { FindCustomerRequestSchema } from './FindCustomerRequestSchema';
-import { FindCustomerRequestSchemaDTO } from './FindCustomerRequestSchemaDTO';
-import { FindCustomerResponseSchema } from './FindCustomerResponseSchema';
-import { FindCustomerResponseSchemaDTO } from './FindCustomerResponseSchemaDTO';
+import { CreateCustomerRequestSchema } from "./CreateCustomerRequestSchema";
+import { CreateCustomerRequestSchemaDTO } from "./CreateCustomerRequestSchemaDTO";
+import { CreateCustomerResponseSchema } from "./CreateCustomerResponseSchema";
+import { CreateCustomerResponseSchemaDTO } from "./CreateCustomerResponseSchemaDTO";
+import { GetCustomerResponseSchema } from "./GetCustomerResponseSchema";
+import { GetCustomerResponseSchemaDTO } from "./GetCustomerResponseSchemaDTO";
 
 export {
-  CreateCustomerRequestSchema,
-  type CreateCustomerRequestSchemaDTO,
-  CreateCustomerResponseSchema,
-  type CreateCustomerResponseSchemaDTO,
-  DeleteCustomerRequestSchema,
-  type DeleteCustomerRequestSchemaDTO,
-  FindCustomerRequestSchema,
-  type FindCustomerRequestSchemaDTO,
-  FindCustomerResponseSchema,
-  type FindCustomerResponseSchemaDTO,
+	CreateCustomerRequestSchema,
+	type CreateCustomerRequestSchemaDTO,
+	CreateCustomerResponseSchema,
+	type CreateCustomerResponseSchemaDTO,
+	GetCustomerResponseSchema,
+	type GetCustomerResponseSchemaDTO,
 };

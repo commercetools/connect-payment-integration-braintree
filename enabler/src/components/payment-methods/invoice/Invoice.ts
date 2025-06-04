@@ -1,77 +1,69 @@
-import {
-  type BaseOptions,
-  type ComponentOptions,
-  PaymentMethod,
-} from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 import { BaseComponent } from "../../BaseComponent";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
 import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 
 export class Invoice extends BaseComponent {
-  private showPayButton: boolean;
+	private showPayButton: boolean;
 
-  constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
-    super(PaymentMethod.invoice, baseOptions, componentOptions);
-    this.showPayButton = componentOptions?.showPayButton ?? false;
-  }
+	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
+		super(PaymentMethod.invoice, baseOptions, componentOptions);
+		this.showPayButton = componentOptions?.showPayButton ?? false;
+	}
 
-  mount(selector: string) {
-    document
-      .querySelector(selector)!
-      .insertAdjacentHTML("afterbegin", this._getTemplate());
+	mount(selector: string) {
+		document.querySelector(selector)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 
-    if (this.showPayButton) {
-      document
-        .querySelector("#invoiceForm-paymentButton")!
-        .addEventListener("click", (e) => {
-          e.preventDefault();
-          this.submit();
-        });
-    }
-  }
+		if (this.showPayButton) {
+			document.querySelector("#invoiceForm-paymentButton")!.addEventListener("click", (e) => {
+				e.preventDefault();
+				this.submit();
+			});
+		}
+	}
 
-  async submit() {
-    // here we would call the SDK to submit the payment
-    this.sdk.init({ environment: this.environment });
-    try {
-      const requestData: PaymentRequestSchemaDTO = {
-        paymentMethod: {
-          type: this.paymentMethod,
-        },
-        paymentOutcome: PaymentOutcome.AUTHORIZED,
-      };
-      const response = await fetch(this.processorUrl + "/payments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Session-Id": this.sessionId,
-        },
-        body: JSON.stringify(requestData),
-      });
-      const data = await response.json();
-      if (data.paymentReference) {
-        this.onComplete &&
-          this.onComplete({
-            isSuccess: true,
-            paymentReference: data.paymentReference,
-          });
-      } else {
-        this.onError("Some error occurred. Please try again.");
-      }
-    } catch (e) {
-      this.onError("Some error occurred. Please try again.");
-    }
-  }
+	async submit() {
+		// here we would call the SDK to submit the payment
+		this.sdk.init({ environment: this.environment });
+		try {
+			const requestData: PaymentRequestSchemaDTO = {
+				paymentMethod: {
+					type: this.paymentMethod,
+				},
+				paymentOutcome: PaymentOutcome.AUTHORIZED,
+			};
+			const response = await fetch(this.processorUrl + "/payments", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Session-Id": this.sessionId,
+				},
+				body: JSON.stringify(requestData),
+			});
+			const data = await response.json();
+			if (data.paymentReference) {
+				this.onComplete &&
+					this.onComplete({
+						isSuccess: true,
+						paymentReference: data.paymentReference,
+					});
+			} else {
+				this.onError("Some error occurred. Please try again.");
+			}
+		} catch (e) {
+			this.onError("Some error occurred. Please try again.");
+		}
+	}
 
-  private _getTemplate() {
-    return this.showPayButton
-      ? `
+	private _getTemplate() {
+		return this.showPayButton
+			? `
     <div class="${styles.wrapper}">
       <p>Pay easily with Invoice and transfer the shopping amount within the specified date.</p>
       <button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="invoiceForm-paymentButton">Pay</button>
     </div>
     `
-      : "";
-  }
+			: "";
+	}
 }

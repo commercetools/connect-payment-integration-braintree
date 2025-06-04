@@ -1,3 +1,3 @@
-import { StatusResponseSchemaDTO } from '../../../dtos/operations';
+import { StatusResponseSchemaDTO } from "../../../dtos/operations";
 
 export type StatusResponse = StatusResponseSchemaDTO;

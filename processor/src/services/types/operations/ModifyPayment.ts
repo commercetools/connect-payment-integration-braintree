@@ -1,6 +1,6 @@
-import { PaymentIntentRequestSchemaDTO } from '../../../dtos/operations';
+import { PaymentIntentRequestSchemaDTO } from "../../../dtos/operations";
 
 export type ModifyPayment = {
-  paymentId: string;
-  data: PaymentIntentRequestSchemaDTO;
+	paymentId: string;
+	data: PaymentIntentRequestSchemaDTO;
 };

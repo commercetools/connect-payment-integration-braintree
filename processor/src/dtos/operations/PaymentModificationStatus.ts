@@ -1,5 +1,5 @@
 export enum PaymentModificationStatus {
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  RECEIVED = 'received',
+	APPROVED = "approved",
+	REJECTED = "rejected",
+	RECEIVED = "received",
 }

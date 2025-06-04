@@ -1,10 +1,10 @@
-import { Type } from '@sinclair/typebox';
+import { Type } from "@sinclair/typebox";
 
 const DropinType = Type.Enum({
-  EMBEDDED: 'embedded',
-  HPP: 'hpp',
+	EMBEDDED: "embedded",
+	HPP: "hpp",
 });
 
 export const SupportedPaymentDropinsData = Type.Object({
-  type: DropinType,
+	type: DropinType,
 });
