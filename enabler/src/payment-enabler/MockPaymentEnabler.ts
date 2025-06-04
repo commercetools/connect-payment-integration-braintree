@@ -3,7 +3,6 @@ import { InvoiceBuilder } from "../components/payment-methods/invoice";
 import { PurchaseOrderBuilder } from "../components/payment-methods/purchase-order";
 import { FakeSdk } from "../sdk/FakeSdk";
 import { type PaymentEnabler } from "./PaymentEnabler";
-import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
 import { type BaseOptions } from "./BaseOptions";
 import { DropinType } from "./DropinType";
 import { type EnablerOptions } from "./EnablerOptions";
@@ -66,10 +65,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
-		const supportedMethods = {
-			embedded: DropinEmbeddedBuilder,
-			// hpp: DropinHppBuilder,
-		};
+		const supportedMethods = {};
 
 		if (!Object.keys(supportedMethods).includes(type)) {
 			throw new Error(
