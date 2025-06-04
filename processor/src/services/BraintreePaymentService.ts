@@ -8,7 +8,7 @@ import {
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import braintree from "braintree";

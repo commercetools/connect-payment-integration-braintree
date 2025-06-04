@@ -5,7 +5,7 @@ import { type EnablerOptions } from "./EnablerOptions";
 import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
 import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 import { BraintreeSdk } from "../sdk";
-import { BraintreeDropinContainerBuilder } from "../components/payment-methods/braintree/BraintreeDropinContainerBuilder";
+import { BraintreeDropinContainerBuilder } from "../dropin";
 
 export class BraintreePaymentEnabler implements PaymentEnabler {
 	setupData: Promise<{ baseOptions: BaseOptions }>;

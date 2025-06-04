@@ -3,7 +3,7 @@ import {
 	type ComponentOptions,
 	type PaymentComponent,
 	type PaymentDropinBuilder,
-} from "../../../payment-enabler";
+} from "../payment-enabler";
 import { BraintreeDropinContainer } from "./BraintreeDropinContainer";
 
 export class BraintreeDropinContainerBuilder implements PaymentDropinBuilder {
