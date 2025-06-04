@@ -1,5 +1,4 @@
 import { type PaymentEnabler } from "./PaymentEnabler";
-import { DropinEmbeddedBuilder } from "../dropin/DropinEmbeddedBuilder";
 import { type BaseOptions } from "./BaseOptions";
 import { DropinType } from "./DropinType";
 import { type EnablerOptions } from "./EnablerOptions";
@@ -43,30 +42,29 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
+		// @ts-expect-error - DropinType.hpp currently not supported
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
-			card: BraintreeDropinContainerBuilder,
+			// 	card: TODO
 		};
 
-		if (!Object.keys(supportedMethods).includes(type)) {
-			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
-			);
-		}
+		// if (!Object.keys(supportedMethods).includes(type)) {
+		throw new Error(
+			`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
+		);
+		// }
 
-		return new supportedMethods[
-			type as keyof {
-				card: BraintreeDropinContainerBuilder;
-			}
-		](baseOptions);
+		// return new supportedMethods[
+		// 	type as keyof typeof supportedMethods
+		// ](baseOptions);
 	}
 
 	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
-			embedded: DropinEmbeddedBuilder,
+			embedded: BraintreeDropinContainerBuilder,
 			// hpp: DropinHppBuilder,
 		};
 
