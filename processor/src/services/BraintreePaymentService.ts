@@ -86,15 +86,15 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return {
 			dropins: [{ type: "embedded" }],
 			components: [
-				{
-					type: PaymentMethodType.CARD,
-				},
-				{
-					type: PaymentMethodType.INVOICE,
-				},
-				{
-					type: PaymentMethodType.PURCHASE_ORDER,
-				},
+				// {
+				// 	type: PaymentMethodType.CARD,
+				// },
+				// {
+				// 	type: PaymentMethodType.INVOICE,
+				// },
+				// {
+				// 	type: PaymentMethodType.PURCHASE_ORDER,
+				// },
 			],
 		};
 	}
