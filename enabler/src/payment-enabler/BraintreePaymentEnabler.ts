@@ -42,7 +42,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
-		// @ts-expect-error - DropinType.hpp currently not supported
+		// @ts-expect-error - unused variable
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
