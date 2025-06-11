@@ -20,5 +20,6 @@ export class BraintreeDropinContainer extends BaseComponent {
 	async submit() {
 		// here we would call the SDK to submit the payment
 		this.sdk.init({ environment: this.environment });
+		//TODO: move logic from setupBraintreeDropin to here
 	}
 }
