@@ -14,8 +14,8 @@ export class Card extends BaseComponent {
 		this.showPayButton = componentOptions?.showPayButton ?? false;
 	}
 
-	mount(selector: string) {
-		document.querySelector(selector)!.insertAdjacentHTML("afterbegin", this._getTemplate());
+	mount(containerId: string) {
+		document.getElementById(containerId)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();

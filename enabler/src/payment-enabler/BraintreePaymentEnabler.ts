@@ -6,6 +6,7 @@ import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
 import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 import { BraintreeSdk } from "../sdk";
 import { BraintreeDropinContainerBuilder } from "../dropin";
+import { CardBuilder } from "../components/payment-methods/card";
 
 export class BraintreePaymentEnabler implements PaymentEnabler {
 	setupData: Promise<{ baseOptions: BaseOptions }>;
@@ -42,22 +43,19 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
-		// @ts-expect-error - unused variable
 		const { baseOptions } = await this.setupData;
 
 		const supportedMethods = {
-			// 	card: TODO
+			card: CardBuilder,
 		};
 
-		// if (!Object.keys(supportedMethods).includes(type)) {
-		throw new Error(
-			`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
-		);
-		// }
+		if (!Object.keys(supportedMethods).includes(type)) {
+			throw new Error(
+				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
+			);
+		}
 
-		// return new supportedMethods[
-		// 	type as keyof typeof supportedMethods
-		// ](baseOptions);
+		return new supportedMethods[type as keyof typeof supportedMethods](baseOptions);
 	}
 
 	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {

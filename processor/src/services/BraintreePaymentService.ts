@@ -8,7 +8,7 @@ import {
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import braintree from "braintree";
@@ -86,15 +86,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return {
 			dropins: [{ type: "embedded" }],
 			components: [
-				// {
-				// 	type: PaymentMethodType.CARD,
-				// },
-				// {
-				// 	type: PaymentMethodType.INVOICE,
-				// },
-				// {
-				// 	type: PaymentMethodType.PURCHASE_ORDER,
-				// },
+				{
+					type: PaymentMethodType.CARD,
+				},
 			],
 		};
 	}
