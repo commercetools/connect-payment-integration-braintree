@@ -30,7 +30,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 			environment: "test",
 		};
 
-		return Promise.resolve({
+		return {
 			baseOptions: {
 				sdk: new BraintreeSdk(sdkOptions),
 				processorUrl: options.processorUrl,
@@ -39,7 +39,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 				onComplete: options.onComplete || (() => {}),
 				onError: options.onError || (() => {}),
 			},
-		});
+		};
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
