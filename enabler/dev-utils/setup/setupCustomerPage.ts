@@ -1,16 +1,16 @@
-import { createSession, tryUpdateSessionFromLocalStorage } from "../dev-utils";
+import { createSession, tryUpdateSessionFromLocalStorage } from "../";
 import {
 	type CreateBraintreeCustomerRequest,
 	createCustomer,
 	deleteCustomer,
 	findCustomer,
-} from "../dev-utils/integrations/braintree/customer";
-import { createCustomerFormElements } from "./createCustomerFormElements";
-import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../src/constants";
-import { cocoSessionStore } from "../src/store";
-import { addLabelledInputToParent, createButtonElement, createHeaderElement } from "../src/helpers/elements";
+} from "../integrations/braintree/customer";
+import { createCustomerFormElements } from "../setup";
+import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../../src/constants";
+import { cocoSessionStore } from "../../src/store";
+import { addLabelledInputToParent, createButtonElement, createHeaderElement } from "../../src/helpers/elements";
 
-export const __setup = function () {
+export const setupCustomerPage = function () {
 	tryUpdateSessionFromLocalStorage().then(() => {
 		if (!cocoSessionStore.getSnapshot()?.id) {
 			createSessionIdFields();
@@ -106,7 +106,7 @@ const createCreateCustomerForm = function () {
 					}
 					return;
 				}
-				createCustomerBody[elementData.parameterName ?? elementData.id] = element.value;
+				createCustomerBody[elementData.parameterName] = element.value;
 			});
 
 			if (missingRequiredParams.length > 0) {

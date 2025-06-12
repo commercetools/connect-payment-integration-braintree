@@ -8,7 +8,7 @@ import {
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import braintree from "braintree";
@@ -83,19 +83,18 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing a list of supported payment components
 	 */
 	public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
-		// TODO get from braintree
 		return {
-			dropins: [],
+			dropins: [{ type: "embedded" }],
 			components: [
-				{
-					type: PaymentMethodType.CARD,
-				},
-				{
-					type: PaymentMethodType.INVOICE,
-				},
-				{
-					type: PaymentMethodType.PURCHASE_ORDER,
-				},
+				// {
+				// 	type: PaymentMethodType.CARD,
+				// },
+				// {
+				// 	type: PaymentMethodType.INVOICE,
+				// },
+				// {
+				// 	type: PaymentMethodType.PURCHASE_ORDER,
+				// },
 			],
 		};
 	}

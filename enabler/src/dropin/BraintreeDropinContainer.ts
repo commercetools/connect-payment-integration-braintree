@@ -1,5 +1,5 @@
-import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
-import { BaseComponent } from "../../BaseComponent";
+import { BaseComponent } from "../components/BaseComponent";
+import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../payment-enabler";
 import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
 export class BraintreeDropinContainer extends BaseComponent {

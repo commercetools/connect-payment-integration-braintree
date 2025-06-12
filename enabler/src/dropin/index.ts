@@ -1,4 +1,5 @@
-import { DropinComponents } from "./DropinComponents";
-import { DropinEmbeddedBuilder } from "./DropinEmbeddedBuilder";
+import { BraintreeDropinContainer } from "./BraintreeDropinContainer";
+import { BraintreeDropinContainerBuilder } from "./BraintreeDropinContainerBuilder";
+import { setupBraintreeDropin } from "./setupBraintreeDropin";
 
-export { DropinComponents, DropinEmbeddedBuilder };
+export { BraintreeDropinContainer, BraintreeDropinContainerBuilder, setupBraintreeDropin };

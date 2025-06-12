@@ -1,6 +1,6 @@
 import { create } from "braintree-web-drop-in";
-import { getConfig } from "../../../../dev-utils";
-import { braintreeDropinContainerId, braintreePurchaseButtonId } from "../../../constants";
+import { getConfig } from "../../dev-utils";
+import { braintreeDropinContainerId, braintreePurchaseButtonId } from "../constants";
 
 const config = getConfig();
 

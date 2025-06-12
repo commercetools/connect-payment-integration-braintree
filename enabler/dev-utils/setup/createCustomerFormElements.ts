@@ -1,8 +1,10 @@
-import { type LabelledInputData } from "../src/helpers/elements";
+import { type LabelledInputData } from "../../src/helpers/elements";
+import type { CreateBraintreeCustomerRequest } from "../integrations/braintree/customer";
 
 export type CreateCustomerFormData = LabelledInputData & {
+	id: string;
 	isOptional?: boolean;
-	parameterName?: string;
+	parameterName: keyof CreateBraintreeCustomerRequest;
 };
 
 export const createCustomerFormElements: CreateCustomerFormData[] = [
@@ -47,7 +49,8 @@ export const createCustomerFormElements: CreateCustomerFormData[] = [
 	},
 	{
 		isOptional: true,
-		id: "customFields",
+		id: "customerCustomFields",
+		parameterName: "customFields",
 		label: "Custom fields:",
 		labelStyle: "margin-right: 5px",
 	},
