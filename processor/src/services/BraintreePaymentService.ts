@@ -13,6 +13,11 @@ import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePayment
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
+import { logger } from '../libs/logger';
+import { PaymentModificationStatus } from "../dtos/operations";
+
+import type { AmountSchemaDTO } from "../dtos/operations";
+
 
 const config = getConfig();
 
@@ -93,6 +98,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
+	
+
 	/**
 	 * Create payment
 	 *
@@ -130,11 +137,31 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	public async capturePayment(
-		// @ts-expect-error - unused parameter
-		request: CapturePaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
-		throw new Error("Not yet implemented");
+	async capturePayment(capturePaymentRequest: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
+		const action = "capturePayment";
+		const transactionType = this.getPaymentTransactionType(action);
+		logger.info(`Processing payment modification.`, {
+		  paymentId: capturePaymentRequest.payment.id,
+		  action
+		});
+	
+		const response = await this.processPaymentModificationInternal({
+			request: capturePaymentRequest,
+		  	transactionType,
+		  	adyenOperation: 'capture',
+		  	amount: capturePaymentRequest.amount,
+		});
+	
+		logger.info(`Payment modification completed.`, {
+		  paymentId: capturePaymentRequest.payment.id,
+		  action: 'capturePayment',
+		  result: response.outcome,
+		});
+	
+		return {
+			outcome: response.outcome,
+			pspReference: response.pspReference,
+		};
 	}
 
 	/**
@@ -179,5 +206,38 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	// @ts-expect-error - unused parameter
 	private validatePaymentMethod(request: CreatePaymentRequest): void {
 		throw new Error("Not yet implemented");
+	}
+
+	private async processPaymentModificationInternal(opts: {
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest ;
+		transactionType: 'Charge' | 'Refund' | 'CancelAuthorization';
+		adyenOperation: 'capture' | 'refund' | 'cancel' | 'reverse';
+		amount: AmountSchemaDTO;
+	  }): Promise<PaymentProviderModificationResponse> {
+		const { request, transactionType, adyenOperation, amount } = opts;
+		await this.ctPaymentService.updatePayment({
+		  id: request.payment.id,
+		  transaction: {
+			type: transactionType,
+			amount,
+			state: 'Initial',
+		  },
+		});
+	
+		const interfaceId = request.payment.interfaceId as string;
+	
+		const response = await this.makeCallToAdyenInternal(interfaceId, adyenOperation, request);
+	
+		await this.ctPaymentService.updatePayment({
+		  id: request.payment.id,
+		  transaction: {
+			type: transactionType,
+			amount,
+			interactionId: response.pspReference,
+			state: this.convertPaymentModificationOutcomeToState(PaymentModificationStatus.RECEIVED),
+		  },
+		});
+	
+		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.pspReference };
 	}
 }
