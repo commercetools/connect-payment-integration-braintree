@@ -5,7 +5,7 @@ import styles from "../../../style/style.module.scss";
 import { BaseComponent } from "../../BaseComponent";
 import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
 import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
-
+import { client } from "braintree-web";
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 

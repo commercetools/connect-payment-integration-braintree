@@ -7,12 +7,34 @@ import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
 import { BraintreeSdk } from "../sdk";
 import { BraintreeDropinContainerBuilder } from "../dropin";
 import { CardBuilder } from "../components/payment-methods/card";
+import { client } from "braintree-web";
 
 export class BraintreePaymentEnabler implements PaymentEnabler {
 	setupData: Promise<{ baseOptions: BaseOptions }>;
 
 	constructor(options: EnablerOptions) {
 		this.setupData = BraintreePaymentEnabler._Setup(options);
+	}
+
+	private getBraintreeToken = async (options: EnablerOptions): Promise<string> => {
+
+		let response!: Response;
+		try {
+			response = await fetch(`${options.processorUrl}/init`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Session-Id": options.sessionId,
+				},
+				body: JSON.stringify({}),
+			});
+		} catch (error) {
+			console.log("error: ", error);
+			console.log("response: ", response);
+		}
+
+		const token: { clientToken: string } = await response.json();
+		return token.clientToken
 	}
 
 	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
@@ -25,14 +47,18 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 
 		// const configJson = await configResponse.json();
 
+		const clientToken = await BraintreePaymentEnabler.prototype.getBraintreeToken(options);
+
 		const sdkOptions = {
 			// environment: configJson.environment,
 			environment: "test",
 		};
-
+		const braintreeClient = await client.create({
+			authorization: clientToken,
+		})
 		return {
 			baseOptions: {
-				sdk: new BraintreeSdk(sdkOptions),
+				sdk: braintreeClient,
 				processorUrl: options.processorUrl,
 				sessionId: options.sessionId,
 				environment: sdkOptions.environment,
