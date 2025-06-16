@@ -5,7 +5,8 @@ import {
 	PaymentMethod,
 	type PaymentResult,
 } from "../payment-enabler";
-import { BasePaymentSdk } from "../sdk";
+
+import type { Client } from "braintree-web";
 
 export type ElementOptions = {
 	paymentMethod: PaymentMethod;
@@ -16,7 +17,7 @@ export type ElementOptions = {
  */
 export abstract class BaseComponent implements PaymentComponent {
 	protected paymentMethod: ElementOptions["paymentMethod"];
-	protected sdk: BasePaymentSdk;
+	protected sdk: Client;
 	protected processorUrl: BaseOptions["processorUrl"];
 	protected sessionId: BaseOptions["sessionId"];
 	protected environment: BaseOptions["environment"];
