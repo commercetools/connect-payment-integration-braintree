@@ -42,7 +42,7 @@
 		"@jest/globals": "29.7.0",
 		"@types/braintree": "^3.3.14",
 		"@types/jest": "29.5.14",
-		"@types/node": "22.15.29",
+		"@types/node": "24.0.1",
 		"@typescript-eslint/eslint-plugin": "8.34.0",
 		"@typescript-eslint/parser": "8.34.0",
 		"eslint": "9.28.0",
