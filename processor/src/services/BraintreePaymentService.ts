@@ -11,19 +11,19 @@ import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionRe
 import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
-import braintree from "braintree";
+import { BraintreeGateway, Environment } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 
 const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	private braintreeGateway: braintree.BraintreeGateway;
+	private braintreeGateway: BraintreeGateway;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
 
-		this.braintreeGateway = new braintree.BraintreeGateway({
-			environment: braintree.Environment.Sandbox,
+		this.braintreeGateway = new BraintreeGateway({
+			environment: Environment.Sandbox,
 			merchantId: config.braintreeMerchantId,
 			publicKey: config.braintreePublicKey,
 			privateKey: config.braintreePrivateKey,
@@ -94,6 +94,34 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	}
 
 	/**
+	 * Create payment
+	 *
+	 * @remarks
+	 * Implementation to provide the mocking data for payment creation in external PSPs
+	 *
+	 * @param request - contains paymentType defined in composable commerce
+	 * @returns Promise with mocking data containing operation status and PSP reference
+	 */
+	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+		throw new Error("Not yet implemented");
+		try {
+			const response = await this.braintreeGateway.transaction.sale({
+				amount: request.data.amount,
+				paymentMethodNonce: request.data.nonce,
+				options: request.data.options,
+			});
+			if (response.success) {
+				// TODO handle success
+				response.transaction.
+			} else {
+				// TODO handle error
+			}
+		} catch (error) {
+			// TODO handle error
+		}
+	}
+
+	/**
 	 * Capture payment
 	 *
 	 * @remarks
@@ -138,22 +166,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		// @ts-expect-error - unused parameter
 		request: RefundPaymentRequest,
 	): Promise<PaymentProviderModificationResponse> {
-		throw new Error("Not yet implemented");
-	}
-
-	/**
-	 * Create payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment creation in external PSPs
-	 *
-	 * @param request - contains paymentType defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-	public async createPayment(
-		// @ts-expect-error - unused parameter
-		request: CreatePaymentRequest,
-	): Promise<PaymentResponseSchemaDTO> {
 		throw new Error("Not yet implemented");
 	}
 
