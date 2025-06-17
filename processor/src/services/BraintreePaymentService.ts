@@ -13,11 +13,11 @@ import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePayment
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
-import { logger } from '../libs/logger';
+import { logger } from "../libs/logger";
 import { PaymentModificationStatus } from "../dtos/operations";
-
 import type { AmountSchemaDTO } from "../dtos/operations";
-
+import { ErrorInvalidOperation, Errorx } from "@commercetools/connect-payments-sdk";
+import { wrapBraintreeError } from "../errors";
 
 const config = getConfig();
 
@@ -98,8 +98,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	
-
 	/**
 	 * Create payment
 	 *
@@ -110,7 +108,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
 	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
-		throw new Error("Not yet implemented");
 		try {
 			const response = await this.braintreeGateway.transaction.sale({
 				amount: request.data.amount,
@@ -119,13 +116,13 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			});
 			if (response.success) {
 				// TODO handle success
-				response.transaction.
 			} else {
 				// TODO handle error
 			}
 		} catch (error) {
 			// TODO handle error
 		}
+		throw new Error("Not yet implemented");
 	}
 
 	/**
@@ -141,23 +138,23 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		const action = "capturePayment";
 		const transactionType = this.getPaymentTransactionType(action);
 		logger.info(`Processing payment modification.`, {
-		  paymentId: capturePaymentRequest.payment.id,
-		  action
+			paymentId: capturePaymentRequest.payment.id,
+			action,
 		});
-	
+
 		const response = await this.processPaymentModificationInternal({
 			request: capturePaymentRequest,
-		  	transactionType,
-		  	adyenOperation: 'capture',
-		  	amount: capturePaymentRequest.amount,
+			transactionType,
+			braintreeOperation: "capture",
+			amount: capturePaymentRequest.amount,
 		});
-	
+
 		logger.info(`Payment modification completed.`, {
-		  paymentId: capturePaymentRequest.payment.id,
-		  action: 'capturePayment',
-		  result: response.outcome,
+			paymentId: capturePaymentRequest.payment.id,
+			action: "capturePayment",
+			result: response.outcome,
 		});
-	
+
 		return {
 			outcome: response.outcome,
 			pspReference: response.pspReference,
@@ -208,36 +205,73 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		throw new Error("Not yet implemented");
 	}
 
+	private async makeCallToBraintreeInternal(
+		// @ts-expect-error - unused parameter
+		interfaceId: string,
+		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
+		// @ts-expect-error - unused parameter
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
+	): Promise<PaymentProviderModificationResponse> {
+		try {
+			switch (braintreeOperation) {
+				case "capture": {
+					throw new Error("Not yet implemented");
+				}
+				case "refund": {
+					throw new Error("Not yet implemented");
+				}
+				case "cancel": {
+					throw new Error("Not yet implemented");
+				}
+				case "reverse": {
+					throw new Error("Not yet implemented");
+				}
+				default: {
+					logger.error(
+						`makeCallToBraintreeInternal: Operation  ${braintreeOperation} not supported when modifying payment.`,
+					);
+					throw new ErrorInvalidOperation(`Operation not supported.`);
+				}
+			}
+		} catch (e) {
+			if (e instanceof Errorx) {
+				throw e;
+			} else {
+				throw wrapBraintreeError(e);
+			}
+		}
+	}
+
 	private async processPaymentModificationInternal(opts: {
-		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest ;
-		transactionType: 'Charge' | 'Refund' | 'CancelAuthorization';
-		adyenOperation: 'capture' | 'refund' | 'cancel' | 'reverse';
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest;
+		transactionType: "Charge" | "Refund" | "CancelAuthorization";
+		braintreeOperation: "capture" | "refund" | "cancel" | "reverse";
 		amount: AmountSchemaDTO;
-	  }): Promise<PaymentProviderModificationResponse> {
-		const { request, transactionType, adyenOperation, amount } = opts;
+	}): Promise<PaymentProviderModificationResponse> {
+		const { request, transactionType, braintreeOperation, amount } = opts;
 		await this.ctPaymentService.updatePayment({
-		  id: request.payment.id,
-		  transaction: {
-			type: transactionType,
-			amount,
-			state: 'Initial',
-		  },
+			id: request.payment.id,
+			transaction: {
+				type: transactionType,
+				amount,
+				state: "Initial",
+			},
 		});
-	
+
 		const interfaceId = request.payment.interfaceId as string;
-	
-		const response = await this.makeCallToAdyenInternal(interfaceId, adyenOperation, request);
-	
+
+		const response = await this.makeCallToBraintreeInternal(interfaceId, braintreeOperation, request);
+
 		await this.ctPaymentService.updatePayment({
-		  id: request.payment.id,
-		  transaction: {
-			type: transactionType,
-			amount,
-			interactionId: response.pspReference,
-			state: this.convertPaymentModificationOutcomeToState(PaymentModificationStatus.RECEIVED),
-		  },
+			id: request.payment.id,
+			transaction: {
+				type: transactionType,
+				amount,
+				interactionId: response.pspReference,
+				state: this.convertPaymentModificationOutcomeToState(PaymentModificationStatus.RECEIVED),
+			},
 		});
-	
+
 		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.pspReference };
 	}
 }

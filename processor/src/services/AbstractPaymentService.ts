@@ -18,12 +18,11 @@ import {
 	SupportedPaymentComponentsSchemaDTO,
 	TransactionDraftDTO,
 	TransactionResponseDTO,
-	PaymentIntentResponseSchemaDTO,
 	AmountSchemaDTO,
 	PaymentModificationStatus,
 } from "../dtos/operations";
 
-import { logger } from '../libs/logger';
+import { logger } from "../libs/logger";
 import { PaymentTransactionTypes } from "./types/operations/PaymentTransactionTypes";
 
 export abstract class AbstractPaymentService {
@@ -123,8 +122,8 @@ export abstract class AbstractPaymentService {
 			id: opts.paymentId,
 		});
 		const request = opts.data.actions[0]!;
-		const action = request.action
-		
+		const action = request.action;
+
 		switch (action) {
 			case "cancelPayment": {
 				// TODO : execute cancel payment
@@ -138,7 +137,7 @@ export abstract class AbstractPaymentService {
 					amount: request.amount,
 				});
 			}
-			case 'refundPayment': {
+			case "refundPayment": {
 				// TODO : execute refund payment
 				logger.error(`Operation not supported when modifying payment.`);
 				throw new ErrorInvalidOperation(`Operation not supported.`);
