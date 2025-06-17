@@ -1,9 +1,11 @@
-import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
 import { fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
-// import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 import { hostedFields, type HostedFields } from "braintree-web";
+import { PaymentOutcome } from "../../../dtos";
+import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
+
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -64,13 +66,12 @@ export class Card extends BaseComponent {
 			payload = await this.hostedFieldsInstance.tokenize();
 			console.log("Tokenization result:", payload);
 		} catch (error) {
-			console.error("Error tokenizing card data:", error);
-			this.onError("Card tokenization failed. Please try again.");
+			this.onError(error);
 			return;
 		}
 
 		const request = {
-			nounce: payload.nonce,
+			nonce: payload.nonce,
 		};
 		try {
 			const response = await fetch(this.processorUrl + "/payments", {
@@ -81,14 +82,18 @@ export class Card extends BaseComponent {
 				},
 				body: JSON.stringify(request),
 			});
-			const createPaymentResponse = await response.json();
+			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
 			console.log("Payment response:", createPaymentResponse);
+			const resultCode = createPaymentResponse.resultCode;
 
-			// TODO : handle response and call onComplete()
+			const paymentResult: PaymentResult = {
+				paymentReference: createPaymentResponse.paymentReference,
+				isSuccess: resultCode === PaymentOutcome.AUTHORIZED,
+			};
+			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
-			console.error("Error processing payment:", error);
-			this.onError("Payment processing failed. Please try again.");
-			return;
+			console.error("Error creating payment");
+			this.onError(error);
 		}
 		// try {
 		// 	// Below is a mock implementation but not recommend and PCI compliant approach,
