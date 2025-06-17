@@ -18,7 +18,6 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 	}
 
 	private static getBraintreeToken = async (options: EnablerOptions): Promise<string> => {
-
 		let response!: Response;
 		try {
 			response = await fetch(`${options.processorUrl}/init`, {
@@ -35,8 +34,8 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		}
 
 		const token: { clientToken: string } = await response.json();
-		return token.clientToken
-	}
+		return token.clientToken;
+	};
 
 	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
 		// Fetch SDK config from processor if needed, for example:
@@ -56,7 +55,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		};
 		const braintreeClient: Client = await client.create({
 			authorization: clientToken,
-		})
+		});
 
 		return {
 			baseOptions: {

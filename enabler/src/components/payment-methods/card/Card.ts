@@ -1,7 +1,7 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import {  fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
+import { fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
 // import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
 import { hostedFields, type HostedFields } from "braintree-web";
 export class Card extends BaseComponent {
@@ -13,34 +13,33 @@ export class Card extends BaseComponent {
 	}
 
 	async mount(containerId: string) {
-		
 		document.getElementById(containerId)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 		this.hostedFieldsInstance = await hostedFields.create({
 			client: this.sdk,
 			styles: {
 				input: {
-				  // change input styles to match
-				  // bootstrap styles
-				  'font-size': '2rem',
-				  color: '#495057'
-				}
-			  },
+					// change input styles to match
+					// bootstrap styles
+					"font-size": "2rem",
+					color: "#495057",
+				},
+			},
 			fields: {
 				number: {
-				  selector: '#cc-number',
+					selector: "#cc-number",
 				},
 				cardholderName: {
-					selector: '#cc-name',
+					selector: "#cc-name",
 				},
 				cvv: {
-				  selector: '#cc-cvv',
+					selector: "#cc-cvv",
 				},
 				expirationDate: {
-				  selector: '#cc-expiration',
-				  placeholder: 'MM/YY'
+					selector: "#cc-expiration",
+					placeholder: "MM/YY",
 				},
-			}
-		})
+			},
+		});
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();
@@ -57,21 +56,40 @@ export class Card extends BaseComponent {
 		// if (!isFormValid) {
 		// 	return;
 		// }
-		
+		let payload;
 		try {
 			if (!this.hostedFieldsInstance) {
 				throw new Error("Hosted Fields instance is not initialized.");
-			} 
-			const payload = await this.hostedFieldsInstance.tokenize();
-			console.log('Tokenization result:', payload);
-		} catch(error) {
-			console.error('Error tokenizing card data:', error);
+			}
+			payload = await this.hostedFieldsInstance.tokenize();
+			console.log("Tokenization result:", payload);
+		} catch (error) {
+			console.error("Error tokenizing card data:", error);
 			this.onError("Card tokenization failed. Please try again.");
 			return;
-		};	
+		}
 
-			
-		
+		const request = {
+			nounce: payload.nonce,
+		};
+		try {
+			const response = await fetch(this.processorUrl + "/payments", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Session-Id": this.sessionId,
+				},
+				body: JSON.stringify(request),
+			});
+			const createPaymentResponse = await response.json();
+			console.log("Payment response:", createPaymentResponse);
+
+			// TODO : handle response and call onComplete()
+		} catch (error) {
+			console.error("Error processing payment:", error);
+			this.onError("Payment processing failed. Please try again.");
+			return;
+		}
 		// try {
 		// 	// Below is a mock implementation but not recommend and PCI compliant approach,
 		// 	// please use respective PSP iframe capabilities to handle PAN data
@@ -96,15 +114,6 @@ export class Card extends BaseComponent {
 		// 		},
 		// 		paymentOutcome: resultCode,
 		// 	};
-		// 	const response = await fetch(this.processorUrl + "/payments", {
-		// 		method: "POST",
-		// 		headers: {
-		// 			"Content-Type": "application/json",
-		// 			"X-Session-Id": this.sessionId,
-		// 		},
-		// 		body: JSON.stringify(request),
-		// 	});
-		// 	const data = await response.json();
 
 		// 	if (resultCode === PaymentOutcome.AUTHORIZED) {
 		// 		this.onComplete &&
@@ -187,7 +196,7 @@ export class Card extends BaseComponent {
 				</div>
 				</div>`;
 	}
-	
+
 	override showValidation() {
 		validateAllFields();
 	}
