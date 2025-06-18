@@ -18,7 +18,7 @@
 	"dependencies": {
 		"@commercetools/platform-sdk": "^8.11.0",
 		"@commercetools/ts-client": "^3.3.1",
-		"braintree-web-drop-in": "^1.44.1",
+		"braintree-web-drop-in": "^1.45.0",
 		"cookie": "^1.0.2",
 		"serve": "14.2.4"
 	},
