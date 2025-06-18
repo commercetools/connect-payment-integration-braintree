@@ -1,9 +1,10 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { hostedFields, type HostedFields } from "braintree-web";
+import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import { PaymentOutcome } from "../../../dtos";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
+import type { HostedFieldsHostedFieldsFieldData } from "braintree-web/hosted-fields";
 
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
@@ -41,6 +42,56 @@ export class Card extends BaseComponent {
 				},
 			},
 		});
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Failed to create Hosted Fields instance.");
+		}
+
+		function findLabel(field: HostedFieldsHostedFieldsFieldData): Element | null {
+			return document.querySelector(`.hosted-field--label[for="${field.container.id}"]`);
+		}
+
+		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+
+			const label = findLabel(field);
+			if (label) {
+				label.classList.add("label-float");
+				label.classList.remove("filled");
+			}
+		});
+		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+			var label = findLabel(field);
+
+			if (label && field.isEmpty) {
+				label.classList.remove("label-float");
+			} else if (label && field.isValid) {
+				label.classList.add("filled");
+			} else if (label) {
+				label.classList.add("invalid");
+			}
+		});
+
+		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+			var label = findLabel(field);
+			if (label) {
+				label.classList.remove("filled");
+				label.classList.remove("invalid");
+			}
+		});
+
+		this.hostedFieldsInstance.on("validityChange", function (event) {
+			var field = event.fields[event.emittedBy];
+			var label = findLabel(field);
+
+			if (label && field.isPotentiallyValid) {
+				label.classList.remove("invalid");
+			} else if (label) {
+				label.classList.add("invalid");
+			}
+		});
+
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();
