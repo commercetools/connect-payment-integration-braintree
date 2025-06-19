@@ -5,24 +5,30 @@ import {
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
 	StatusResponse,
-} from "./types/operations";
-import { AbstractPaymentService } from "./AbstractPaymentService";
-import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
-import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
-import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
+} from "../types/operations";
+import { AbstractPaymentService } from "../AbstractPaymentService";
+import {
+	SupportedPaymentComponentsSchemaDTO,
+	TransactionDraftDTO,
+	TransactionResponseDTO,
+} from "../../dtos/operations";
+import { PaymentMethodType, PaymentResponseSchemaDTO } from "../../dtos/payment";
+import { BraintreePaymentServiceOptions } from "../types/payment/BraintreePaymentServiceOptions";
+import { BraintreeInitResponse, CreatePaymentRequest } from "../types/payment";
 import { BraintreeGateway, Environment } from "braintree";
-import { getConfig } from "../dev-utils/getConfig";
-import { logger } from "../libs/logger";
-import { PaymentModificationStatus } from "../dtos/operations";
-import type { AmountSchemaDTO } from "../dtos/operations";
+import { getConfig } from "../../dev-utils/getConfig";
+import { logger } from "../../libs/logger";
+import { PaymentModificationStatus } from "../../dtos/operations";
+import type { AmountSchemaDTO } from "../../dtos/operations";
 import { ErrorInvalidOperation, Errorx } from "@commercetools/connect-payments-sdk";
-import { wrapBraintreeError } from "../errors";
+import { wrapBraintreeError } from "../../errors";
+import { createPayment as createPaymentExternal } from "./createPayment";
 
 const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	private braintreeGateway: BraintreeGateway;
+	protected braintreeGateway: BraintreeGateway;
+	public createPayment: (request: CreatePaymentRequest) => Promise<PaymentResponseSchemaDTO>;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
@@ -33,6 +39,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			publicKey: config.braintreePublicKey,
 			privateKey: config.braintreePrivateKey,
 		});
+
+		this.createPayment = createPaymentExternal;
 	}
 
 	/**
@@ -96,33 +104,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				},
 			],
 		};
-	}
-
-	/**
-	 * Create payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment creation in external PSPs
-	 *
-	 * @param request - contains paymentType defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
-		try {
-			const response = await this.braintreeGateway.transaction.sale({
-				amount: request.data.amount,
-				paymentMethodNonce: request.data.nonce,
-				options: request.data.options,
-			});
-			if (response.success) {
-				// TODO handle success
-			} else {
-				// TODO handle error
-			}
-		} catch (error) {
-			// TODO handle error
-		}
-		throw new Error("Not yet implemented");
 	}
 
 	/**

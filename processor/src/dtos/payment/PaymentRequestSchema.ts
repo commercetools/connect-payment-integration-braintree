@@ -13,5 +13,5 @@ export const PaymentRequestSchema = Type.Object({
 	options: Type.Object({
 		submitForSettlement: Type.Boolean(),
 	}),
-	//paymentOutcome: PaymentOutcomeSchema,
+	paymentReference: Type.Optional(Type.String()),
 });
