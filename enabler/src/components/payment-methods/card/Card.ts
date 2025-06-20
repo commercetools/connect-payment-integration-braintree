@@ -9,6 +9,7 @@ import type { HostedFieldsHostedFieldsFieldData } from "braintree-web/hosted-fie
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
+
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
 		this.showPayButton = componentOptions?.showPayButton ?? false;
