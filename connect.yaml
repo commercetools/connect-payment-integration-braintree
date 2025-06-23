@@ -42,6 +42,9 @@ deployAs:
         - key: BRAINTREE_MERCHANT_ID
           description: Braintree merchant ID
           required: true
+        - key: BRAINTREE_ENVIRONMENT
+          description: Braintree environment (sandbox or production)
+          required: true
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: commercetools client secret

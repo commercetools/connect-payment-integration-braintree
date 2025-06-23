@@ -17,7 +17,8 @@ const config = {
 	braintreeMerchantId: process.env.BRAINTREE_MERCHANT_ID || "xxx",
 	braintreePublicKey: process.env.BRAINTREE_PUBLIC_KEY || "xxx",
 	braintreePrivateKey: process.env.BRAINTREE_PRIVATE_KEY || "xxx",
-
+	braintreeEnvironment: process.env.BRAINTREE_ENVIRONMENT || "sandbox",
+	
 	// Payment Providers config
 	returnUrl: process.env.RETURN_URL,
 };
