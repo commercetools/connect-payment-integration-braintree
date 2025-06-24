@@ -1,14 +1,14 @@
 import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
-import { ConfigResponse /* ModifyPayment, StatusResponse*/ } from "../../src/services/types/operations";
-import { paymentSDK } from "../../src/sdk/paymentSDK";
+import { ConfigResponse /* ModifyPayment, StatusResponse*/ } from "../../../src/services/types/operations";
+import { paymentSDK } from "../../../src/sdk/paymentSDK";
 // import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 // import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
 // import { mockGetPaymentResult, mockUpdatePaymentResult } from '../utils/mock-payment-results';
 // import { mockGetCartResult } from '../utils/mock-cart-data';
 // import * as Config from '../../src/dev-utils/getConfig';
-import { /* CreatePaymentRequest, */ BraintreePaymentServiceOptions } from "../../src/services/types/payment";
-import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
-import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
+import { /* CreatePaymentRequest, */ BraintreePaymentServiceOptions } from "../../../src/services/types/payment";
+import { AbstractPaymentService } from "../../../src/services/AbstractPaymentService";
+import { BraintreePaymentService } from "../../../src/services/BraintreePaymentService";
 // import * as FastifyContext from '../../src/libs/fastify/context';
 // import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
@@ -37,6 +37,7 @@ describe(BraintreePaymentService.name, () => {
 	};
 	const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
 	// const mockPaymentService: BraintreePaymentService = new BraintreePaymentService(opts);
+
 	beforeEach(() => {
 		jest.setTimeout(10000);
 		jest.resetAllMocks();
