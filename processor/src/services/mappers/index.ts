@@ -1,3 +1,4 @@
 import { mapBraintreeToCtResultCode } from "./mapBraintreeToCtResultCode";
+import { mapCtTotalPriceToBraintreeAmount } from "./mapCtTotalPriceToBraintreeAmount";
 
-export { mapBraintreeToCtResultCode };
+export { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount };
