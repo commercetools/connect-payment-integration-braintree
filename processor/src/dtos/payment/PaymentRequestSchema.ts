@@ -7,8 +7,6 @@ export const PaymentRequestSchema = Type.Object({
 	amount: Type.String(),
 	paymentMethod: Type.Object({
 		type: Type.Enum(PaymentMethodType),
-		//poNumber: Type.Optional(Type.String()),
-		//invoiceMemo: Type.Optional(Type.String()),
 	}),
 	options: Type.Object({
 		submitForSettlement: Type.Boolean(),
