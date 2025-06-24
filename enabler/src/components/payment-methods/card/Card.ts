@@ -1,9 +1,10 @@
-import { type BaseOptions, type ComponentOptions, PaymentMethod } from "../../../payment-enabler";
+import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { fieldIds, getCardBrand, getInput, validateAllFields } from "./utils";
-// import { PaymentOutcome, type PaymentRequestSchemaDTO } from "../../../dtos";
-import { hostedFields, type HostedFields } from "braintree-web";
+import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
+import { PaymentOutcome } from "../../../dtos";
+import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
+import type { HostedFieldsHostedFieldsFieldData } from "braintree-web/hosted-fields";
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -40,22 +41,65 @@ export class Card extends BaseComponent {
 				},
 			},
 		});
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Failed to create Hosted Fields instance.");
+		}
+
+		function findLabel(field: HostedFieldsHostedFieldsFieldData): Element | null {
+			return document.querySelector(`.hosted-field--label[for="${field.container.id}"]`);
+		}
+
+		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+
+			const label = findLabel(field);
+			if (label) {
+				label.classList.add("label-float");
+				label.classList.remove("filled");
+			}
+		});
+		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+			var label = findLabel(field);
+
+			if (label && field.isEmpty) {
+				label.classList.remove("label-float");
+			} else if (label && field.isValid) {
+				label.classList.add("filled");
+			} else if (label) {
+				label.classList.add("invalid");
+			}
+		});
+
+		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
+			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
+			var label = findLabel(field);
+			if (label) {
+				label.classList.remove("filled");
+				label.classList.remove("invalid");
+			}
+		});
+
+		this.hostedFieldsInstance.on("validityChange", function (event) {
+			var field = event.fields[event.emittedBy];
+			var label = findLabel(field);
+
+			if (label && field.isPotentiallyValid) {
+				label.classList.remove("invalid");
+			} else if (label) {
+				label.classList.add("invalid");
+			}
+		});
+
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();
 				this.submit();
 			});
 		}
-
-		//addFormFieldsEventListeners();
 	}
 
 	async submit() {
-		// TODO: Do field validation
-		// const isFormValid = validateAllFields();
-		// if (!isFormValid) {
-		// 	return;
-		// }
 		let payload;
 		try {
 			if (!this.hostedFieldsInstance) {
@@ -64,13 +108,12 @@ export class Card extends BaseComponent {
 			payload = await this.hostedFieldsInstance.tokenize();
 			console.log("Tokenization result:", payload);
 		} catch (error) {
-			console.error("Error tokenizing card data:", error);
-			this.onError("Card tokenization failed. Please try again.");
+			this.onError(error);
 			return;
 		}
 
 		const request = {
-			nounce: payload.nonce,
+			nonce: payload.nonce,
 		};
 		try {
 			const response = await fetch(this.processorUrl + "/payments", {
@@ -81,52 +124,21 @@ export class Card extends BaseComponent {
 				},
 				body: JSON.stringify(request),
 			});
-			const createPaymentResponse = await response.json();
+			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
 			console.log("Payment response:", createPaymentResponse);
+			const resultCode = createPaymentResponse.resultCode;
 
-			// TODO : handle response and call onComplete()
+			const paymentResult: PaymentResult = {
+				paymentReference: createPaymentResponse.paymentReference,
+				isSuccess: resultCode === PaymentOutcome.AUTHORIZED,
+			};
+			await this.hostedFieldsInstance.teardown();
+
+			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
-			console.error("Error processing payment:", error);
-			this.onError("Payment processing failed. Please try again.");
-			return;
+			console.error("Error creating payment");
+			this.onError(error);
 		}
-		// try {
-		// 	// Below is a mock implementation but not recommend and PCI compliant approach,
-		// 	// please use respective PSP iframe capabilities to handle PAN data
-		// 	const requestData = {
-		// 		paymentMethod: {
-		// 			type: this.paymentMethod,
-		// 			cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ""),
-		// 			expiryMonth: getInput(fieldIds.expiryDate).value.split("/")[0],
-		// 			expiryYear: getInput(fieldIds.expiryDate).value.split("/")[1],
-		// 			cvc: getInput(fieldIds.cvv).value,
-		// 			holderName: getInput(fieldIds.holderName).value,
-		// 		},
-		// 	};
-
-		// 	// Mock Validation
-		// 	let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
-		// 	const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
-
-		// 	const request: PaymentRequestSchemaDTO = {
-		// 		paymentMethod: {
-		// 			type: this.paymentMethod,
-		// 		},
-		// 		paymentOutcome: resultCode,
-		// 	};
-
-		// 	if (resultCode === PaymentOutcome.AUTHORIZED) {
-		// 		this.onComplete &&
-		// 			this.onComplete({
-		// 				isSuccess: true,
-		// 				paymentReference: data.paymentReference,
-		// 			});
-		// 	} else {
-		// 		this.onComplete && this.onComplete({ isSuccess: false });
-		// 	}
-		// } catch (e) {
-		// 	this.onError("Some error occurred. Please try again.");
-		// }
 	}
 	private _getTemplate() {
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
@@ -182,45 +194,7 @@ export class Card extends BaseComponent {
 				</form>
 				</div>
 				<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-				<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
-				<div class="toast-header">
-					<strong class="mr-auto">Success!</strong>
-					<small>Just now</small>
-					<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="toast-body">
-					Next, submit the payment method nonce to your server.
-				</div>
-				</div>
+	
 				</div>`;
 	}
-
-	override showValidation() {
-		validateAllFields();
-	}
-
-	override isValid() {
-		return validateAllFields();
-	}
-
-	override getState() {
-		return {
-			card: {
-				endDigits: getInput(fieldIds.cardNumber).value.slice(-4),
-				brand: getCardBrand(getInput(fieldIds.cardNumber).value),
-				expiryDate: getInput(fieldIds.expiryDate).value,
-			},
-		};
-	}
-
-	override isAvailable() {
-		return Promise.resolve(true);
-	}
-
-	// private isCreditCardAllowed(cardNumber: string) {
-	// 	const allowedCreditCards = ["4111111111111111", "5555555555554444", "341925950237632"];
-	// 	return allowedCreditCards.includes(cardNumber);
-	// }
 }

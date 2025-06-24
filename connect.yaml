@@ -1,10 +1,6 @@
 deployAs:
   - name: enabler
     applicationType: assets
-    configuration:
-      standardConfiguration:
-        - key: VITE_BRAINTREE_TOKENIZATION_KEY
-          description: Braintree tokenisation key
   - name: processor
     applicationType: service
     endpoint: /
