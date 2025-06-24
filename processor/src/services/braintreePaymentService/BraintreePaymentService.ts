@@ -12,7 +12,7 @@ import {
 	TransactionDraftDTO,
 	TransactionResponseDTO,
 } from "../../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../../dtos/payment";
+import { PaymentMethodType } from "../../dtos/payment";
 import { BraintreePaymentServiceOptions } from "../types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "../types/payment";
 import { BraintreeGateway, Environment } from "braintree";
@@ -28,7 +28,7 @@ const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
 	protected braintreeGateway: BraintreeGateway;
-	public createPayment: (request: CreatePaymentRequest) => Promise<PaymentResponseSchemaDTO>;
+	public createPayment: typeof createPaymentExternal;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
