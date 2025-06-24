@@ -19,7 +19,7 @@ const config = {
 	braintreePrivateKey: process.env.BRAINTREE_PRIVATE_KEY || "xxx",
 
 	// Payment Providers config
-	returnUrl: process.env.RETURN_URL,
+	returnUrl: process.env.MERCHANT_RETURN_URL,
 };
 
 for (const key in config) {
