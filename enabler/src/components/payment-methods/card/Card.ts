@@ -4,7 +4,7 @@ import { BaseComponent } from "../../BaseComponent";
 import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import { PaymentOutcome } from "../../../dtos";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
-import type { HostedFieldsHostedFieldsFieldData } from "braintree-web/hosted-fields";
+import type { HostedFieldsHostedFieldsFieldData, HostedFieldsTokenizePayload } from "braintree-web/hosted-fields";
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -100,7 +100,7 @@ export class Card extends BaseComponent {
 	}
 
 	async submit() {
-		let payload;
+		let payload: HostedFieldsTokenizePayload;
 		try {
 			if (!this.hostedFieldsInstance) {
 				throw new Error("Hosted Fields instance is not initialized.");
@@ -114,6 +114,8 @@ export class Card extends BaseComponent {
 
 		const request = {
 			nonce: payload.nonce,
+			type: "card",
+			paymentReference: payload.description,
 		};
 		try {
 			const response = await fetch(this.processorUrl + "/payments", {
