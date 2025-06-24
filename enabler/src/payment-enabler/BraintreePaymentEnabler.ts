@@ -51,9 +51,6 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		const sdkOptions = {
 			environment: "test",
 		};
-		const braintreeClient: Client = await client.create({
-			authorization: clientToken,
-		});
 
 		const braintreeClient: Client = await client.create({
 			authorization: clientToken,
