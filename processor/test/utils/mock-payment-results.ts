@@ -1,5 +1,11 @@
 import { Payment, Transaction } from "@commercetools/connect-payments-sdk";
-import { ValidationErrorsCollection, type ValidatedResponse, type Transaction as BraintreeTransaction, type ValidationError, Address } from "braintree";
+import {
+	ValidationErrorsCollection,
+	type ValidatedResponse,
+	type Transaction as BraintreeTransaction,
+	type ValidationError,
+	Address,
+} from "braintree";
 export const mockGetPaymentResult: Payment = {
 	id: "123456",
 	version: 1,
@@ -58,19 +64,28 @@ export const mockUpdatePaymentResult: Payment = {
 const error: ValidationError = {
 	attribute: "dummy-attribute",
 	code: "dummy-code",
-	message: "dummy-message"
-}
+	message: "dummy-message",
+};
 
 const errorsCollection: ValidationErrorsCollection = {
 	deepErrors: () => [error],
-	for: (name: string) => { return errorsCollection },
-	forIndex: (index: number) => { return errorsCollection},
+	for: (name: string) => {
+		return errorsCollection;
+	},
+	forIndex: (index: number) => {
+		return errorsCollection;
+	},
 	on: (name: string) => error,
-}
+};
 
 export const mockBraintreeRefundPaymentResponse: ValidatedResponse<BraintreeTransaction> = {
 	success: true,
 	message: "Refund successful",
 	params: {},
-	errors: errorsCollection
+	errors: errorsCollection,
+	transaction: {
+		id: "dummy-braintree-transaction-id",
+		type: "credit",
+		amount: "1200.00",
+	},
 } as ValidatedResponse<BraintreeTransaction>;

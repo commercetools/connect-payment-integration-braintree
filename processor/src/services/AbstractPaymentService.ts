@@ -138,9 +138,11 @@ export abstract class AbstractPaymentService {
 				});
 			}
 			case "refundPayment": {
-				// TODO : execute refund payment
-				logger.error(`Operation not supported when modifying payment.`);
-				throw new ErrorInvalidOperation(`Operation not supported.`);
+				return await this.refundPayment({
+					payment: ctPayment,
+					merchantReference: request.merchantReference,
+					amount: request.amount,
+				});
 			}
 			default: {
 				logger.error(`Operation not supported when modifying payment.`);

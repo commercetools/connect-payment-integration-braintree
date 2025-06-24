@@ -169,27 +169,26 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
 
-
 	async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "refundPayment";
 		logger.info(`Processing payment modification.`, {
-		  paymentId: request.payment.id,
-		  action
+			paymentId: request.payment.id,
+			action,
 		});
-		
+
 		const response = await this.processPaymentModificationInternal({
-		  request,
-		  transactionType: 'Refund',
-		  braintreeOperation: 'refund',
-		  amount: request.amount,
+			request,
+			transactionType: "Refund",
+			braintreeOperation: "refund",
+			amount: request.amount,
 		});
-	
+
 		logger.info(`Payment modification completed.`, {
-		  paymentId: request.payment.id,
-		  action,
-		  result: response.outcome,
+			paymentId: request.payment.id,
+			action,
+			result: response.outcome,
 		});
-	
+
 		return response;
 	}
 
@@ -268,7 +267,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				type: transactionType,
 				amount,
 				interactionId: response.transaction.id,
-				state: this.convertPaymentModificationOutcomeToState(response.success?PaymentModificationStatus.RECEIVED: PaymentModificationStatus.REJECTED),
+				state: this.convertPaymentModificationOutcomeToState(
+					response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+				),
 			},
 		});
 

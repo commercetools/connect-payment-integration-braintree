@@ -18,7 +18,7 @@ const config = {
 	braintreePublicKey: process.env.BRAINTREE_PUBLIC_KEY || "xxx",
 	braintreePrivateKey: process.env.BRAINTREE_PRIVATE_KEY || "xxx",
 	braintreeEnvironment: process.env.BRAINTREE_ENVIRONMENT || "sandbox",
-	
+
 	// Payment Providers config
 	returnUrl: process.env.RETURN_URL,
 };
