@@ -1,4 +1,5 @@
 import { cartPageId } from "../../src/constants";
+import { createHeaderElement } from "../../src/helpers/elements";
 import { cocoSessionStore } from "../../src/store";
 import { tryUpdateSessionFromLocalStorage } from "../tryUpdateSessionFromLocalStorage";
 import { setupCreateSessionIdFields } from "./setupCreateSessionFields";
@@ -13,4 +14,7 @@ export const setupCartPage = function () {
 	});
 };
 
-const createCartPage = function () {};
+const createCartPage = function () {
+	const cartPage = document.getElementById(cartPageId);
+	cartPage?.appendChild(createHeaderElement({ type: "h4", text: "Cart page" }));
+};
