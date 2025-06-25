@@ -1,4 +1,5 @@
 import {
+	Cart,
 	CommercetoolsCartService,
 	CommercetoolsPaymentService,
 	ErrorInvalidJsonInput,
@@ -207,5 +208,13 @@ export abstract class AbstractPaymentService {
 				throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);
 			}
 		}
+	}
+
+	protected async hasPaymentAmountChanged(cart: Cart, ctPayment: Payment): Promise<boolean> {
+		const amountPlanned = await this.ctCartService.getPaymentAmount({ cart });
+		return (
+			ctPayment.amountPlanned.centAmount !== amountPlanned.centAmount ||
+			ctPayment.amountPlanned.currencyCode !== amountPlanned.currencyCode
+		);
 	}
 }
