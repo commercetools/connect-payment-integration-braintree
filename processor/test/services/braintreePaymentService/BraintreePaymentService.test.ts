@@ -1,9 +1,10 @@
 import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
-import { ConfigResponse /* ModifyPayment, StatusResponse*/ } from "../../../src/services/types/operations";
+import { ConfigResponse, ModifyPayment, /*  StatusResponse*/ } from "../../../src/services/types/operations";
 import { paymentSDK } from "../../../src/sdk/paymentSDK";
 import { DefaultPaymentService } from "@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service";
 // import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 // import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
+import { BraintreeClient } from "../../../src/clients";
 
 import {
 	mockGetPaymentResult,
