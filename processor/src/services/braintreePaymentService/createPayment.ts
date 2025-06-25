@@ -3,7 +3,7 @@ import { PaymentResponseSchemaDTO } from "../../dtos/payment";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../../libs/fastify/context";
 import { hasPaymentAmountChanged } from "../helpers";
 import { CreatePaymentRequest } from "../types/payment";
-import { BraintreePaymentService } from "./BraintreePaymentService";
+import { BraintreePaymentService } from "../BraintreePaymentService";
 import { wrapBraintreeError } from "../../errors";
 import { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount } from "../mappers";
 import { logger } from "../../libs/logger";

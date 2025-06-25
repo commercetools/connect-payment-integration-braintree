@@ -5,24 +5,20 @@ import {
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
 	StatusResponse,
-} from "../types/operations";
-import { AbstractPaymentService } from "../AbstractPaymentService";
-import {
-	SupportedPaymentComponentsSchemaDTO,
-	TransactionDraftDTO,
-	TransactionResponseDTO,
-} from "../../dtos/operations";
-import { PaymentMethodType } from "../../dtos/payment";
-import { BraintreePaymentServiceOptions } from "../types/payment/BraintreePaymentServiceOptions";
-import { BraintreeInitResponse, CreatePaymentRequest } from "../types/payment";
+} from "./types/operations";
+import { AbstractPaymentService } from "./AbstractPaymentService";
+import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
+import { PaymentMethodType } from "../dtos/payment";
+import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
+import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment } from "braintree";
-import { getConfig } from "../../dev-utils/getConfig";
-import { logger } from "../../libs/logger";
-import { PaymentModificationStatus } from "../../dtos/operations";
-import type { AmountSchemaDTO } from "../../dtos/operations";
+import { getConfig } from "../dev-utils/getConfig";
+import { logger } from "../libs/logger";
+import { PaymentModificationStatus } from "../dtos/operations";
+import type { AmountSchemaDTO } from "../dtos/operations";
 import { ErrorInvalidOperation, Errorx } from "@commercetools/connect-payments-sdk";
-import { wrapBraintreeError } from "../../errors";
-import { createPayment as createPaymentExternal } from "./createPayment";
+import { wrapBraintreeError } from "../errors";
+import { createPayment as createPaymentExternal } from "./braintreePaymentService/createPayment";
 
 const config = getConfig();
 

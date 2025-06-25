@@ -1,3 +1,3 @@
-import { BraintreePaymentService } from "./BraintreePaymentService";
+import { BraintreePaymentService } from "../BraintreePaymentService";
 
 export { BraintreePaymentService };
