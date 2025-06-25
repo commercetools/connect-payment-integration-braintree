@@ -4,7 +4,6 @@ import { DropinType } from "./DropinType";
 import { type EnablerOptions } from "./EnablerOptions";
 import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
 import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
-// import { BraintreeSdk } from "../sdk";
 import { BraintreeDropinContainerBuilder } from "../dropin";
 import { CardBuilder } from "../components/payment-methods/card";
 import { client } from "braintree-web";
@@ -50,9 +49,9 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		const clientToken = await BraintreePaymentEnabler.getBraintreeToken(options);
 
 		const sdkOptions = {
-			// environment: configJson.environment,
 			environment: "test",
 		};
+
 		const braintreeClient: Client = await client.create({
 			authorization: clientToken,
 		});

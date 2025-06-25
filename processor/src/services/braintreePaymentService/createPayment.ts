@@ -5,7 +5,7 @@ import { hasPaymentAmountChanged } from "../helpers";
 import { CreatePaymentRequest } from "../types/payment";
 import { BraintreePaymentService } from "./BraintreePaymentService";
 import { wrapBraintreeError } from "../../errors";
-import { mapBraintreeToCtResultCode } from "../mappers";
+import { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount } from "../mappers";
 import { logger } from "../../libs/logger";
 
 /**
@@ -26,7 +26,7 @@ export const createPayment = async function (
 	let ctPayment = request.data.paymentReference
 		? await this.ctPaymentService.updatePayment({
 				id: request.data.paymentReference,
-				paymentMethod: request.data.paymentMethod?.type,
+				paymentMethod: request.data.paymentMethodType,
 			})
 		: undefined;
 
@@ -48,7 +48,7 @@ export const createPayment = async function (
 			amountPlanned,
 			paymentMethodInfo: {
 				paymentInterface: getPaymentInterfaceFromContext() || "braintree",
-				method: request.data.paymentMethod?.type,
+				method: request.data.paymentMethodType,
 			},
 			...(ctCart.customerId && {
 				customer: {
@@ -73,9 +73,9 @@ export const createPayment = async function (
 	let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 	try {
 		btResponse = await this.braintreeGateway.transaction.sale({
-			amount: request.data.amount,
+			amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
 			paymentMethodNonce: request.data.nonce,
-			options: request.data.options,
+			options: request.data.options ?? { submitForSettlement: true },
 		});
 		if (!btResponse.success) {
 			const prefix = ["soft_declined", "hard_declined"].includes(btResponse?.transaction?.processorResponseType)
