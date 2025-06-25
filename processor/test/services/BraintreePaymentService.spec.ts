@@ -15,7 +15,7 @@ import {
 
 import { /* CreatePaymentRequest, */ BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
-import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
+import { BraintreePaymentService } from "../../src/services/braintreePaymentService";
 import { BraintreeClient } from "../../src/clients/BraintreeClient";
 // import * as FastifyContext from '../../src/libs/fastify/context';
 // import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
