@@ -114,11 +114,11 @@ export class Card extends BaseComponent {
 
 		const request = {
 			nonce: payload.nonce,
-			type: "card",
+			paymentMethodType: "card",
 			paymentReference: payload.description,
 		};
 		try {
-			const response = await fetch(this.processorUrl + "/payments", {
+			const response = await fetch(this.processorUrl + "/payment", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
