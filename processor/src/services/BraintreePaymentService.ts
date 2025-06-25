@@ -25,7 +25,7 @@ import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fa
 const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	protected braintreeGateway: BraintreeGateway;
+	private braintreeGateway: BraintreeGateway;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
