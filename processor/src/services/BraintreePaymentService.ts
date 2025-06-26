@@ -5,31 +5,32 @@ import {
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
 	StatusResponse,
-} from "../types/operations";
-import { AbstractPaymentService } from "../AbstractPaymentService";
+} from "./types/operations";
+import { AbstractPaymentService } from "./AbstractPaymentService";
 import {
 	SupportedPaymentComponentsSchemaDTO,
 	TransactionDraftDTO,
 	TransactionResponseDTO,
-} from "../../dtos/operations";
-import { PaymentMethodType } from "../../dtos/payment";
-import { BraintreePaymentServiceOptions } from "../types/payment/BraintreePaymentServiceOptions";
-import { BraintreeInitResponse, CreatePaymentRequest } from "../types/payment";
+} from "../dtos/operations";
+import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
+import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
+import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
-import { getConfig } from "../../dev-utils/getConfig";
-import { logger } from "../../libs/logger";
-import { PaymentModificationStatus } from "../../dtos/operations";
-import type { AmountSchemaDTO } from "../../dtos/operations";
-import { ErrorInvalidOperation, Errorx } from "@commercetools/connect-payments-sdk";
-import { wrapBraintreeError } from "../../errors";
-import { createPayment as createPaymentExternal } from "./createPayment";
-import { BraintreeClient } from "../../clients/BraintreeClient";
+import { getConfig } from "../dev-utils/getConfig";
+import { logger } from "../libs/logger";
+import { PaymentModificationStatus } from "../dtos/operations";
+import type { AmountSchemaDTO } from "../dtos/operations";
+import { ErrorInvalidOperation, Errorx, TransactionState } from "@commercetools/connect-payments-sdk";
+import { wrapBraintreeError } from "../errors";
+import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
+import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
+import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
+import { BraintreeClient } from "../clients/BraintreeClient";
 
 const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	protected braintreeGateway: BraintreeGateway;
-	public createPayment: typeof createPaymentExternal;
+	private braintreeGateway: BraintreeGateway;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
@@ -40,8 +41,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			publicKey: config.braintreePublicKey,
 			privateKey: config.braintreePrivateKey,
 		});
-
-		this.createPayment = createPaymentExternal;
 	}
 
 	/**
@@ -104,6 +103,118 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					type: PaymentMethodType.CARD,
 				},
 			],
+		};
+	}
+
+	/**
+	 * Create payment
+	 *
+	 * @remarks
+	 * Implementation to provide the mocking data for payment creation in external PSPs
+	 *
+	 * @param request - contains paymentType defined in composable commerce
+	 * @returns Promise with mocking data containing operation status and PSP reference
+	 */
+	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
+		let ctPayment = request.data.paymentReference
+			? await this.ctPaymentService.updatePayment({
+					id: request.data.paymentReference,
+					paymentMethod: request.data.paymentMethodType,
+				})
+			: undefined;
+
+		// If there's a payment reference
+		if (ctPayment) {
+			if (await this.hasPaymentAmountChanged(ctCart, ctPayment)) {
+				throw new ErrorInvalidOperation(
+					"The payment amount does not fulfill the remaining amount of the cart",
+					{
+						fields: {
+							cartId: ctCart.id,
+							paymentId: ctPayment.id,
+						},
+					},
+				);
+			}
+		} else {
+			// Else no payment reference
+			const amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+			ctPayment = await this.ctPaymentService.createPayment({
+				amountPlanned,
+				paymentMethodInfo: {
+					paymentInterface: getPaymentInterfaceFromContext() || "braintree",
+					method: request.data.paymentMethodType,
+				},
+				...(ctCart.customerId && {
+					customer: {
+						typeId: "customer",
+						id: ctCart.customerId,
+					},
+				}),
+				...(!ctCart.customerId &&
+					ctCart.anonymousId && {
+						anonymousId: ctCart.anonymousId,
+					}),
+			});
+			ctCart = await this.ctCartService.addPayment({
+				resource: {
+					id: ctCart.id,
+					version: ctCart.version,
+				},
+				paymentId: ctPayment.id,
+			});
+		}
+
+		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
+		try {
+			btResponse = await this.braintreeGateway.transaction.sale({
+				amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
+				paymentMethodNonce: request.data.nonce,
+				options: request.data.options ?? { submitForSettlement: true },
+			});
+			if (!btResponse.success) {
+				const prefix = ["soft_declined", "hard_declined"].includes(
+					btResponse?.transaction?.processorResponseType,
+				)
+					? `[${btResponse.transaction.processorResponseType}] `
+					: "";
+				// TODO standardize errors
+				throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
+			}
+		} catch (error) {
+			throw wrapBraintreeError(error);
+		}
+
+		const txState: TransactionState = mapBraintreeToCtResultCode(
+			btResponse.transaction.status,
+			btResponse.transaction.type !== undefined, // TODO check this, currently based loosely on Adyen isActionRequired method
+		);
+
+		const updatedPayment = await this.ctPaymentService.updatePayment({
+			id: ctPayment.id,
+			pspReference: btResponse.transaction.id,
+			transaction: {
+				type: "Authorization", //TODO: is there any case where this could be a direct charge?
+				amount: ctPayment.amountPlanned,
+				interactionId: btResponse.transaction.id,
+				state: txState,
+			},
+		});
+
+		logger.info(`Payment authorization processed.`, {
+			paymentId: updatedPayment.id,
+			interactionId: btResponse.transaction.id,
+			result: btResponse.transaction.status,
+		});
+
+		return {
+			...btResponse.transaction,
+			paymentReference: updatedPayment.id,
+			//TODO copied verbatim from Adyen, likely not needed for card transactions
+			// ...(txState === "Success" || txState === "Pending"
+			// 	? { merchantReturnUrl: this.buildRedirectMerchantUrl(updatedPayment.id, btResponse.transaction.status) }
+			// 	: {}),
 		};
 	}
 

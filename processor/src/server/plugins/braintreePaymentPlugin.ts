@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { paymentSDK } from "../../sdk/paymentSDK";
 import { braintreePaymentRoutes } from "../../routes/braintreePaymentRoutes";
-import { BraintreePaymentService } from "../../services/braintreePaymentService/BraintreePaymentService";
+import { BraintreePaymentService } from "../../services/BraintreePaymentService";
 
 export default async function (server: FastifyInstance) {
 	const braintreePaymentService = new BraintreePaymentService({
