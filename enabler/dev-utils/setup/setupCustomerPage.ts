@@ -1,4 +1,4 @@
-import { createSession, tryUpdateSessionFromLocalStorage } from "../";
+import { tryUpdateSessionFromLocalStorage } from "../";
 import {
 	type CreateBraintreeCustomerRequest,
 	createCustomer,
@@ -9,11 +9,12 @@ import { createCustomerFormElements } from "../setup";
 import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../../src/constants";
 import { cocoSessionStore } from "../../src/store";
 import { addLabelledInputToParent, createButtonElement, createHeaderElement } from "../../src/helpers/elements";
+import { setupCreateSessionIdFields } from "./setupCreateSessionFields";
 
 export const setupCustomerPage = function () {
 	tryUpdateSessionFromLocalStorage().then(() => {
 		if (!cocoSessionStore.getSnapshot()?.id) {
-			createSessionIdFields();
+			setupCreateSessionIdFields(customerPageId, createCustomerPage);
 		} else {
 			createCustomerPage();
 		}
@@ -24,52 +25,6 @@ const createCustomerPage = function () {
 	createCreateCustomerForm();
 	createFindCustomerFields();
 	createDeleteCustomerFields();
-};
-
-const createSessionIdFields = function () {
-	const customerPage = document.getElementById(customerPageId);
-	let sessionContainer = document.createElement("div");
-	const sessionContainerId = "sessionContainer";
-	sessionContainer.setAttribute("id", sessionContainerId);
-	const cartIdInputId = "cartIdInput";
-
-	sessionContainer = addLabelledInputToParent(
-		{
-			id: cartIdInputId,
-			label: "Cart ID:",
-			labelStyle: "margin-right: 5px",
-		},
-		sessionContainer,
-	);
-
-	const createSessionButton = createButtonElement({
-		id: submitCreateCustomerId,
-		value: "Create Session",
-		onClick: async (event: MouseEvent) => {
-			event.preventDefault();
-
-			const cartId = (document.getElementById(cartIdInputId) as HTMLInputElement)?.value;
-			if (!cartId) {
-				window.alert("Cart Id missing");
-				return;
-			}
-
-			createSession(cartId)
-				.then(() => {
-					const sessionContainer = document.getElementById(sessionContainerId);
-					if (sessionContainer) {
-						sessionContainer.innerHTML = "";
-					}
-					createCustomerPage();
-				})
-				.catch((error) => {
-					window.alert(`There was an error creating the session: ${error}`);
-				});
-		},
-	});
-
-	sessionContainer.appendChild(createSessionButton);
-	customerPage?.appendChild(sessionContainer);
 };
 
 const createCreateCustomerForm = function () {

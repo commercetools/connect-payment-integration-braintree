@@ -37,6 +37,7 @@ describe(BraintreePaymentService.name, () => {
 	};
 	const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
 	// const mockPaymentService: BraintreePaymentService = new BraintreePaymentService(opts);
+
 	beforeEach(() => {
 		jest.setTimeout(10000);
 		jest.resetAllMocks();

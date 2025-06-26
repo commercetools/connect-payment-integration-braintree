@@ -1,4 +1,5 @@
 import {
+	Cart,
 	CommercetoolsCartService,
 	CommercetoolsPaymentService,
 	ErrorInvalidJsonInput,
@@ -18,10 +19,12 @@ import {
 	SupportedPaymentComponentsSchemaDTO,
 	TransactionDraftDTO,
 	TransactionResponseDTO,
-	PaymentIntentResponseSchemaDTO,
 	AmountSchemaDTO,
 	PaymentModificationStatus,
 } from "../dtos/operations";
+
+import { logger } from "../libs/logger";
+import { PaymentTransactionTypes } from "./types/operations/PaymentTransactionTypes";
 
 export abstract class AbstractPaymentService {
 	protected ctCartService: CommercetoolsCartService;
@@ -115,48 +118,36 @@ export abstract class AbstractPaymentService {
 	 * @param opts - input for payment modification including payment ID, action and payment amount
 	 * @returns Promise with outcome of payment modification after invocation to PSPs
 	 */
-	public async modifyPayment(opts: ModifyPayment): Promise<PaymentIntentResponseSchemaDTO> {
+	public async modifyPayment(opts: ModifyPayment): Promise<PaymentProviderModificationResponse> {
 		const ctPayment = await this.ctPaymentService.getPayment({
 			id: opts.paymentId,
 		});
 		const request = opts.data.actions[0]!;
+		const action = request.action;
 
-		let requestAmount!: AmountSchemaDTO;
-		if (request.action != "cancelPayment") {
-			requestAmount = request.amount;
-		} else {
-			requestAmount = ctPayment.amountPlanned;
+		switch (action) {
+			case "cancelPayment": {
+				// TODO : execute cancel payment
+				logger.error(`Operation not supported when modifying payment.`);
+				throw new ErrorInvalidOperation(`Operation not supported.`);
+			}
+			case "capturePayment": {
+				return await this.capturePayment({
+					payment: ctPayment,
+					merchantReference: request.merchantReference,
+					amount: request.amount,
+				});
+			}
+			case "refundPayment": {
+				// TODO : execute refund payment
+				logger.error(`Operation not supported when modifying payment.`);
+				throw new ErrorInvalidOperation(`Operation not supported.`);
+			}
+			default: {
+				logger.error(`Operation not supported when modifying payment.`);
+				throw new ErrorInvalidOperation(`Operation not supported.`);
+			}
 		}
-
-		const transactionType = this.getPaymentTransactionType(request.action);
-		const updatedPayment = await this.ctPaymentService.updatePayment({
-			id: ctPayment.id,
-			transaction: {
-				type: transactionType,
-				amount: requestAmount,
-				state: "Initial",
-			},
-		});
-		const res = await this.processPaymentModification(
-			updatedPayment,
-			transactionType,
-			requestAmount,
-			request.merchantReference,
-		);
-
-		await this.ctPaymentService.updatePayment({
-			id: ctPayment.id,
-			transaction: {
-				type: transactionType,
-				amount: requestAmount,
-				interactionId: res.pspReference,
-				state: this.convertPaymentModificationOutcomeToState(res.outcome),
-			},
-		});
-
-		return {
-			outcome: res.outcome,
-		};
 	}
 
 	protected convertPaymentModificationOutcomeToState(
@@ -171,7 +162,7 @@ export abstract class AbstractPaymentService {
 		}
 	}
 
-	protected getPaymentTransactionType(action: string): string {
+	protected getPaymentTransactionType(action: string): PaymentTransactionTypes {
 		switch (action) {
 			case "cancelPayment": {
 				return "CancelAuthorization";
@@ -217,5 +208,13 @@ export abstract class AbstractPaymentService {
 				throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);
 			}
 		}
+	}
+
+	protected async hasPaymentAmountChanged(cart: Cart, ctPayment: Payment): Promise<boolean> {
+		const amountPlanned = await this.ctCartService.getPaymentAmount({ cart });
+		return (
+			ctPayment.amountPlanned.centAmount !== amountPlanned.centAmount ||
+			ctPayment.amountPlanned.currencyCode !== amountPlanned.currencyCode
+		);
 	}
 }

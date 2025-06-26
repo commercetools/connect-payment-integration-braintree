@@ -11,19 +11,27 @@ import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionRe
 import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
-import braintree from "braintree";
+import { BraintreeGateway, Environment } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
+import { logger } from "../libs/logger";
+import { PaymentModificationStatus } from "../dtos/operations";
+import type { AmountSchemaDTO } from "../dtos/operations";
+import { ErrorInvalidOperation, Errorx, TransactionState } from "@commercetools/connect-payments-sdk";
+import { wrapBraintreeError } from "../errors";
+import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
+import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
+import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 
 const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	private braintreeGateway: braintree.BraintreeGateway;
+	private braintreeGateway: BraintreeGateway;
 
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
 
-		this.braintreeGateway = new braintree.BraintreeGateway({
-			environment: braintree.Environment.Sandbox,
+		this.braintreeGateway = new BraintreeGateway({
+			environment: Environment.Sandbox,
 			merchantId: config.braintreeMerchantId,
 			publicKey: config.braintreePublicKey,
 			privateKey: config.braintreePrivateKey,
@@ -94,6 +102,118 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	}
 
 	/**
+	 * Create payment
+	 *
+	 * @remarks
+	 * Implementation to provide the mocking data for payment creation in external PSPs
+	 *
+	 * @param request - contains paymentType defined in composable commerce
+	 * @returns Promise with mocking data containing operation status and PSP reference
+	 */
+	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
+		let ctPayment = request.data.paymentReference
+			? await this.ctPaymentService.updatePayment({
+					id: request.data.paymentReference,
+					paymentMethod: request.data.paymentMethodType,
+				})
+			: undefined;
+
+		// If there's a payment reference
+		if (ctPayment) {
+			if (await this.hasPaymentAmountChanged(ctCart, ctPayment)) {
+				throw new ErrorInvalidOperation(
+					"The payment amount does not fulfill the remaining amount of the cart",
+					{
+						fields: {
+							cartId: ctCart.id,
+							paymentId: ctPayment.id,
+						},
+					},
+				);
+			}
+		} else {
+			// Else no payment reference
+			const amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+			ctPayment = await this.ctPaymentService.createPayment({
+				amountPlanned,
+				paymentMethodInfo: {
+					paymentInterface: getPaymentInterfaceFromContext() || "braintree",
+					method: request.data.paymentMethodType,
+				},
+				...(ctCart.customerId && {
+					customer: {
+						typeId: "customer",
+						id: ctCart.customerId,
+					},
+				}),
+				...(!ctCart.customerId &&
+					ctCart.anonymousId && {
+						anonymousId: ctCart.anonymousId,
+					}),
+			});
+			ctCart = await this.ctCartService.addPayment({
+				resource: {
+					id: ctCart.id,
+					version: ctCart.version,
+				},
+				paymentId: ctPayment.id,
+			});
+		}
+
+		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
+		try {
+			btResponse = await this.braintreeGateway.transaction.sale({
+				amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
+				paymentMethodNonce: request.data.nonce,
+				options: request.data.options ?? { submitForSettlement: true },
+			});
+			if (!btResponse.success) {
+				const prefix = ["soft_declined", "hard_declined"].includes(
+					btResponse?.transaction?.processorResponseType,
+				)
+					? `[${btResponse.transaction.processorResponseType}] `
+					: "";
+				// TODO standardize errors
+				throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
+			}
+		} catch (error) {
+			throw wrapBraintreeError(error);
+		}
+
+		const txState: TransactionState = mapBraintreeToCtResultCode(
+			btResponse.transaction.status,
+			btResponse.transaction.type !== undefined, // TODO check this, currently based loosely on Adyen isActionRequired method
+		);
+
+		const updatedPayment = await this.ctPaymentService.updatePayment({
+			id: ctPayment.id,
+			pspReference: btResponse.transaction.id,
+			transaction: {
+				type: "Authorization", //TODO: is there any case where this could be a direct charge?
+				amount: ctPayment.amountPlanned,
+				interactionId: btResponse.transaction.id,
+				state: txState,
+			},
+		});
+
+		logger.info(`Payment authorization processed.`, {
+			paymentId: updatedPayment.id,
+			interactionId: btResponse.transaction.id,
+			result: btResponse.transaction.status,
+		});
+
+		return {
+			...btResponse.transaction,
+			paymentReference: updatedPayment.id,
+			//TODO copied verbatim from Adyen, likely not needed for card transactions
+			// ...(txState === "Success" || txState === "Pending"
+			// 	? { merchantReturnUrl: this.buildRedirectMerchantUrl(updatedPayment.id, btResponse.transaction.status) }
+			// 	: {}),
+		};
+	}
+
+	/**
 	 * Capture payment
 	 *
 	 * @remarks
@@ -102,11 +222,31 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	public async capturePayment(
-		// @ts-expect-error - unused parameter
-		request: CapturePaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
-		throw new Error("Not yet implemented");
+	async capturePayment(capturePaymentRequest: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
+		const action = "capturePayment";
+		const transactionType = this.getPaymentTransactionType(action);
+		logger.info(`Processing payment modification.`, {
+			paymentId: capturePaymentRequest.payment.id,
+			action,
+		});
+
+		const response = await this.processPaymentModificationInternal({
+			request: capturePaymentRequest,
+			transactionType,
+			braintreeOperation: "capture",
+			amount: capturePaymentRequest.amount,
+		});
+
+		logger.info(`Payment modification completed.`, {
+			paymentId: capturePaymentRequest.payment.id,
+			action: "capturePayment",
+			result: response.outcome,
+		});
+
+		return {
+			outcome: response.outcome,
+			pspReference: response.pspReference,
+		};
 	}
 
 	/**
@@ -141,22 +281,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		throw new Error("Not yet implemented");
 	}
 
-	/**
-	 * Create payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment creation in external PSPs
-	 *
-	 * @param request - contains paymentType defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-	public async createPayment(
-		// @ts-expect-error - unused parameter
-		request: CreatePaymentRequest,
-	): Promise<PaymentResponseSchemaDTO> {
-		throw new Error("Not yet implemented");
-	}
-
 	public async handleTransaction(
 		// @ts-expect-error - unused parameter
 		transactionDraft: TransactionDraftDTO,
@@ -167,5 +291,75 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	// @ts-expect-error - unused parameter
 	private validatePaymentMethod(request: CreatePaymentRequest): void {
 		throw new Error("Not yet implemented");
+	}
+
+	private async makeCallToBraintreeInternal(
+		// @ts-expect-error - unused parameter
+		interfaceId: string,
+		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
+		// @ts-expect-error - unused parameter
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
+	): Promise<PaymentProviderModificationResponse> {
+		try {
+			switch (braintreeOperation) {
+				case "capture": {
+					throw new Error("Not yet implemented");
+				}
+				case "refund": {
+					throw new Error("Not yet implemented");
+				}
+				case "cancel": {
+					throw new Error("Not yet implemented");
+				}
+				case "reverse": {
+					throw new Error("Not yet implemented");
+				}
+				default: {
+					logger.error(
+						`makeCallToBraintreeInternal: Operation  ${braintreeOperation} not supported when modifying payment.`,
+					);
+					throw new ErrorInvalidOperation(`Operation not supported.`);
+				}
+			}
+		} catch (e) {
+			if (e instanceof Errorx) {
+				throw e;
+			} else {
+				throw wrapBraintreeError(e);
+			}
+		}
+	}
+
+	private async processPaymentModificationInternal(opts: {
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest;
+		transactionType: "Charge" | "Refund" | "CancelAuthorization";
+		braintreeOperation: "capture" | "refund" | "cancel" | "reverse";
+		amount: AmountSchemaDTO;
+	}): Promise<PaymentProviderModificationResponse> {
+		const { request, transactionType, braintreeOperation, amount } = opts;
+		await this.ctPaymentService.updatePayment({
+			id: request.payment.id,
+			transaction: {
+				type: transactionType,
+				amount,
+				state: "Initial",
+			},
+		});
+
+		const interfaceId = request.payment.interfaceId as string;
+
+		const response = await this.makeCallToBraintreeInternal(interfaceId, braintreeOperation, request);
+
+		await this.ctPaymentService.updatePayment({
+			id: request.payment.id,
+			transaction: {
+				type: transactionType,
+				amount,
+				interactionId: response.pspReference,
+				state: this.convertPaymentModificationOutcomeToState(PaymentModificationStatus.RECEIVED),
+			},
+		});
+
+		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.pspReference };
 	}
 }
