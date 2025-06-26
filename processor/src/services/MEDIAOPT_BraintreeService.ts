@@ -1,3 +1,6 @@
+//----------------------------------------------------------------------------------------------
+//TODO delete this file, it was added purely as a reference and should be removed before release
+//----------------------------------------------------------------------------------------------
 import braintree, {
 	ClientTokenRequest,
 	TransactionRequest,
