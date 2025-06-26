@@ -1,14 +1,26 @@
 import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
-import { ConfigResponse /* ModifyPayment, StatusResponse*/ } from "../../src/services/types/operations";
+import { ConfigResponse, ModifyPayment, /*  StatusResponse*/ } from "../../src/services/types/operations";
 import { paymentSDK } from "../../src/sdk/paymentSDK";
+import { DefaultPaymentService } from "@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service";
+
 // import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 // import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
-// import { mockGetPaymentResult, mockUpdatePaymentResult } from '../utils/mock-payment-results';
+import { BraintreeClient } from "../../src/clients";
+
+import {
+	mockGetPaymentResult,
+	mockUpdatePaymentResult,
+	mockBraintreeRefundPaymentResponse,
+} from "../utils/mock-payment-results";
 // import { mockGetCartResult } from '../utils/mock-cart-data';
 // import * as Config from '../../src/dev-utils/getConfig';
+
 import { /* CreatePaymentRequest, */ BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
+
+
+
 // import * as FastifyContext from '../../src/libs/fastify/context';
 // import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
@@ -142,30 +154,29 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("refundPayment", async () => {
-		// TODO: implement and fix
-		// const modifyPaymentOpts: ModifyPayment = {
-		//   paymentId: 'dummy-paymentId',
-		//   data: {
-		//     actions: [
-		//       {
-		//         action: 'refundPayment',
-		//         amount: {
-		//           centAmount: 150000,
-		//           currencyCode: 'USD',
-		//         },
-		//       },
-		//     ],
-		//   },
-		// };
-		// jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// jest
-		//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-		//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-		// jest
-		//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-		//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-		// const result = await paymentService.modifyPayment(modifyPaymentOpts);
-		// expect(result?.outcome).toStrictEqual('approved');
+		const modifyPaymentOpts: ModifyPayment = {
+			paymentId: "dummy-paymentId",
+			data: {
+				actions: [
+					{
+						action: "refundPayment",
+						amount: {
+							centAmount: 150000,
+							currencyCode: "USD",
+						},
+					},
+				],
+			},
+		};
+
+		jest.spyOn(DefaultPaymentService.prototype, "getPayment").mockResolvedValue(mockGetPaymentResult);
+		jest.spyOn(DefaultPaymentService.prototype, "updatePayment").mockResolvedValue(mockUpdatePaymentResult);
+		jest.spyOn(DefaultPaymentService.prototype, "updatePayment").mockResolvedValue(mockUpdatePaymentResult);
+		jest.spyOn(BraintreeClient.prototype, "refundPayment").mockResolvedValue(mockBraintreeRefundPaymentResponse);
+
+		const result = await paymentService.modifyPayment(modifyPaymentOpts);
+		expect(result?.outcome).toStrictEqual("received");
+		expect(result?.pspReference).toStrictEqual("dummy-braintree-transaction-id");
 	});
 
 	test("create card payment", async () => {

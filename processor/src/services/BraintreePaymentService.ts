@@ -7,11 +7,15 @@ import {
 	StatusResponse,
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
-import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
+import {
+	SupportedPaymentComponentsSchemaDTO,
+	TransactionDraftDTO,
+	TransactionResponseDTO,
+} from "../dtos/operations";
 import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
-import { BraintreeGateway, Environment } from "braintree";
+import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { PaymentModificationStatus } from "../dtos/operations";
@@ -21,6 +25,7 @@ import { wrapBraintreeError } from "../errors";
 import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
+import { BraintreeClient } from "../clients/BraintreeClient";
 
 const config = getConfig();
 
@@ -274,11 +279,28 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	public async refundPayment(
-		// @ts-expect-error - unused parameter
-		request: RefundPaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
-		throw new Error("Not yet implemented");
+
+	async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
+		const action = "refundPayment";
+		logger.info(`Processing payment modification.`, {
+			paymentId: request.payment.id,
+			action,
+		});
+
+		const response = await this.processPaymentModificationInternal({
+			request,
+			transactionType: "Refund",
+			braintreeOperation: "refund",
+			amount: request.amount,
+		});
+
+		logger.info(`Payment modification completed.`, {
+			paymentId: request.payment.id,
+			action,
+			result: response.outcome,
+		});
+
+		return response;
 	}
 
 	public async handleTransaction(
@@ -294,19 +316,19 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	}
 
 	private async makeCallToBraintreeInternal(
-		// @ts-expect-error - unused parameter
 		interfaceId: string,
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
 		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
+	): Promise<ValidatedResponse<Transaction>> {
 		try {
 			switch (braintreeOperation) {
 				case "capture": {
 					throw new Error("Not yet implemented");
 				}
 				case "refund": {
-					throw new Error("Not yet implemented");
+					const braintreeClient = BraintreeClient.getInstance();
+					return await braintreeClient.refundPayment(interfaceId);
 				}
 				case "cancel": {
 					throw new Error("Not yet implemented");
@@ -355,11 +377,13 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			transaction: {
 				type: transactionType,
 				amount,
-				interactionId: response.pspReference,
-				state: this.convertPaymentModificationOutcomeToState(PaymentModificationStatus.RECEIVED),
+				interactionId: response.transaction.id,
+				state: this.convertPaymentModificationOutcomeToState(
+					response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+				),
 			},
 		});
 
-		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.pspReference };
+		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.transaction.id };
 	}
 }
