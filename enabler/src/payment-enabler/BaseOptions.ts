@@ -10,6 +10,7 @@ export type BaseOptions = {
 	sessionId: string;
 	environment: string;
 	locale?: string;
+	paymentReference?: string;
 	onComplete: (result: PaymentResult) => void;
 	onError: (error?: any) => void;
 };

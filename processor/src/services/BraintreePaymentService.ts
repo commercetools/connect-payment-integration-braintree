@@ -64,11 +64,43 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise returning Braintree client token
 	 */
 	public async init(customerId?: string): Promise<BraintreeInitResponse> {
+
+		const ctCart = await this.ctCartService.getCart({
+			id: getCartIdFromContext(),
+		  });
+	  
+		  const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		  const ctPayment = await this.ctPaymentService.createPayment({
+			amountPlanned,
+			paymentMethodInfo: {
+			  paymentInterface: getPaymentInterfaceFromContext() || 'braintree',
+			},
+			...(ctCart.customerId && {
+			  customer: {
+				typeId: 'customer',
+				id: ctCart.customerId,
+			  },
+			}),
+			...(!ctCart.customerId &&
+			  ctCart.anonymousId && {
+				anonymousId: ctCart.anonymousId,
+			  }),
+		  });
+	  
+			await this.ctCartService.addPayment({
+			resource: {
+			  id: ctCart.id,
+			  version: ctCart.version,
+			},
+			paymentId: ctPayment.id,
+		  });
+	  
+		
 		try {
 			const response = await this.braintreeGateway.clientToken.generate({
 				customerId,
 			});
-			return { clientToken: response.clientToken };
+			return { clientToken: response.clientToken, paymentReference: ctPayment.id, };
 		} catch (error) {
 			console.error("Error in BraintreePaymentService init: ", error);
 			throw error;

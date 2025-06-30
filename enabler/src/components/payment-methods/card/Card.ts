@@ -111,11 +111,11 @@ export class Card extends BaseComponent {
 			this.onError(error);
 			return;
 		}
-
+		
 		const request = {
 			nonce: payload.nonce,
 			paymentMethodType: "card",
-			paymentReference: payload.description,
+			paymentReference: this.paymentReference,
 		};
 		try {
 			const response = await fetch(this.processorUrl + "/payment", {
