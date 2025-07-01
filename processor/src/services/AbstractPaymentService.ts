@@ -127,9 +127,10 @@ export abstract class AbstractPaymentService {
 
 		switch (action) {
 			case "cancelPayment": {
-				// TODO : execute cancel payment
-				logger.error(`Operation not supported when modifying payment.`);
-				throw new ErrorInvalidOperation(`Operation not supported.`);
+				return await this.cancelPayment({
+					payment: ctPayment,
+					merchantReference: request.merchantReference,
+				});
 			}
 			case "capturePayment": {
 				return await this.capturePayment({
@@ -175,7 +176,6 @@ export abstract class AbstractPaymentService {
 			case "refundPayment": {
 				return "Refund";
 			}
-			// TODO: Handle Error case
 			default: {
 				throw new ErrorInvalidJsonInput(`Request body does not contain valid JSON.`);
 			}

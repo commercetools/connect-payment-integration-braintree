@@ -7,11 +7,7 @@ import {
 	StatusResponse,
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
-import {
-	SupportedPaymentComponentsSchemaDTO,
-	TransactionDraftDTO,
-	TransactionResponseDTO,
-} from "../dtos/operations";
+import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
 import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
@@ -64,43 +60,41 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise returning Braintree client token
 	 */
 	public async init(customerId?: string): Promise<BraintreeInitResponse> {
-
 		const ctCart = await this.ctCartService.getCart({
 			id: getCartIdFromContext(),
-		  });
-	  
-		  const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
-		  const ctPayment = await this.ctPaymentService.createPayment({
+		});
+
+		const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		const ctPayment = await this.ctPaymentService.createPayment({
 			amountPlanned,
 			paymentMethodInfo: {
-			  paymentInterface: getPaymentInterfaceFromContext() || 'braintree',
+				paymentInterface: getPaymentInterfaceFromContext() || "braintree",
 			},
 			...(ctCart.customerId && {
-			  customer: {
-				typeId: 'customer',
-				id: ctCart.customerId,
-			  },
+				customer: {
+					typeId: "customer",
+					id: ctCart.customerId,
+				},
 			}),
 			...(!ctCart.customerId &&
-			  ctCart.anonymousId && {
-				anonymousId: ctCart.anonymousId,
-			  }),
-		  });
-	  
-			await this.ctCartService.addPayment({
+				ctCart.anonymousId && {
+					anonymousId: ctCart.anonymousId,
+				}),
+		});
+
+		await this.ctCartService.addPayment({
 			resource: {
-			  id: ctCart.id,
-			  version: ctCart.version,
+				id: ctCart.id,
+				version: ctCart.version,
 			},
 			paymentId: ctPayment.id,
-		  });
-	  
-		
+		});
+
 		try {
 			const response = await this.braintreeGateway.clientToken.generate({
 				customerId,
 			});
-			return { clientToken: response.clientToken, paymentReference: ctPayment.id, };
+			return { clientToken: response.clientToken, paymentReference: ctPayment.id };
 		} catch (error) {
 			console.error("Error in BraintreePaymentService init: ", error);
 			throw error;
@@ -296,10 +290,32 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
 	public async cancelPayment(
-		// @ts-expect-error - unused parameter
-		request: CancelPaymentRequest,
+		cancelPaymentRequest: CancelPaymentRequest,
 	): Promise<PaymentProviderModificationResponse> {
-		throw new Error("Not yet implemented");
+		const action = "cancelPayment";
+		const transactionType = this.getPaymentTransactionType(action);
+		logger.info(`Processing payment modification.`, {
+			paymentId: cancelPaymentRequest.payment.id,
+			action,
+		});
+
+		const response = await this.processPaymentModificationInternal({
+			request: cancelPaymentRequest,
+			transactionType,
+			braintreeOperation: "cancel",
+			amount: cancelPaymentRequest.payment.amountPlanned,
+		});
+
+		logger.info(`Payment modification completed.`, {
+			paymentId: cancelPaymentRequest.payment.id,
+			action: "capturePayment",
+			result: response.outcome,
+		});
+
+		return {
+			outcome: response.outcome,
+			pspReference: response.pspReference,
+		};
 	}
 
 	/**
@@ -363,7 +379,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					return await braintreeClient.refundPayment(interfaceId);
 				}
 				case "cancel": {
-					throw new Error("Not yet implemented");
+					const braintreeClient = BraintreeClient.getInstance();
+					return await braintreeClient.cancelPayment(interfaceId);
 				}
 				case "reverse": {
 					throw new Error("Not yet implemented");
