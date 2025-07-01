@@ -1,3 +1,3 @@
 import { BraintreeClient } from "./BraintreeClient";
 
-export { BraintreeClient }
+export { BraintreeClient };

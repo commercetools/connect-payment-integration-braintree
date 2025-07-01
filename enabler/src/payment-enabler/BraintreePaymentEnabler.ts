@@ -16,7 +16,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		this.setupData = BraintreePaymentEnabler._Setup(options);
 	}
 
-	private static getBraintreeToken = async (options: EnablerOptions): Promise<string> => {
+	private static getBraintreeToken = async (options: EnablerOptions): Promise<{ clientToken: string, paymentReference: string }> => {
 		let response!: Response;
 		try {
 			response = await fetch(`${options.processorUrl}/init`, {
@@ -32,21 +32,13 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 			console.log("response: ", response);
 		}
 
-		const token: { clientToken: string } = await response.json();
-		return token.clientToken;
+		const initResponse: { clientToken: string, paymentReference: string } = await response.json();
+		return { clientToken: initResponse.clientToken, paymentReference: initResponse.paymentReference };
 	};
 
 	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
-		// Fetch SDK config from processor if needed, for example:
 
-		// const configResponse = await fetch(instance.processorUrl + '/config', {
-		//   method: 'GET',
-		//   headers: { 'Content-Type': 'application/json', 'X-Session-Id': options.sessionId },
-		// });
-
-		// const configJson = await configResponse.json();
-
-		const clientToken = await BraintreePaymentEnabler.getBraintreeToken(options);
+		const { clientToken, paymentReference } = await BraintreePaymentEnabler.getBraintreeToken(options);
 
 		const sdkOptions = {
 			environment: "test",
@@ -62,6 +54,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 				processorUrl: options.processorUrl,
 				sessionId: options.sessionId,
 				environment: sdkOptions.environment,
+				paymentReference,
 				onComplete: options.onComplete || (() => {}),
 				onError: options.onError || (() => {}),
 			},
