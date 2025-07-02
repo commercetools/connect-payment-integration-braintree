@@ -5,10 +5,14 @@ import {
 	deleteCustomer,
 	findCustomer,
 } from "../integrations/braintree/customer";
-import { createCustomerFormElements } from "../setup";
+import { customerFormElementsData } from "./customerFormElementsData";
 import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../../src/constants";
 import { cocoSessionStore } from "../../src/store";
-import { addLabelledInputToParent, createButtonElement, createHeaderElement } from "../../src/helpers/elements";
+import {
+	createAndAddLabelledInputToParent,
+	createButtonElement,
+	createHeaderElement,
+} from "../../src/helpers/elements";
 import { setupCreateSessionIdFields } from "./setupCreateSessionFields";
 
 export const setupCustomerPage = function () {
@@ -33,8 +37,8 @@ const createCreateCustomerForm = function () {
 	let createCustomerForm = document.createElement("form");
 	createCustomerForm.setAttribute("id", createCustomerFormId);
 
-	createCustomerFormElements.forEach((inputData) => {
-		createCustomerForm = addLabelledInputToParent(inputData, createCustomerForm);
+	customerFormElementsData.forEach((inputData) => {
+		createCustomerForm = createAndAddLabelledInputToParent(inputData, createCustomerForm);
 	});
 
 	const submitButton = createButtonElement({
@@ -49,7 +53,7 @@ const createCreateCustomerForm = function () {
 				email: "",
 			};
 			let missingRequiredParams: string[] = [];
-			createCustomerFormElements.forEach((elementData) => {
+			customerFormElementsData.forEach((elementData) => {
 				const element = document.getElementById(elementData.id) as HTMLInputElement;
 				if (!element) {
 					console.error(`Element with id ${elementData.id} not found when creating customer`);
@@ -97,7 +101,7 @@ const createFindCustomerFields = function () {
 
 	const findCustomerInputId = "findCustomerInputId";
 
-	findCustomerContainer = addLabelledInputToParent(
+	findCustomerContainer = createAndAddLabelledInputToParent(
 		{
 			id: findCustomerInputId,
 			label: "Customer ID:",
@@ -147,7 +151,7 @@ const createDeleteCustomerFields = function () {
 
 	const deleteCustomerInputId = "deleteCustomerInputId";
 
-	deleteCustomerContainer = addLabelledInputToParent(
+	deleteCustomerContainer = createAndAddLabelledInputToParent(
 		{
 			id: deleteCustomerInputId,
 			label: "Customer ID:",

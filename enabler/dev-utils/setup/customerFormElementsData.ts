@@ -7,7 +7,7 @@ export type CreateCustomerFormData = LabelledInputData & {
 	parameterName: keyof CreateBraintreeCustomerRequest;
 };
 
-export const createCustomerFormElements: CreateCustomerFormData[] = [
+export const customerFormElementsData: CreateCustomerFormData[] = [
 	{
 		id: "customerFirstName",
 		parameterName: "firstName",

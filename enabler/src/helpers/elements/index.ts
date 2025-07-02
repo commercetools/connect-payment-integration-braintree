@@ -1,4 +1,4 @@
-import { type LabelledInputData, addLabelledInputToParent } from "./addLabelledInputToParent";
+import { type LabelledInputData, createAndAddLabelledInputToParent } from "./addLabelledInputToParent";
 import { type ButtonElementData, createButtonElement } from "./createButtonElement";
 import { type HeaderElementData, createHeaderElement } from "./createHeaderElement";
 import { type InputElementData, createInputElement } from "./createInputElement";
@@ -6,7 +6,7 @@ import { type LabelElementData, createLabelElement } from "./createLabelElement"
 
 export {
 	type LabelledInputData,
-	addLabelledInputToParent,
+	createAndAddLabelledInputToParent,
 	type ButtonElementData,
 	createButtonElement,
 	type HeaderElementData,
