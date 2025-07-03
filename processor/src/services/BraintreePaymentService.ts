@@ -428,7 +428,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+					response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
