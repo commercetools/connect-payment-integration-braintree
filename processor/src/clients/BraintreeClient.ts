@@ -39,4 +39,10 @@ export class BraintreeClient {
 			await this.braintreeGateway.transaction.refund(interactionId);
 		return refundResult;
 	}
+
+	public async cancelPayment(interactionId: string): Promise<ValidatedResponse<Transaction>> {
+		const cancelResult: ValidatedResponse<Transaction> =
+			await this.braintreeGateway.transaction.void(interactionId);
+		return cancelResult;
+	}
 }
