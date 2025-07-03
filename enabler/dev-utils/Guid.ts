@@ -1,4 +1,4 @@
-// NOW TO BE USED IN PRODUCTION
+// NOT TO BE USED IN PRODUCTION
 class Guid {
 	static NewGuid = (noHyphens?: boolean) => {
 		var d = new Date().getTime();
