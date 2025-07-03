@@ -1,10 +1,6 @@
 import { devPageId } from "../../src/constants";
-import {
-	createAndAddLabelledInputToParent,
-	createButtonElement,
-	createHeaderElement,
-} from "../../src/helpers/elements";
-import { createClearSessionButton } from "../../src/helpers/elements/custom-elements";
+import { createAndAddLabelledInputToParent, createButtonElement, createHeaderElement } from "../helpers/elements";
+import { createClearSessionButton } from "../helpers/elements/custom-elements";
 import { cocoSessionStore } from "../../src/store";
 import { fetchAdminToken } from "../fetchAdminToken";
 import { createSession } from "../";
@@ -36,7 +32,7 @@ const createDevPage = function (devPage: HTMLElement) {
 		return;
 	}
 	createCartDetailsForm(devPage, cartId);
-	createProductsForm(devPage, cartId);
+	createProductsForm(devPage);
 	createFindTransactionForm(devPage);
 };
 

@@ -1,5 +1,5 @@
 import { submitCreateCustomerId } from "../../src/constants";
-import { createAndAddLabelledInputToParent, createButtonElement } from "../../src/helpers/elements";
+import { createAndAddLabelledInputToParent, createButtonElement } from "../helpers/elements";
 import { createSession } from "../createSession";
 
 export const setupCreateSessionIdFields = function (
@@ -15,7 +15,7 @@ export const setupCreateSessionIdFields = function (
 	sessionContainer = createAndAddLabelledInputToParent(
 		{
 			id: cartIdInputId,
-			label: "Cart ID:",
+			label: "Existing cart ID:",
 			labelStyle: "margin-right: 5px",
 		},
 		sessionContainer,

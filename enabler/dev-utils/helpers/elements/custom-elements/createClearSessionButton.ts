@@ -1,4 +1,4 @@
-import { cocoSessionStore } from "../../../store";
+import { cocoSessionStore } from "../../../../src/store";
 import { createButtonElement } from "../createButtonElement";
 
 export const createClearSessionButton = (): HTMLInputElement =>

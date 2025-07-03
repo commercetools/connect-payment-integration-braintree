@@ -8,11 +8,7 @@ import {
 import { customerFormElementsData } from "./customerFormElementsData";
 import { createCustomerFormId, customerPageId, submitCreateCustomerId } from "../../src/constants";
 import { cocoSessionStore } from "../../src/store";
-import {
-	createAndAddLabelledInputToParent,
-	createButtonElement,
-	createHeaderElement,
-} from "../../src/helpers/elements";
+import { createAndAddLabelledInputToParent, createButtonElement, createHeaderElement } from "../helpers/elements";
 import { setupCreateSessionIdFields } from "./setupCreateSessionFields";
 
 export const setupCustomerPage = function () {
