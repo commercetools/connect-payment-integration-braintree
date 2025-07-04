@@ -308,10 +308,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 
 		logger.info(`Payment modification completed.`, {
 			paymentId: cancelPaymentRequest.payment.id,
-			action: "capturePayment",
+			action,
 			result: response.outcome,
 		});
-
 		return {
 			outcome: response.outcome,
 			pspReference: response.pspReference,
@@ -428,11 +427,11 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+					response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
-
-		return { outcome: PaymentModificationStatus.RECEIVED, pspReference: response.transaction.id };
+		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED
+		return { outcome, pspReference: response.transaction.id };
 	}
 }
