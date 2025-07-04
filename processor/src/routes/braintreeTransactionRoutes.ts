@@ -8,6 +8,9 @@ type transactionRoutesOptions = {
 	transactionService: BraintreeTransactionService;
 	sessionHeaderAuthHook: SessionHeaderAuthenticationHook;
 };
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// TODO remove before release, these routes (at least /find/:transactionId) shouldn't make it into production
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 export const braintreeTransactionRoutes = async (
 	fastify: FastifyInstance,
