@@ -11,7 +11,6 @@ import {
 	PaymentResponseSchemaDTO,
 } from "../dtos/payment";
 import { BraintreePaymentService } from "../services/BraintreePaymentService";
-import { logger } from "../libs/logger";
 
 type PaymentRoutesOptions = {
 	paymentService: BraintreePaymentService;
@@ -61,12 +60,25 @@ export const braintreePaymentRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			logger.info(request.body);
 			const response = await opts.paymentService.createPayment({
 				data: request.body,
 			});
 			if (response.paymentReference) {
-				return reply.status(200).send(response);
+				return reply.status(200).send({
+					paymentReference: response.paymentReference,
+					id: response.id,
+					additionalProcessorResponse: response.additionalProcessorResponse,
+					amount: response.amount,
+					status: response.status,
+					statusHistory:
+						response.statusHistory?.map((history) => ({
+							amount: history.amount,
+							status: history.status,
+							timestamp: history.timestamp,
+							transactionSource: history.transactionSource,
+							user: history.user,
+						})) ?? undefined,
+				});
 			} else {
 				return reply.status(500).send();
 			}
