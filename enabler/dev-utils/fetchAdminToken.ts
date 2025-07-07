@@ -2,7 +2,7 @@ import { getConfig } from "./getConfig";
 
 const config = getConfig();
 
-export const fetchAdminToken = async () => {
+export const fetchAdminToken = async (): Promise<string> => {
 	const myHeaders = new Headers();
 
 	myHeaders.append("Authorization", `Basic ${btoa(`${config.CTP_CLIENT_ID}:${config.CTP_CLIENT_SECRET}`)}`);
@@ -26,7 +26,7 @@ export const fetchAdminToken = async () => {
 			title: "Token fetch failed",
 			message: `Error ${response.status} while fetching token`,
 		});
-		return;
+		throw new Error(`Error ${response.status} while fetching token`);
 	} else {
 		console.log({
 			title: "Token fetched",

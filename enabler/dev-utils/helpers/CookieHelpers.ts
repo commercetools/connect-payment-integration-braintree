@@ -1,5 +1,5 @@
-import { COCO_SESSION_COOKIE_KEY, cookieHandler } from "../../dev-utils/cookieHandling";
-import type { Session } from "../store/stores/CoCoSessionStore";
+import { COCO_SESSION_COOKIE_KEY, cookieHandler } from "../cookieHandling";
+import type { Session } from "../../src/store/stores/CoCoSessionStore";
 
 export class CookieHelpers {
 	static getSession(): Session | undefined {

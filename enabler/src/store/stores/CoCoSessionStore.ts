@@ -1,4 +1,4 @@
-import { CookieHelpers } from "../../helpers/CookieHelpers";
+import { CookieHelpers } from "../../../dev-utils/helpers/CookieHelpers";
 import { Store } from "../Store";
 
 export type Session =

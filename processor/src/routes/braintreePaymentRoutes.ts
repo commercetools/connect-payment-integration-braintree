@@ -11,6 +11,7 @@ import {
 	PaymentResponseSchemaDTO,
 } from "../dtos/payment";
 import { BraintreePaymentService } from "../services/BraintreePaymentService";
+import { logger } from "../libs/logger";
 
 type PaymentRoutesOptions = {
 	paymentService: BraintreePaymentService;
@@ -60,6 +61,7 @@ export const braintreePaymentRoutes = async (
 			},
 		},
 		async (request, reply) => {
+			logger.info(request.body);
 			const response = await opts.paymentService.createPayment({
 				data: request.body,
 			});

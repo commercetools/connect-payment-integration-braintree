@@ -1,4 +1,4 @@
-import { type LabelledInputData } from "../../src/helpers/elements";
+import { type LabelledInputData } from "../helpers/elements";
 import type { CreateBraintreeCustomerRequest } from "../integrations/braintree/customer";
 
 export type CreateCustomerFormData = LabelledInputData & {
@@ -7,7 +7,7 @@ export type CreateCustomerFormData = LabelledInputData & {
 	parameterName: keyof CreateBraintreeCustomerRequest;
 };
 
-export const createCustomerFormElements: CreateCustomerFormData[] = [
+export const customerFormElementsData: CreateCustomerFormData[] = [
 	{
 		id: "customerFirstName",
 		parameterName: "firstName",

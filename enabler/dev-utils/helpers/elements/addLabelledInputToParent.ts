@@ -7,7 +7,7 @@ export type LabelledInputData = Omit<InputElementData & LabelElementData, "style
 	inputStyle?: string;
 };
 
-export const addLabelledInputToParent = function <ParentElement extends HTMLElement>(
+export const createAndAddLabelledInputToParent = function <ParentElement extends HTMLElement>(
 	labelledInputData: LabelledInputData,
 	parentElement: ParentElement,
 ): ParentElement {

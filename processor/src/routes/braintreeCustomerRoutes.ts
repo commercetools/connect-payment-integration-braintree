@@ -9,14 +9,14 @@ import {
 } from "../dtos/customer";
 import { Type } from "@sinclair/typebox";
 
-type PaymentRoutesOptions = {
+type CustomerRoutesOptions = {
 	customerService: BraintreeCustomerService;
 	sessionHeaderAuthHook: SessionHeaderAuthenticationHook;
 };
 
 export const braintreeCustomerRoutes = async (
 	fastify: FastifyInstance,
-	opts: FastifyPluginOptions & PaymentRoutesOptions,
+	opts: FastifyPluginOptions & CustomerRoutesOptions,
 ) => {
 	fastify.post<{
 		Body: CreateCustomerRequestSchemaDTO;

@@ -1,4 +1,4 @@
-import { CookieHelpers } from "../src/helpers/CookieHelpers";
+import { CookieHelpers } from "./helpers/CookieHelpers";
 import { cocoSessionStore } from "../src/store";
 import { createSession } from "./createSession";
 

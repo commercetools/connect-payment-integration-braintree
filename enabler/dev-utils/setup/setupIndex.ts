@@ -1,12 +1,39 @@
 import { BraintreePaymentEnabler, DropinType, type PaymentComponent } from "../../src/payment-enabler";
-import { createSession, getConfig } from "..";
+import { createSession, fetchAccessToken, getConfig, tryUpdateSessionFromLocalStorage } from "..";
 import { braintreeContainerId, createCheckoutButtonId } from "../../src/constants";
 import { cocoSessionStore } from "../../src/store";
+import { getPaymentMethods } from "../../src/integrations/braintree/operations";
 
 const config = getConfig();
 
-export const setupIndex = function async(): void {
-	createCheckout();
+export const setupIndex = function () {
+	tryUpdateSessionFromLocalStorage().then(() => {
+		setupPaymentMethods();
+		createCheckout();
+	});
+};
+
+const setupPaymentMethods = async function () {
+	const accessToken = await fetchAccessToken();
+
+	const paymentMethodSelect = document.getElementById("paymentMethod");
+	if (paymentMethodSelect) {
+		const paymentMethods = await getPaymentMethods(accessToken);
+		paymentMethods.components.forEach((component) => {
+			const option = document.createElement("option");
+			option.value = component.type;
+			option.textContent = component.type;
+			paymentMethodSelect.appendChild(option);
+		});
+		paymentMethods.dropins?.forEach((method) => {
+			const option = document.createElement("option");
+			option.value = `${method.type}`;
+			option.textContent = `dropin-${method.type}`;
+			paymentMethodSelect.appendChild(option);
+		});
+	} else {
+		console.error('Cannot populate payment method selection, select with ID "paymentMethod" not found.');
+	}
 };
 
 const createCheckout = async function () {
