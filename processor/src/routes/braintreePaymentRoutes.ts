@@ -64,21 +64,7 @@ export const braintreePaymentRoutes = async (
 				data: request.body,
 			});
 			if (response.paymentReference) {
-				return reply.status(200).send({
-					paymentReference: response.paymentReference,
-					id: response.id,
-					additionalProcessorResponse: response.additionalProcessorResponse,
-					amount: response.amount,
-					status: response.status,
-					statusHistory:
-						response.statusHistory?.map((history) => ({
-							amount: history.amount,
-							status: history.status,
-							timestamp: history.timestamp,
-							transactionSource: history.transactionSource,
-							user: history.user,
-						})) ?? undefined,
-				});
+				return reply.status(200).send(response);
 			} else {
 				return reply.status(500).send();
 			}

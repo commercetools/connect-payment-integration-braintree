@@ -221,7 +221,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			id: ctPayment.id,
 			pspReference: btResponse.transaction.id,
 			transaction: {
-				type: "Authorization", //TODO: is there any case where this could be a direct charge?
+				type: "Authorization", 
 				amount: ctPayment.amountPlanned,
 				interactionId: btResponse.transaction.id,
 				state: txState,
@@ -234,13 +234,22 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			result: btResponse.transaction.status,
 		});
 
+		
 		return {
-			...btResponse.transaction,
+			id: btResponse.transaction.status,
+			status : btResponse.transaction.status,
+			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
+			amount: btResponse.transaction.amount,
 			paymentReference: updatedPayment.id,
-			//TODO copied verbatim from Adyen, likely not needed for card transactions
-			// ...(txState === "Success" || txState === "Pending"
-			// 	? { merchantReturnUrl: this.buildRedirectMerchantUrl(updatedPayment.id, btResponse.transaction.status) }
-			// 	: {}),
+			statusHistory:
+				btResponse.transaction.statusHistory?.map((history: any) => ({
+					amount: history.amount,
+					status: history.status,
+					timestamp: history.timestamp,
+					transactionSource: history.transactionSource,
+					user: history.user,
+				})) ?? undefined,
+			
 		};
 	}
 

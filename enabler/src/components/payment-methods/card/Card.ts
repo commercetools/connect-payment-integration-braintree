@@ -128,11 +128,11 @@ export class Card extends BaseComponent {
 			});
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
 			console.log("Payment response:", createPaymentResponse);
-			const resultCode = createPaymentResponse.resultCode;
+			const status = createPaymentResponse.status;
 
 			const paymentResult: PaymentResult = {
-				paymentReference: createPaymentResponse.paymentReference,
-				isSuccess: resultCode === PaymentOutcome.AUTHORIZED,
+				paymentReference: createPaymentResponse.paymentReference ?? "",
+				isSuccess: status === PaymentOutcome.AUTHORIZED || status === PaymentOutcome.PENDING,
 			};
 			await this.hostedFieldsInstance.teardown();
 

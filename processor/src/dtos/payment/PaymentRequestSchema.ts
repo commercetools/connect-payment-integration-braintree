@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-//import { PaymentOutcomeSchema } from "./PaymentOutcomeSchema";
+
 import { PaymentMethodType } from "./PaymentMethodType";
 
 export const PaymentRequestSchema = Type.Object({

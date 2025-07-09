@@ -1,9 +1,20 @@
 import { Type } from "@sinclair/typebox";
 
 export const PaymentResponseSchema = Type.Object({
-	paymentReference: Type.String(),
-	resultCode: Type.Enum({
-		AUTHORIZED: "Authorized",
-		REJECTED: "Rejected",
-	}),
+	id: Type.String(),
+	paymentReference: Type.Optional(Type.String()),
+	additionalProcessorResponse: Type.String(),
+	amount: Type.String(),
+	status: Type.String(),
+	statusHistory: Type.Optional(
+		Type.Array(
+			Type.Object({
+				amount: Type.String(),
+				status: Type.String(),
+				timestamp: Type.Any(),
+				transactionSource: Type.Optional(Type.String()),
+				user: Type.String(),
+			}),
+		),
+	),
 });
