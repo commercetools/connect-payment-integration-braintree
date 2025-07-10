@@ -7,8 +7,8 @@ import {
 	BraintreeInitResponseSchemaDTO,
 	PaymentRequestSchema,
 	PaymentRequestSchemaDTO,
-	PaymentResponseSchema,
-	PaymentResponseSchemaDTO,
+	CreatePaymentResponseSchema,
+	CreatePaymentResponseSchemaDTO,
 } from "../dtos/payment";
 import { BraintreePaymentService } from "../services/BraintreePaymentService";
 
@@ -47,7 +47,7 @@ export const braintreePaymentRoutes = async (
 	);
 	fastify.post<{
 		Body: PaymentRequestSchemaDTO;
-		Reply: PaymentResponseSchemaDTO;
+		Reply: CreatePaymentResponseSchemaDTO;
 	}>(
 		"/payment",
 		{
@@ -55,7 +55,7 @@ export const braintreePaymentRoutes = async (
 			schema: {
 				body: PaymentRequestSchema,
 				response: {
-					200: PaymentResponseSchema,
+					200: CreatePaymentResponseSchema,
 				},
 			},
 		},

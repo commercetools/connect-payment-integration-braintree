@@ -8,7 +8,7 @@ import {
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
@@ -141,7 +141,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains paymentType defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+	public async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponseSchemaDTO> {
 		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
 		let ctPayment = request.data.paymentReference
 			? await this.ctPaymentService.updatePayment({

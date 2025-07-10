@@ -7,8 +7,8 @@ import { PaymentOutcome } from "./PaymentOutcome";
 import { PaymentOutcomeSchema } from "./PaymentOutcomeSchema";
 import { PaymentRequestSchema } from "./PaymentRequestSchema";
 import { PaymentRequestSchemaDTO } from "./PaymentRequestSchemaDTO";
-import { PaymentResponseSchema } from "./PaymentResponseSchema";
-import { type PaymentResponseSchemaDTO } from "./PaymentResponseSchemaDTO";
+import { CreatePaymentResponseSchema } from "./CreatePaymentResponseSchema";
+import { type CreatePaymentResponseSchemaDTO } from "./CreatePaymentResponseSchemaDTO";
 
 export {
 	BraintreeInitRequestSchema,
@@ -20,6 +20,6 @@ export {
 	PaymentOutcomeSchema,
 	PaymentRequestSchema,
 	type PaymentRequestSchemaDTO,
-	PaymentResponseSchema,
-	type PaymentResponseSchemaDTO,
+	CreatePaymentResponseSchema,
+	type CreatePaymentResponseSchemaDTO,
 };

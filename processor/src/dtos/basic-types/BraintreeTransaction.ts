@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 
-export const PaymentResponseSchema = Type.Object({
+export const BraintreeTransaction = Type.Object({
 	id: Type.String(),
 	paymentReference: Type.Optional(Type.String()),
 	additionalProcessorResponse: Type.String(),
