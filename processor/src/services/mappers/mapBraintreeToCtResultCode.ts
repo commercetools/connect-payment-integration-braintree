@@ -3,19 +3,21 @@ import { TransactionStatus } from "braintree";
 
 export const mapBraintreeToCtResultCode = function (
 	resultCode: TransactionStatus,
-	isActionRequired: boolean,
+	success: boolean,
 ): TransactionState {
 	//TODO check this is correct, currently based on the Ayden method and guessing
 	switch (resultCode) {
-		case "authorizing":
+		case "authorizing": {
+			if (success) 
+				return "Pending";
+			return "Failure";
+		}
 		case "settlement_pending":
 		case "settling":
 		case "submitted_for_settlement": {
-			if (!isActionRequired) {
+			if (success) 
 				return "Pending";
-			} else {
-				return "Initial";
-			}
+			return "Failure";
 		}
 		case "authorized":
 		case "settlement_confirmed":

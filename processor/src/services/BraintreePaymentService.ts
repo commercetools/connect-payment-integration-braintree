@@ -199,22 +199,22 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				paymentMethodNonce: request.data.nonce,
 				options: request.data.options ?? { submitForSettlement: true },
 			});
-			if (!btResponse.success) {
-				const prefix = ["soft_declined", "hard_declined"].includes(
-					btResponse?.transaction?.processorResponseType,
-				)
-					? `[${btResponse.transaction.processorResponseType}] `
-					: "";
-				// TODO standardize errors
-				throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
-			}
+			// if (!btResponse.success) {
+			// 	const prefix = ["soft_declined", "hard_declined"].includes(
+			// 		btResponse?.transaction?.processorResponseType,
+			// 	)
+			// 		? `[${btResponse.transaction.processorResponseType}] `
+			// 		: "";
+			// 	// TODO standardize errors
+			// 	throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
+			// }
 		} catch (error) {
 			throw wrapBraintreeError(error);
 		}
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(
 			btResponse.transaction.status,
-			btResponse.transaction.type !== undefined, // TODO check this, currently based loosely on Adyen isActionRequired method
+			btResponse.success
 		);
 
 		const updatedPayment = await this.ctPaymentService.updatePayment({
@@ -231,12 +231,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		logger.info(`Payment authorization processed.`, {
 			paymentId: updatedPayment.id,
 			interactionId: btResponse.transaction.id,
-			result: btResponse.transaction.status,
+			result: btResponse.success,
+			status: btResponse.transaction.status,
 		});
 
 		
 		return {
 			id: btResponse.transaction.status,
+			success: btResponse.success, 
 			status : btResponse.transaction.status,
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
 			amount: btResponse.transaction.amount,
