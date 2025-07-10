@@ -2,7 +2,6 @@ import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentRes
 
 import { BaseComponent } from "../../BaseComponent";
 import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
-import { PaymentOutcome } from "../../../dtos";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
 import type { HostedFieldsHostedFieldsFieldData, HostedFieldsTokenizePayload } from "braintree-web/hosted-fields";
 export class Card extends BaseComponent {
