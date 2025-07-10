@@ -237,7 +237,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 
 		
 		return {
-			id: btResponse.transaction.status,
+			id: btResponse.transaction.id,
 			success: btResponse.success, 
 			status : btResponse.transaction.status,
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
