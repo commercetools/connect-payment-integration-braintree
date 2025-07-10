@@ -1,8 +1,9 @@
 import { SessionHeaderAuthenticationHook } from "@commercetools/connect-payments-sdk";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { FindTransactionResponseSchema, FindTransactionResponseSchemaDTO } from "../dtos/transaction";
+
 import { BraintreeTransactionService } from "../services/BraintreeTransactionService";
+import { type Transaction } from "braintree";
 
 type transactionRoutesOptions = {
 	transactionService: BraintreeTransactionService;
@@ -18,7 +19,7 @@ export const braintreeTransactionRoutes = async (
 ) => {
 	fastify.get<{
 		Params: { transactionId: string };
-		Reply: FindTransactionResponseSchemaDTO;
+		Reply: Transaction;
 	}>(
 		"/find/:transactionId",
 		{
@@ -32,9 +33,9 @@ export const braintreeTransactionRoutes = async (
 					},
 					required: ["transactionId"],
 				},
-				response: {
-					200: FindTransactionResponseSchema,
-				},
+				// response: {
+				// 	200: FindTransactionResponseSchema,
+				// },
 			},
 		},
 		async (request, reply) => {

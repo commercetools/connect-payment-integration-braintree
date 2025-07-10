@@ -7,8 +7,8 @@ import {
 	BraintreeInitResponseSchemaDTO,
 	PaymentRequestSchema,
 	PaymentRequestSchemaDTO,
-	PaymentResponseSchema,
-	PaymentResponseSchemaDTO,
+	CreatePaymentResponseSchema,
+	CreatePaymentResponseSchemaDTO,
 } from "../dtos/payment";
 import { BraintreePaymentService } from "../services/BraintreePaymentService";
 
@@ -47,7 +47,7 @@ export const braintreePaymentRoutes = async (
 	);
 	fastify.post<{
 		Body: PaymentRequestSchemaDTO;
-		Reply: PaymentResponseSchemaDTO;
+		Reply: CreatePaymentResponseSchemaDTO;
 	}>(
 		"/payment",
 		{
@@ -55,7 +55,7 @@ export const braintreePaymentRoutes = async (
 			schema: {
 				body: PaymentRequestSchema,
 				response: {
-					200: PaymentResponseSchema,
+					200: CreatePaymentResponseSchema,
 				},
 			},
 		},
@@ -64,21 +64,7 @@ export const braintreePaymentRoutes = async (
 				data: request.body,
 			});
 			if (response.paymentReference) {
-				return reply.status(200).send({
-					paymentReference: response.paymentReference,
-					id: response.id,
-					additionalProcessorResponse: response.additionalProcessorResponse,
-					amount: response.amount,
-					status: response.status,
-					statusHistory:
-						response.statusHistory?.map((history) => ({
-							amount: history.amount,
-							status: history.status,
-							timestamp: history.timestamp,
-							transactionSource: history.transactionSource,
-							user: history.user,
-						})) ?? undefined,
-				});
+				return reply.status(200).send(response);
 			} else {
 				return reply.status(500).send();
 			}

@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox";
 
 export const BraintreeTransaction = Type.Object({
 	id: Type.String(),
+    success: Type.Boolean(),
 	paymentReference: Type.Optional(Type.String()),
 	additionalProcessorResponse: Type.String(),
 	amount: Type.String(),
@@ -17,5 +18,4 @@ export const BraintreeTransaction = Type.Object({
 			}),
 		),
 	),
-	//TODO COMPLETE TRANSACTION FROM processor\node_modules\@types\braintree\index.d.ts
 });

@@ -2,7 +2,6 @@ import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentRes
 
 import { BaseComponent } from "../../BaseComponent";
 import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
-import { PaymentOutcome } from "../../../dtos";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
 import type { HostedFieldsHostedFieldsFieldData, HostedFieldsTokenizePayload } from "braintree-web/hosted-fields";
 export class Card extends BaseComponent {
@@ -128,11 +127,10 @@ export class Card extends BaseComponent {
 			});
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
 			console.log("Payment response:", createPaymentResponse);
-			const resultCode = createPaymentResponse.resultCode;
-
+		
 			const paymentResult: PaymentResult = {
-				paymentReference: createPaymentResponse.paymentReference,
-				isSuccess: resultCode === PaymentOutcome.AUTHORIZED,
+				paymentReference: createPaymentResponse.paymentReference ?? "",
+				isSuccess: createPaymentResponse.success,
 			};
 			await this.hostedFieldsInstance.teardown();
 

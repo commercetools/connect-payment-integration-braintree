@@ -8,7 +8,7 @@ import {
 } from "./types/operations";
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
-import { PaymentMethodType, PaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
@@ -141,7 +141,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @param request - contains paymentType defined in composable commerce
 	 * @returns Promise with mocking data containing operation status and PSP reference
 	 */
-	public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+	public async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponseSchemaDTO> {
 		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
 		let ctPayment = request.data.paymentReference
 			? await this.ctPaymentService.updatePayment({
@@ -199,29 +199,29 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				paymentMethodNonce: request.data.nonce,
 				options: request.data.options ?? { submitForSettlement: true },
 			});
-			if (!btResponse.success) {
-				const prefix = ["soft_declined", "hard_declined"].includes(
-					btResponse?.transaction?.processorResponseType,
-				)
-					? `[${btResponse.transaction.processorResponseType}] `
-					: "";
-				// TODO standardize errors
-				throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
-			}
+			// if (!btResponse.success) {
+			// 	const prefix = ["soft_declined", "hard_declined"].includes(
+			// 		btResponse?.transaction?.processorResponseType,
+			// 	)
+			// 		? `[${btResponse.transaction.processorResponseType}] `
+			// 		: "";
+			// 	// TODO standardize errors
+			// 	throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
+			// }
 		} catch (error) {
 			throw wrapBraintreeError(error);
 		}
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(
 			btResponse.transaction.status,
-			btResponse.transaction.type !== undefined, // TODO check this, currently based loosely on Adyen isActionRequired method
+			btResponse.success
 		);
 
 		const updatedPayment = await this.ctPaymentService.updatePayment({
 			id: ctPayment.id,
 			pspReference: btResponse.transaction.id,
 			transaction: {
-				type: "Authorization", //TODO: is there any case where this could be a direct charge?
+				type: "Authorization", 
 				amount: ctPayment.amountPlanned,
 				interactionId: btResponse.transaction.id,
 				state: txState,
@@ -231,16 +231,27 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		logger.info(`Payment authorization processed.`, {
 			paymentId: updatedPayment.id,
 			interactionId: btResponse.transaction.id,
-			result: btResponse.transaction.status,
+			result: btResponse.success,
+			status: btResponse.transaction.status,
 		});
 
+		
 		return {
-			...btResponse.transaction,
+			id: btResponse.transaction.id,
+			success: btResponse.success, 
+			status : btResponse.transaction.status,
+			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
+			amount: btResponse.transaction.amount,
 			paymentReference: updatedPayment.id,
-			//TODO copied verbatim from Adyen, likely not needed for card transactions
-			// ...(txState === "Success" || txState === "Pending"
-			// 	? { merchantReturnUrl: this.buildRedirectMerchantUrl(updatedPayment.id, btResponse.transaction.status) }
-			// 	: {}),
+			statusHistory:
+				btResponse.transaction.statusHistory?.map((history: any) => ({
+					amount: history.amount,
+					status: history.status,
+					timestamp: history.timestamp,
+					transactionSource: history.transactionSource,
+					user: history.user,
+				})) ?? undefined,
+			
 		};
 	}
 
