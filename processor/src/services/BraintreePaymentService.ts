@@ -384,6 +384,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 
 	private async makeCallToBraintreeInternal(
 		interfaceId: string,
+		transactionType: TransactionType,
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
 		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
@@ -403,7 +404,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					return await braintreeClient.cancelPayment(interfaceId);
 				}
 				case "reverse": {
-					throw new Error("Not yet implemented");
+					if (transactionType === "CancelAuthorization") {
+						const braintreeClient = BraintreeClient.getInstance();
+						return await braintreeClient.cancelPayment(interfaceId);
+					} else {
+						// transactionType === "Charge"
+						const braintreeClient = BraintreeClient.getInstance();
+						return await braintreeClient.refundPayment(interfaceId);
+					}
 				}
 				default: {
 					logger.error(
@@ -422,7 +430,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	}
 
 	private async processPaymentModificationInternal(opts: {
-		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest;
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest | ReversePaymentRequest;
 		transactionType: "Charge" | "Refund" | "CancelAuthorization";
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse";
 		amount: AmountSchemaDTO;
@@ -438,8 +446,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		});
 
 		const interfaceId = request.payment.interfaceId as string;
-
-		const response = await this.makeCallToBraintreeInternal(interfaceId, braintreeOperation, request);
+		const response = await this.makeCallToBraintreeInternal(
+			interfaceId,
+			transactionType,
+			braintreeOperation,
+			request,
+		);
 
 		await this.ctPaymentService.updatePayment({
 			id: request.payment.id,
