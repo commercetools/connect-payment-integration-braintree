@@ -197,7 +197,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			btResponse = await this.braintreeGateway.transaction.sale({
 				amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
 				paymentMethodNonce: request.data.nonce,
-				options: request.data.options ?? { submitForSettlement: true },
+				options: request.data.options ?? { submitForSettlement: false },
 			});
 			// if (!btResponse.success) {
 			// 	const prefix = ["soft_declined", "hard_declined"].includes(
@@ -212,16 +212,13 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			throw wrapBraintreeError(error);
 		}
 
-		const txState: TransactionState = mapBraintreeToCtResultCode(
-			btResponse.transaction.status,
-			btResponse.success
-		);
+		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
 
 		const updatedPayment = await this.ctPaymentService.updatePayment({
 			id: ctPayment.id,
 			pspReference: btResponse.transaction.id,
 			transaction: {
-				type: "Authorization", 
+				type: "Authorization",
 				amount: ctPayment.amountPlanned,
 				interactionId: btResponse.transaction.id,
 				state: txState,
@@ -235,11 +232,10 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			status: btResponse.transaction.status,
 		});
 
-		
 		return {
 			id: btResponse.transaction.id,
-			success: btResponse.success, 
-			status : btResponse.transaction.status,
+			success: btResponse.success,
+			status: btResponse.transaction.status,
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
 			amount: btResponse.transaction.amount,
 			paymentReference: updatedPayment.id,
@@ -251,7 +247,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					transactionSource: history.transactionSource,
 					user: history.user,
 				})) ?? undefined,
-			
 		};
 	}
 
@@ -382,7 +377,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		try {
 			switch (braintreeOperation) {
 				case "capture": {
-					throw new Error("Not yet implemented");
+					const braintreeClient = BraintreeClient.getInstance();
+					return await braintreeClient.capturePayment(interfaceId);
 				}
 				case "refund": {
 					const braintreeClient = BraintreeClient.getInstance();
@@ -442,7 +438,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				),
 			},
 		});
-		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED
+		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED;
 		return { outcome, pspReference: response.transaction.id };
 	}
 }
