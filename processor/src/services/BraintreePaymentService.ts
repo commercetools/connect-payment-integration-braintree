@@ -254,15 +254,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	/**
-	 * Capture payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment capture in external PSPs
-	 *
-	 * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
 	async capturePayment(capturePaymentRequest: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "capturePayment";
 		const transactionType = this.getPaymentTransactionType(action);
@@ -290,18 +281,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	/**
-	 * Cancel payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment cancel in external PSPs
-	 *
-	 * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-	public async cancelPayment(
-		cancelPaymentRequest: CancelPaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
+	async cancelPayment(cancelPaymentRequest: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "cancelPayment";
 		const transactionType = this.getPaymentTransactionType(action);
 		logger.info(`Processing payment modification.`, {
@@ -326,16 +306,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			pspReference: response.pspReference,
 		};
 	}
-
-	/**
-	 * Refund payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment refund in external PSPs
-	 *
-	 * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
 
 	async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "refundPayment";
@@ -479,7 +449,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
 					response.success
-						? braintreeOperation === "cancel"
+						? transactionType === "CancelAuthorization"
 							? PaymentModificationStatus.APPROVED
 							: PaymentModificationStatus.RECEIVED
 						: PaymentModificationStatus.REJECTED,
@@ -487,7 +457,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			},
 		});
 		const outcome = response.success
-			? braintreeOperation === "cancel"
+			? transactionType === "CancelAuthorization"
 				? PaymentModificationStatus.APPROVED
 				: PaymentModificationStatus.RECEIVED
 			: PaymentModificationStatus.REJECTED;

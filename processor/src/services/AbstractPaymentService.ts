@@ -159,9 +159,10 @@ export abstract class AbstractPaymentService {
 				});
 			}
 			case "reversePayment": {
-				throw new ErrorInvalidOperation(
-					'"ReversePayment" action is not supported in Braintree payment service.',
-				);
+				return await this.reversePayment({
+					payment: ctPayment,
+					merchantReference: request.merchantReference,
+				});
 			}
 
 			default: {
