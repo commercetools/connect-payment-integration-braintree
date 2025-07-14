@@ -12,6 +12,7 @@ import {
 	mockUpdatePaymentResult,
 	mockBraintreeRefundPaymentResponse,
 	mockBraintreeVoidPaymentResponse,
+	mockBrainTreeCapturePaymentResponse,
 } from "../utils/mock-payment-results";
 // import { mockGetCartResult } from '../utils/mock-cart-data';
 // import * as Config from '../../src/dev-utils/getConfig';
@@ -128,30 +129,29 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("capturePayment", async () => {
-		// TODO: implement and fix
-		// const modifyPaymentOpts: ModifyPayment = {
-		//   paymentId: 'dummy-paymentId',
-		//   data: {
-		//     actions: [
-		//       {
-		//         action: 'capturePayment',
-		//         amount: {
-		//           centAmount: 150000,
-		//           currencyCode: 'USD',
-		//         },
-		//       },
-		//     ],
-		//   },
-		// };
-		// jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// jest
-		//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-		//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-		// jest
-		//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-		//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-		// const result = await paymentService.modifyPayment(modifyPaymentOpts);
-		// expect(result?.outcome).toStrictEqual('approved');
+		const modifyPaymentOpts: ModifyPayment = {
+			paymentId: "dummy-paymentId",
+			data: {
+				actions: [
+					{
+						action: "capturePayment",
+						amount: {
+							centAmount: 150000,
+							currencyCode: "USD",
+						},
+					},
+				],
+			},
+		};
+
+		jest.spyOn(DefaultPaymentService.prototype, "getPayment").mockResolvedValue(mockGetPaymentResult);
+		jest.spyOn(DefaultPaymentService.prototype, "updatePayment").mockResolvedValue(mockUpdatePaymentResult);
+		jest.spyOn(DefaultPaymentService.prototype, "updatePayment").mockResolvedValue(mockUpdatePaymentResult);
+		jest.spyOn(BraintreeClient.prototype, "capturePayment").mockResolvedValue(mockBrainTreeCapturePaymentResponse);
+
+		const result = await paymentService.modifyPayment(modifyPaymentOpts);
+		expect(result?.outcome).toStrictEqual("received");
+		expect(result?.pspReference).toStrictEqual("dummy-braintree-transaction-id");
 	});
 
 	test("refundPayment", async () => {
@@ -304,7 +304,7 @@ describe(BraintreePaymentService.name, () => {
 			//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
 			//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
 			// const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
-			// expect(resultPromise).resolves.toStrictEqual({
+			// expect(resultPromise).resolves toStrictEqual({
 			//   transactionStatus: {
 			//     errors: [
 			//       {

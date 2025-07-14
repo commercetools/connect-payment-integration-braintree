@@ -393,7 +393,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				}
 				default: {
 					logger.error(
-						`makeCallToBraintreeInternal: Operation  ${braintreeOperation} not supported when modifying payment.`,
+						`makeCallToBraintreeInternal: Operation ${braintreeOperation} not supported when modifying payment.`,
 					);
 					throw new ErrorInvalidOperation(`Operation not supported.`);
 				}
@@ -434,11 +434,11 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED,
+					response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
-		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED;
+		const outcome = response.success ? PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED;
 		return { outcome, pspReference: response.transaction.id };
 	}
 }
