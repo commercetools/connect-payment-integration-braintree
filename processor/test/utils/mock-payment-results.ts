@@ -101,3 +101,15 @@ export const mockBraintreeVoidPaymentResponse: ValidatedResponse<BraintreeTransa
 		amount: "1200.00",
 	},
 } as ValidatedResponse<BraintreeTransaction>;
+
+export const mockBrainTreeCapturePaymentResponse: ValidatedResponse<BraintreeTransaction> = {
+	success: true,
+	message: "Settlement successful",
+	params: {},
+	errors: errorsCollection,
+	transaction: {
+		id: "dummy-braintree-transaction-id",
+		type: "sale",
+		amount: "1200.00",
+	},
+} as ValidatedResponse<BraintreeTransaction>;
