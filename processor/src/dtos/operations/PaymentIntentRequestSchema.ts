@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { ActionCancelPaymentSchema } from "./ActionCancelPaymentSchema";
 import { ActionCapturePaymentSchema } from "./ActionCapturePaymentSchema";
 import { ActionRefundPaymentSchema } from "./ActionRefundPaymentSchema";
+import { ActionReversePaymentSchema } from "./ActionReversePaymentSchema";
 
 /**
  * Payment intent request schema.
@@ -20,7 +21,12 @@ import { ActionRefundPaymentSchema } from "./ActionRefundPaymentSchema";
  */
 export const PaymentIntentRequestSchema = Type.Object({
 	actions: Type.Array(
-		Type.Union([ActionCapturePaymentSchema, ActionRefundPaymentSchema, ActionCancelPaymentSchema]),
+		Type.Union([
+			ActionCapturePaymentSchema,
+			ActionRefundPaymentSchema,
+			ActionCancelPaymentSchema,
+			ActionReversePaymentSchema,
+		]),
 		{
 			maxItems: 1,
 		},

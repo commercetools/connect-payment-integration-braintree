@@ -1,6 +1,7 @@
 import { ActionCancelPaymentSchema } from "./ActionCancelPaymentSchema";
 import { ActionCapturePaymentSchema } from "./ActionCapturePaymentSchema";
 import { ActionRefundPaymentSchema } from "./ActionRefundPaymentSchema";
+import { ActionReversePaymentSchema } from "./ActionReversePaymentSchema";
 import { AmountSchema } from "./AmountSchema";
 import { AmountSchemaDTO } from "./AmountSchemaDTO";
 import { ConfigResponseSchema } from "./ConfigResponseSchema";
@@ -26,6 +27,7 @@ export {
 	ActionCancelPaymentSchema,
 	ActionCapturePaymentSchema,
 	ActionRefundPaymentSchema,
+	ActionReversePaymentSchema,
 	AmountSchema,
 	type AmountSchemaDTO,
 	ConfigResponseSchema,

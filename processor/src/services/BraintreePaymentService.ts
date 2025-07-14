@@ -4,8 +4,12 @@ import {
 	ConfigResponse,
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
+	ReversePaymentRequest,
 	StatusResponse,
 } from "./types/operations";
+
+import type { TransactionType } from "@commercetools/connect-payments-sdk";
+
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
@@ -356,6 +360,46 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return response;
 	}
 
+	async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
+		logger.info(`Processing payment modification.`, {
+			paymentId: request.payment.id,
+			action: "reversePayment",
+		});
+
+		const transactionStateChecker = (transactionType: TransactionType, states: TransactionState[]) =>
+			this.ctPaymentService.hasTransactionInState({ payment: request.payment, transactionType, states });
+
+		const hasCharge = transactionStateChecker("Charge", ["Success"]);
+		const hasAuthorization = transactionStateChecker("Authorization", ["Success"]);
+
+		let response!: PaymentProviderModificationResponse;
+		if (hasCharge) {
+			response = await this.processPaymentModificationInternal({
+				request,
+				transactionType: "Refund",
+				braintreeOperation: "reverse",
+				amount: request.payment.amountPlanned,
+			});
+		} else if (hasAuthorization) {
+			response = await this.processPaymentModificationInternal({
+				request,
+				transactionType: "CancelAuthorization",
+				braintreeOperation: "reverse",
+				amount: request.payment.amountPlanned,
+			});
+		} else {
+			throw new ErrorInvalidOperation(`There is no successful payment transaction to reverse.`);
+		}
+
+		logger.info(`Payment modification completed.`, {
+			paymentId: request.payment.id,
+			action: "reversePayment",
+			result: response.outcome,
+		});
+
+		return response;
+	}
+
 	public async handleTransaction(
 		// @ts-expect-error - unused parameter
 		transactionDraft: TransactionDraftDTO,
@@ -434,11 +478,19 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success ? braintreeOperation==="cancel"? PaymentModificationStatus.APPROVED : PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+					response.success
+						? braintreeOperation === "cancel"
+							? PaymentModificationStatus.APPROVED
+							: PaymentModificationStatus.RECEIVED
+						: PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
-		const outcome = response.success ? braintreeOperation==="cancel"? PaymentModificationStatus.APPROVED : PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED;
+		const outcome = response.success
+			? braintreeOperation === "cancel"
+				? PaymentModificationStatus.APPROVED
+				: PaymentModificationStatus.RECEIVED
+			: PaymentModificationStatus.REJECTED;
 		return { outcome, pspReference: response.transaction.id };
 	}
 }
