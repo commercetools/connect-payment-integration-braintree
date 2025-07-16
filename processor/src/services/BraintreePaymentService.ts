@@ -460,19 +460,11 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success
-						? transactionType === "CancelAuthorization"
-							? PaymentModificationStatus.APPROVED
-							: PaymentModificationStatus.RECEIVED
-						: PaymentModificationStatus.REJECTED,
+					response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
-		const outcome = response.success
-			? transactionType === "CancelAuthorization"
-				? PaymentModificationStatus.APPROVED
-				: PaymentModificationStatus.RECEIVED
-			: PaymentModificationStatus.REJECTED;
+		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED;
 		return { outcome, pspReference: response.transaction.id };
 	}
 }

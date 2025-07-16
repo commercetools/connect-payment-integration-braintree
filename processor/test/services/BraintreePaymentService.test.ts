@@ -151,7 +151,7 @@ describe(BraintreePaymentService.name, () => {
 		jest.spyOn(BraintreeClient.prototype, "capturePayment").mockResolvedValue(mockBrainTreeCapturePaymentResponse);
 
 		const result = await paymentService.modifyPayment(modifyPaymentOpts);
-		expect(result?.outcome).toStrictEqual("received");
+		expect(result?.outcome).toStrictEqual("approved");
 		expect(result?.pspReference).toStrictEqual("dummy-braintree-transaction-id");
 	});
 
@@ -177,7 +177,7 @@ describe(BraintreePaymentService.name, () => {
 		jest.spyOn(BraintreeClient.prototype, "refundPayment").mockResolvedValue(mockBraintreeRefundPaymentResponse);
 
 		const result = await paymentService.modifyPayment(modifyPaymentOpts);
-		expect(result?.outcome).toStrictEqual("received");
+		expect(result?.outcome).toStrictEqual("approved");
 		expect(result?.pspReference).toStrictEqual("dummy-braintree-transaction-id");
 	});
 
