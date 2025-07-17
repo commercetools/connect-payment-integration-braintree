@@ -23,7 +23,6 @@ export class Card extends BaseComponent {
 					"font-size": "1rem",
 					color: "#495057",
 				},
-				
 			},
 			fields: {
 				number: {
@@ -111,7 +110,7 @@ export class Card extends BaseComponent {
 			this.onError(error);
 			return;
 		}
-		
+
 		const request = {
 			nonce: payload.nonce,
 			paymentMethodType: "card",
@@ -128,7 +127,7 @@ export class Card extends BaseComponent {
 			});
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
 			console.log("Payment response:", createPaymentResponse);
-		
+
 			const paymentResult: PaymentResult = {
 				paymentReference: createPaymentResponse.paymentReference ?? "",
 				isSuccess: createPaymentResponse.success,
@@ -148,6 +147,7 @@ export class Card extends BaseComponent {
 					.form-control {
 						height: calc(1.5em + .75rem + 2px);
 					}
+						
 					body {
 						background-color: #fff;
 						padding: 15px;
