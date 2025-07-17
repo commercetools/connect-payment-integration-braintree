@@ -13,6 +13,7 @@ import {
 	ModifyPayment,
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
+	ReversePaymentRequest,
 	StatusResponse,
 } from "./types/operations";
 import {
@@ -99,6 +100,17 @@ export abstract class AbstractPaymentService {
 	abstract refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse>;
 
 	/**
+	 * Reverse payment
+	 *
+	 * @remarks
+	 * Abstract method to execute payment reverse in external PSPs. The actual invocation to PSPs should be implemented in subclasses
+	 *
+	 * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
+	 * @returns Promise with outcome containing operation status and PSP reference
+	 */
+	abstract reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse>;
+
+	/**
 	 * Handle the payment transaction request. It will create a new Payment in CoCo and associate it with the provided cartId. If no amount is given it will use the full cart amount.
 	 *
 	 * @remarks
@@ -146,6 +158,13 @@ export abstract class AbstractPaymentService {
 					amount: request.amount,
 				});
 			}
+			case "reversePayment": {
+				return await this.reversePayment({
+					payment: ctPayment,
+					merchantReference: request.merchantReference,
+				});
+			}
+
 			default: {
 				logger.error(`Operation not supported when modifying payment.`);
 				throw new ErrorInvalidOperation(`Operation not supported.`);

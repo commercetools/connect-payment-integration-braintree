@@ -4,8 +4,12 @@ import {
 	ConfigResponse,
 	PaymentProviderModificationResponse,
 	RefundPaymentRequest,
+	ReversePaymentRequest,
 	StatusResponse,
 } from "./types/operations";
+
+import type { TransactionType } from "@commercetools/connect-payments-sdk";
+
 import { AbstractPaymentService } from "./AbstractPaymentService";
 import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
@@ -250,15 +254,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	/**
-	 * Capture payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment capture in external PSPs
-	 *
-	 * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
 	async capturePayment(capturePaymentRequest: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "capturePayment";
 		const transactionType = this.getPaymentTransactionType(action);
@@ -286,18 +281,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	/**
-	 * Cancel payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment cancel in external PSPs
-	 *
-	 * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-	public async cancelPayment(
-		cancelPaymentRequest: CancelPaymentRequest,
-	): Promise<PaymentProviderModificationResponse> {
+	async cancelPayment(cancelPaymentRequest: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "cancelPayment";
 		const transactionType = this.getPaymentTransactionType(action);
 		logger.info(`Processing payment modification.`, {
@@ -323,16 +307,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		};
 	}
 
-	/**
-	 * Refund payment
-	 *
-	 * @remarks
-	 * Implementation to provide the mocking data for payment refund in external PSPs
-	 *
-	 * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-	 * @returns Promise with mocking data containing operation status and PSP reference
-	 */
-
 	async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
 		const action = "refundPayment";
 		logger.info(`Processing payment modification.`, {
@@ -356,6 +330,46 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return response;
 	}
 
+	async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
+		logger.info(`Processing payment modification.`, {
+			paymentId: request.payment.id,
+			action: "reversePayment",
+		});
+
+		const transactionStateChecker = (transactionType: TransactionType, states: TransactionState[]) =>
+			this.ctPaymentService.hasTransactionInState({ payment: request.payment, transactionType, states });
+
+		const hasCharge = transactionStateChecker("Charge", ["Success"]);
+		const hasAuthorization = transactionStateChecker("Authorization", ["Success"]);
+
+		let response!: PaymentProviderModificationResponse;
+		if (hasCharge) {
+			response = await this.processPaymentModificationInternal({
+				request,
+				transactionType: "Refund",
+				braintreeOperation: "reverse",
+				amount: request.payment.amountPlanned,
+			});
+		} else if (hasAuthorization) {
+			response = await this.processPaymentModificationInternal({
+				request,
+				transactionType: "CancelAuthorization",
+				braintreeOperation: "reverse",
+				amount: request.payment.amountPlanned,
+			});
+		} else {
+			throw new ErrorInvalidOperation(`There is no successful payment transaction to reverse.`);
+		}
+
+		logger.info(`Payment modification completed.`, {
+			paymentId: request.payment.id,
+			action: "reversePayment",
+			result: response.outcome,
+		});
+
+		return response;
+	}
+
 	public async handleTransaction(
 		// @ts-expect-error - unused parameter
 		transactionDraft: TransactionDraftDTO,
@@ -370,6 +384,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 
 	private async makeCallToBraintreeInternal(
 		interfaceId: string,
+		transactionType: TransactionType,
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
 		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
@@ -389,7 +404,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					return await braintreeClient.cancelPayment(interfaceId);
 				}
 				case "reverse": {
-					throw new Error("Not yet implemented");
+					if (transactionType === "CancelAuthorization") {
+						const braintreeClient = BraintreeClient.getInstance();
+						return await braintreeClient.cancelPayment(interfaceId);
+					} else {
+						// transactionType === "Charge"
+						const braintreeClient = BraintreeClient.getInstance();
+						return await braintreeClient.refundPayment(interfaceId);
+					}
 				}
 				default: {
 					logger.error(
@@ -408,7 +430,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	}
 
 	private async processPaymentModificationInternal(opts: {
-		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest;
+		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest | ReversePaymentRequest;
 		transactionType: "Charge" | "Refund" | "CancelAuthorization";
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse";
 		amount: AmountSchemaDTO;
@@ -424,8 +446,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		});
 
 		const interfaceId = request.payment.interfaceId as string;
-
-		const response = await this.makeCallToBraintreeInternal(interfaceId, braintreeOperation, request);
+		const response = await this.makeCallToBraintreeInternal(
+			interfaceId,
+			transactionType,
+			braintreeOperation,
+			request,
+		);
 
 		await this.ctPaymentService.updatePayment({
 			id: request.payment.id,
@@ -434,11 +460,11 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				amount,
 				interactionId: response.transaction.id,
 				state: this.convertPaymentModificationOutcomeToState(
-					response.success ? braintreeOperation==="cancel"? PaymentModificationStatus.APPROVED : PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED,
+					response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED,
 				),
 			},
 		});
-		const outcome = response.success ? braintreeOperation==="cancel"? PaymentModificationStatus.APPROVED : PaymentModificationStatus.RECEIVED : PaymentModificationStatus.REJECTED;
+		const outcome = response.success ? PaymentModificationStatus.APPROVED : PaymentModificationStatus.REJECTED;
 		return { outcome, pspReference: response.transaction.id };
 	}
 }

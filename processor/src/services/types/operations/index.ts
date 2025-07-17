@@ -4,6 +4,7 @@ import { ConfigResponse } from "./ConfigResponse";
 import { ModifyPayment } from "./ModifyPayment";
 import { PaymentProviderModificationResponse } from "./PaymentProviderModificationResponse";
 import { RefundPaymentRequest } from "./RefundPaymentRequest";
+import { ReversePaymentRequest } from "./ReversePaymentRequest";
 import { StatusResponse } from "./StatusResponse";
 
 export {
@@ -13,5 +14,6 @@ export {
 	type ModifyPayment,
 	type PaymentProviderModificationResponse,
 	type RefundPaymentRequest,
+	type ReversePaymentRequest,
 	type StatusResponse,
 };
