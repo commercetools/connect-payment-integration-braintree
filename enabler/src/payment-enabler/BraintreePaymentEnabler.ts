@@ -16,7 +16,9 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		this.setupData = BraintreePaymentEnabler._Setup(options);
 	}
 
-	private static getBraintreeToken = async (options: EnablerOptions): Promise<{ clientToken: string, paymentReference: string }> => {
+	private static getBraintreeToken = async (
+		options: EnablerOptions,
+	): Promise<{ clientToken: string; paymentReference: string }> => {
 		let response!: Response;
 		try {
 			response = await fetch(`${options.processorUrl}/init`, {
@@ -32,12 +34,11 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 			console.log("response: ", response);
 		}
 
-		const initResponse: { clientToken: string, paymentReference: string } = await response.json();
+		const initResponse: { clientToken: string; paymentReference: string } = await response.json();
 		return { clientToken: initResponse.clientToken, paymentReference: initResponse.paymentReference };
 	};
 
 	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
-
 		const { clientToken, paymentReference } = await BraintreePaymentEnabler.getBraintreeToken(options);
 
 		const sdkOptions = {
