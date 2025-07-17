@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@commercetools/platform-sdk": "^8.12.1",
-		"@commercetools/ts-client": "^4.0.0",
+		"@commercetools/ts-client": "^4.0.1",
 		"braintree-web-drop-in": "^1.45.1",
 		"braintree-web": "^3.123.0",
 		"cookie": "^1.0.2",
@@ -26,7 +26,7 @@
 	"devDependencies": {
 		"@types/braintree-web": "^3.96.17",
 		"@types/braintree-web-drop-in": "^1.39.4",
-		"@types/node": "24.0.13",
+		"@types/node": "24.0.14",
 		"concurrently": "^9.2.0",
 		"jest": "30.0.4",
 		"prettier": "^3.6.2",
