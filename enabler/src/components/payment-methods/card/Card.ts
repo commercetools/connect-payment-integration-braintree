@@ -20,9 +20,10 @@ export class Card extends BaseComponent {
 				input: {
 					// change input styles to match
 					// bootstrap styles
-					"font-size": "2rem",
+					"font-size": "1rem",
 					color: "#495057",
 				},
+				
 			},
 			fields: {
 				number: {
@@ -142,6 +143,43 @@ export class Card extends BaseComponent {
 	}
 	private _getTemplate() {
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
+				
+				<style>
+					.form-control {
+						height: calc(1.5em + .75rem + 2px);
+					}
+					body {
+						background-color: #fff;
+						padding: 15px;
+					}
+
+					.toast {
+						position: fixed;
+						top: 15px;
+						right: 15px;
+						z-index: 9999;
+					}
+
+					.bootstrap-basic {
+						background: white;
+					}
+
+					/* Braintree Hosted Fields styling classes*/
+					.braintree-hosted-fields-focused {
+						color: #495057;
+						background-color: #fff;
+						border-color: #80bdff;
+						outline: 0;
+						box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+					}
+
+					.braintree-hosted-fields-focused.is-invalid {
+						border-color: #dc3545;
+						box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+					}
+
+
+				</style>
 				<div class="bootstrap-basic">
 				<form class="needs-validation" novalidate="">
 
