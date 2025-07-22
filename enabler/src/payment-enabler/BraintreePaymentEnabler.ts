@@ -1,10 +1,7 @@
 import { type PaymentEnabler } from "./PaymentEnabler";
 import { type BaseOptions } from "./BaseOptions";
-import { DropinType } from "./DropinType";
 import { type EnablerOptions } from "./EnablerOptions";
 import { type PaymentComponentBuilder } from "./PaymentComponentBuilder";
-import { type PaymentDropinBuilder } from "./PaymentDropinBuilder";
-import { BraintreeDropinContainerBuilder } from "../dropin";
 import { CardBuilder } from "../components/payment-methods/card";
 import { client } from "braintree-web";
 import type { Client } from "braintree-web";
@@ -76,23 +73,5 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		}
 
 		return new supportedMethods[type as keyof typeof supportedMethods](baseOptions);
-	}
-
-	async createDropinBuilder(type: DropinType): Promise<PaymentDropinBuilder | never> {
-		const { baseOptions } = await this.setupData;
-
-		const supportedMethods = {
-			embedded: BraintreeDropinContainerBuilder,
-			// hpp: DropinHppBuilder,
-		};
-
-		if (!Object.keys(supportedMethods).includes(type)) {
-			throw new Error(
-				`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(", ")}`,
-			);
-		}
-
-		// @ts-expect-error - DropinType.hpp currently not supported
-		return new supportedMethods[type](baseOptions);
 	}
 }

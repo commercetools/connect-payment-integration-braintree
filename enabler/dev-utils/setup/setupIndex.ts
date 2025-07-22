@@ -1,4 +1,4 @@
-import { BraintreePaymentEnabler, DropinType, type PaymentComponent } from "../../src/payment-enabler";
+import { BraintreePaymentEnabler, type PaymentComponent } from "../../src/payment-enabler";
 import { createSession, fetchAccessToken, getConfig, tryUpdateSessionFromLocalStorage } from "..";
 import { braintreeContainerId, createCheckoutButtonId } from "../../src/constants";
 import { cocoSessionStore } from "../../src/store";
@@ -86,27 +86,9 @@ const createCheckout = async function () {
 
 			const selectedPaymentMethod = paymentMethodSelect.value;
 
-			const isDropin = paymentMethodSelect.options[paymentMethodSelect.selectedIndex]!.text.startsWith("dropin");
-
 			let component: PaymentComponent;
 
-			if (isDropin) {
-				const dropinBuilder = await braintreeEnabler.createDropinBuilder(selectedPaymentMethod as DropinType);
-				component = dropinBuilder.build({
-					showPayButton: false,
-					onPayButtonClick: async () => {
-						// to be used for validation
-						const termsChecked = (document.getElementById("termsCheckbox") as HTMLInputElement)?.checked;
-						if (!termsChecked) {
-							event.preventDefault();
-							alert("You must agree to the terms and conditions.");
-							return Promise.reject("error-occurred");
-						}
-						return Promise.resolve(); // change to true, to test payment flow
-					},
-				});
-			} else {
-				const componentBuilder = await braintreeEnabler.createComponentBuilder(selectedPaymentMethod);
+			const componentBuilder = await braintreeEnabler.createComponentBuilder(selectedPaymentMethod);
 				component = componentBuilder.build({
 					showPayButton: !componentBuilder.componentHasSubmit,
 					...(componentBuilder.componentHasSubmit
@@ -125,8 +107,7 @@ const createCheckout = async function () {
 								},
 							}),
 				});
-			}
-
+			
 			component.mount(braintreeContainerId);
 		});
 	} else {
