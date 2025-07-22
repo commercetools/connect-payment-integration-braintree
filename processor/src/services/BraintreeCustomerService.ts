@@ -3,7 +3,7 @@ import { BraintreeCustomerServiceOptions } from "./types/payment/BraintreeCustom
 import braintree from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 import { CreateCustomerRequest, CreateCustomerResponse } from "./types/customer";
-import { appLogger } from "../libs/logger";
+import { logger } from "../libs/logger";
 
 const config = getConfig();
 
@@ -37,10 +37,7 @@ export class BraintreeCustomerService {
 	public async findCustomer(customerId: string): Promise<braintree.Customer> {
 		const customer = await this.braintreeGateway.customer.find(customerId);
 		if (!customer) {
-			appLogger.info(
-				{},
-				`Error in BraintreePaymentService findCustomer: customer with ID ${customerId} not found`,
-			);
+			logger.info(`Error in BraintreePaymentService findCustomer: customer with ID ${customerId} not found`);
 		}
 		return customer;
 	}
