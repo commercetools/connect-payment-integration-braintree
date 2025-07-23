@@ -182,22 +182,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 
 		let btResponse = await BraintreeClient.getInstance().createPayment(amount, nonce);
 
-		// if (!btResponse.success) {
-		// 	const message = `Braintree transaction failed with status [${btResponse.transaction.status}] and message [${btResponse.message}]`;
-		// 	logger.error(message, {
-		// 		transactionId: btResponse.transaction.id,
-		// 		status: btResponse.transaction.status,
-		// 	});
-		// 	throw new Errorx(message, {
-		// 		fields: {
-		// 			transactionId: btResponse.transaction.id,
-		// 			status: btResponse.transaction.status,
-		// 		},
-		// 	});
-		// }
-
 		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
-
 		const updatedPayment = await this.ctPaymentService.updatePayment({
 			id: ctPayment.id,
 			pspReference: btResponse.transaction.id,
