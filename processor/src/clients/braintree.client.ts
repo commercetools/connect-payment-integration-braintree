@@ -21,7 +21,7 @@ export class BraintreeClient {
 		const config = getConfig();
 		this.braintreeGateway = new braintree.BraintreeGateway({
 			environment:
-				config.braintreeEnvironment === "production"
+				config.braintreeEnvironment.toLowerCase() === "production"
 					? braintree.Environment.Production
 					: braintree.Environment.Sandbox,
 			merchantId: config.braintreeMerchantId,
