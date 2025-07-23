@@ -335,13 +335,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return response;
 	}
 
-	public async handleTransaction(
-		// @ts-expect-error - unused parameter
-		transactionDraft: TransactionDraftDTO,
-	): Promise<TransactionResponseDTO> {
-		throw new Error("Not yet implemented");
-	}
-
 	// @ts-expect-error - unused parameter
 	private validatePaymentMethod(request: CreatePaymentRequest): void {
 		throw new Error("Not yet implemented");
