@@ -3,7 +3,7 @@ import { TransactionStatus } from "braintree";
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
 	switch (resultCode) {
-		case "authorizing": 
+		case "authorizing":
 		case "settlement_pending":
 		case "settling":
 		case "submitted_for_settlement": {

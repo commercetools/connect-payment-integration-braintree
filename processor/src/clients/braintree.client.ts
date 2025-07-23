@@ -54,21 +54,9 @@ export class BraintreeClient {
 	public async createPayment(amount: string, nonce: string): Promise<ValidatedResponse<Transaction>> {
 		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 		try {
-			console.log("Creating Braintree transaction with amount:", amount, "and nonce:", nonce);
-			// const config = getConfig();
-			// this.braintreeGateway = new braintree.BraintreeGateway({
-			// 	environment:
-			// 		config.braintreeEnvironment.toLowerCase() === "production"
-			// 			? braintree.Environment.Production
-			// 			: braintree.Environment.Sandbox,
-			// 	merchantId: config.braintreeMerchantId + ".....",
-			// 	publicKey: config.braintreePublicKey,
-			// 	privateKey: config.braintreePrivateKey,
-			// });
-
 			btResponse = await this.braintreeGateway.transaction.sale({
 				amount,
-				paymentMethodNonce: nonce + "...",
+				paymentMethodNonce: nonce,
 				options: { submitForSettlement: false },
 			});
 
