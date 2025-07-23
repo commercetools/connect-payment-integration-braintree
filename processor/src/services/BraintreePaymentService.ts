@@ -99,14 +99,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				customerId,
 			});
 			return { clientToken: response.clientToken, paymentReference: ctPayment.id };
-		} catch (e) {
-			
+		} catch (e: any) {
 			logger.error(`Error generating Braintree client token.`, {
 				error: e,
 			});
-			console.log(JSON.stringify(e));
 			const errorData: BraintreeApiErrorData = {
 				status: 500,
+				name: e?.name,
+				type: e?.type,
 			};
 			throw new BraintreeApiError(errorData, {
 				privateMessage: "Braintree client token generation failed.",
@@ -226,12 +226,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			// 		},
 			// 	});
 			// }
-		} catch (e) {
+		} catch (e: any) {
 			logger.error(`Error creating Braintree transaction.`, {
 				error: e,
 			});
 			const errorData: BraintreeApiErrorData = {
 				status: 500,
+				name: e?.name,
+				type: e?.type,
 			};
 			throw new BraintreeApiError(errorData, {
 				privateMessage: "Error creating Braintree transaction.",
@@ -443,12 +445,14 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					throw new ErrorInvalidOperation(`Operation not supported.`);
 				}
 			}
-		} catch (e) {
+		} catch (e: any) {
 			logger.error(`Error processing Braintree [${braintreeOperation}] for transaction [${interfaceId}].`, {
 				error: e,
 			});
 			const errorData: BraintreeApiErrorData = {
 				status: 500,
+				name: e?.name,
+				type: e?.type,
 			};
 			throw new BraintreeApiError(errorData, {
 				privateMessage: "Error creating Braintree transaction.",

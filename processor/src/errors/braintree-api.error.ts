@@ -3,8 +3,7 @@ import { Errorx, ErrorxAdditionalOpts } from "@commercetools/connect-payments-sd
 export type BraintreeApiErrorData = {
 	status: number;
 	name?: string;
-	message?: string;
-	debug_id?: string | null;
+	type?: string;
 };
 
 export class BraintreeApiError extends Errorx {
@@ -12,7 +11,7 @@ export class BraintreeApiError extends Errorx {
 		super({
 			code: `BraintreeError-${errorData.name}`,
 			httpErrorStatus: errorData.status,
-			message: errorData.message as string,
+			message: `error type : ${errorData.type}`,
 			...additionalOpts,
 		});
 	}
