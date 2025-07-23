@@ -15,8 +15,7 @@ import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionRe
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
-import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
-import { getConfig } from "../dev-utils/getConfig";
+import { type ValidatedResponse, type Transaction } from "braintree";
 import { logger } from "../libs/logger";
 import { PaymentModificationStatus } from "../dtos/operations";
 import type { AmountSchemaDTO } from "../dtos/operations";
@@ -25,22 +24,10 @@ import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 import { BraintreeClient } from "../clients/braintree.client";
-import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
-
-const config = getConfig();
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	private braintreeGateway: BraintreeGateway;
-
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
-
-		this.braintreeGateway = new BraintreeGateway({
-			environment: Environment.Sandbox,
-			merchantId: config.braintreeMerchantId,
-			publicKey: config.braintreePublicKey + "....",
-			privateKey: config.braintreePrivateKey,
-		});
 	}
 
 	/**
@@ -93,26 +80,10 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			},
 			paymentId: ctPayment.id,
 		});
+		const braintreeClient = BraintreeClient.getInstance();
 
-		try {
-			const response = await this.braintreeGateway.clientToken.generate({
-				customerId,
-			});
-			return { clientToken: response.clientToken, paymentReference: ctPayment.id };
-		} catch (e: any) {
-			logger.error(`Error generating Braintree client token.`, {
-				error: e,
-			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Braintree client token generation failed.",
-				cause: e,
-			});
-		}
+		const response = await braintreeClient.initiateSession(customerId);
+		return { clientToken: response.clientToken, paymentReference: ctPayment.id };
 	}
 
 	/**
@@ -206,40 +177,24 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			});
 		}
 
-		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
-		try {
-			btResponse = await this.braintreeGateway.transaction.sale({
-				amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
-				paymentMethodNonce: request.data.nonce,
-				options: request.data.options ?? { submitForSettlement: false },
-			});
-			// if (!btResponse.success) {
-			// 	const message = `Braintree transaction failed with status [${btResponse.transaction.status}] and message [${btResponse.message}]`;
-			// 	logger.error(message, {
-			// 		transactionId: btResponse.transaction.id,
-			// 		status: btResponse.transaction.status,
-			// 	});
-			// 	throw new Errorx(message, {
-			// 		fields: {
-			// 			transactionId: btResponse.transaction.id,
-			// 			status: btResponse.transaction.status,
-			// 		},
-			// 	});
-			// }
-		} catch (e: any) {
-			logger.error(`Error creating Braintree transaction.`, {
-				error: e,
-			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error creating Braintree transaction.",
-				cause: e,
-			});
-		}
+		const amount: string = mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice);
+		const nonce: string = request.data.nonce;
+
+		let btResponse = await BraintreeClient.getInstance().createPayment(amount, nonce);
+
+		// if (!btResponse.success) {
+		// 	const message = `Braintree transaction failed with status [${btResponse.transaction.status}] and message [${btResponse.message}]`;
+		// 	logger.error(message, {
+		// 		transactionId: btResponse.transaction.id,
+		// 		status: btResponse.transaction.status,
+		// 	});
+		// 	throw new Errorx(message, {
+		// 		fields: {
+		// 			transactionId: btResponse.transaction.id,
+		// 			status: btResponse.transaction.status,
+		// 		},
+		// 	});
+		// }
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
 
@@ -414,50 +369,35 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
 	): Promise<ValidatedResponse<Transaction>> {
-		try {
-			switch (braintreeOperation) {
-				case "capture": {
+		switch (braintreeOperation) {
+			case "capture": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.capturePayment(interfaceId);
+			}
+			case "refund": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.refundPayment(interfaceId);
+			}
+			case "cancel": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.cancelPayment(interfaceId);
+			}
+			case "reverse": {
+				if (transactionType === "CancelAuthorization") {
 					const braintreeClient = BraintreeClient.getInstance();
-					return await braintreeClient.capturePayment(interfaceId);
-				}
-				case "refund": {
+					return await braintreeClient.cancelPayment(interfaceId);
+				} else {
+					// transactionType === "Charge"
 					const braintreeClient = BraintreeClient.getInstance();
 					return await braintreeClient.refundPayment(interfaceId);
 				}
-				case "cancel": {
-					const braintreeClient = BraintreeClient.getInstance();
-					return await braintreeClient.cancelPayment(interfaceId);
-				}
-				case "reverse": {
-					if (transactionType === "CancelAuthorization") {
-						const braintreeClient = BraintreeClient.getInstance();
-						return await braintreeClient.cancelPayment(interfaceId);
-					} else {
-						// transactionType === "Charge"
-						const braintreeClient = BraintreeClient.getInstance();
-						return await braintreeClient.refundPayment(interfaceId);
-					}
-				}
-				default: {
-					logger.error(
-						`makeCallToBraintreeInternal: Operation ${braintreeOperation} not supported when modifying payment.`,
-					);
-					throw new ErrorInvalidOperation(`Operation not supported.`);
-				}
 			}
-		} catch (e: any) {
-			logger.error(`Error processing Braintree [${braintreeOperation}] for transaction [${interfaceId}].`, {
-				error: e,
-			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error creating Braintree transaction.",
-				cause: e,
-			});
+			default: {
+				logger.error(
+					`makeCallToBraintreeInternal: Operation ${braintreeOperation} not supported when modifying payment.`,
+				);
+				throw new ErrorInvalidOperation(`Operation not supported.`);
+			}
 		}
 	}
 
