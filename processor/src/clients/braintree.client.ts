@@ -2,6 +2,7 @@ import braintree, { type ClientToken, type Transaction, type ValidatedResponse }
 import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
+import { ErrorGeneral } from "@commercetools/connect-payments-sdk";
 
 /**
  * Find customer
@@ -67,30 +68,23 @@ export class BraintreeClient {
 				options: { submitForSettlement: false },
 			});
 			return btResponse;
-			// if (!btResponse.success) {
-			// 	const message = `Braintree transaction failed with status [${btResponse.transaction.status}] and message [${btResponse.message}]`;
-			// 	logger.error(message, {
-			// 		transactionId: btResponse.transaction.id,
-			// 		status: btResponse.transaction.status,
-			// 	});
-			// 	throw new Errorx(message, {
-			// 		fields: {
-			// 			transactionId: btResponse.transaction.id,
-			// 			status: btResponse.transaction.status,
-			// 		},
-			// 	});
-			// }
 		} catch (e: any) {
 			logger.error(`Error creating Braintree transaction.`, {
 				error: e,
 			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error creating Braintree transaction.",
+			if (e.name && e.type) {
+				const errorData: BraintreeApiErrorData = {
+					status: 500,
+					name: e?.name,
+					type: e?.type,
+				};
+				throw new BraintreeApiError(errorData, {
+					privateMessage: "Error creating Braintree transaction.",
+					cause: e,
+				});
+			}
+			throw new ErrorGeneral(undefined, {
+				privateMessage: "Failed due to network error or internal computations",
 				cause: e,
 			});
 		}
@@ -105,13 +99,19 @@ export class BraintreeClient {
 			logger.error(`Error processing Braintree refund payment for transaction [${interactionId}].`, {
 				error: e,
 			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error refund Braintree transaction.",
+			if (e.name && e.type) {
+				const errorData: BraintreeApiErrorData = {
+					status: 500,
+					name: e.name,
+					type: e.type,
+				};
+				throw new BraintreeApiError(errorData, {
+					privateMessage: "Error refund Braintree transaction.",
+					cause: e,
+				});
+			}
+			throw new ErrorGeneral(undefined, {
+				privateMessage: "Failed due to network error or internal computations",
 				cause: e,
 			});
 		}
@@ -126,13 +126,19 @@ export class BraintreeClient {
 			logger.error(`Error processing Braintree cancel payment for transaction [${interactionId}].`, {
 				error: e,
 			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error cancel Braintree transaction.",
+			if (e.name && e.type) {
+				const errorData: BraintreeApiErrorData = {
+					status: 500,
+					name: e?.name,
+					type: e?.type,
+				};
+				throw new BraintreeApiError(errorData, {
+					privateMessage: "Error cancel Braintree transaction.",
+					cause: e,
+				});
+			}
+			throw new ErrorGeneral(undefined, {
+				privateMessage: "Failed due to network error or internal computations",
 				cause: e,
 			});
 		}
@@ -147,13 +153,19 @@ export class BraintreeClient {
 			logger.error(`Error processing Braintree capture payment for transaction [${interactionId}].`, {
 				error: e,
 			});
-			const errorData: BraintreeApiErrorData = {
-				status: 500,
-				name: e?.name,
-				type: e?.type,
-			};
-			throw new BraintreeApiError(errorData, {
-				privateMessage: "Error capture Braintree transaction.",
+			if (e.name && e.type) {
+				const errorData: BraintreeApiErrorData = {
+					status: 500,
+					name: e?.name,
+					type: e?.type,
+				};
+				throw new BraintreeApiError(errorData, {
+					privateMessage: "Error capture Braintree transaction.",
+					cause: e,
+				});
+			}
+			throw new ErrorGeneral(undefined, {
+				privateMessage: "Failed due to network error or internal computations",
 				cause: e,
 			});
 		}
