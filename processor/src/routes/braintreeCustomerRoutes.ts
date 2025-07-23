@@ -33,13 +33,8 @@ export const braintreeCustomerRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			try {
-				const response = await opts.customerService.createCustomer(request.body);
-				return reply.status(200).send(response);
-			} catch (error) {
-				console.error("Error in create customer: ", error);
-				return reply.code(500).send();
-			}
+			const response = await opts.customerService.createCustomer(request.body);
+			return reply.status(200).send(response);
 		},
 	);
 	fastify.get<{
@@ -64,13 +59,8 @@ export const braintreeCustomerRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			try {
-				const response = await opts.customerService.findCustomer(request.params.customerId);
-				return reply.status(200).send(response);
-			} catch (error) {
-				console.error("Error in find customer: ", error);
-				return reply.code(500).send();
-			}
+			const response = await opts.customerService.findCustomer(request.params.customerId);
+			return reply.status(200).send(response);
 		},
 	);
 	fastify.delete<{ Params: { customerId: string } }>(
@@ -94,13 +84,8 @@ export const braintreeCustomerRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			try {
-				await opts.customerService.deleteCustomer(request.params.customerId);
-				return reply.status(204).send();
-			} catch (error) {
-				console.error("Error in delete customer: ", error);
-				return reply.code(500).send();
-			}
+			await opts.customerService.deleteCustomer(request.params.customerId);
+			return reply.status(204).send();
 		},
 	);
 };

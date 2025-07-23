@@ -36,13 +36,8 @@ export const braintreePaymentRoutes = async (
 			},
 		},
 		async (request, reply) => {
-			try {
-				const response = await opts.paymentService.init(request.body.customerId);
-				return reply.status(200).send(response);
-			} catch (error) {
-				console.error("Error in /init: ", error);
-				return reply.code(500).send();
-			}
+			const response = await opts.paymentService.init(request.body.customerId);
+			return reply.status(200).send(response);
 		},
 	);
 	fastify.post<{

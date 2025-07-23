@@ -1,3 +1,3 @@
-import { wrapBraintreeError } from "./wrapBraintreeError";
+import { BraintreeApiError, BraintreeApiErrorData } from "./braintree-api.error";
 
-export { wrapBraintreeError };
+export { BraintreeApiError, type BraintreeApiErrorData };

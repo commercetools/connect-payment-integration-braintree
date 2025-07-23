@@ -15,32 +15,19 @@ import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionRe
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
-import { BraintreeGateway, Environment, type ValidatedResponse, type Transaction } from "braintree";
-import { getConfig } from "../dev-utils/getConfig";
+import { type ValidatedResponse, type Transaction } from "braintree";
 import { logger } from "../libs/logger";
 import { PaymentModificationStatus } from "../dtos/operations";
 import type { AmountSchemaDTO } from "../dtos/operations";
-import { ErrorInvalidOperation, Errorx, TransactionState } from "@commercetools/connect-payments-sdk";
-import { wrapBraintreeError } from "../errors";
+import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
 import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
-import { BraintreeClient } from "../clients/BraintreeClient";
-
-const config = getConfig();
+import { BraintreeClient } from "../clients/braintree.client";
 
 export class BraintreePaymentService extends AbstractPaymentService {
-	private braintreeGateway: BraintreeGateway;
-
 	constructor(opts: BraintreePaymentServiceOptions) {
 		super(opts.ctCartService, opts.ctPaymentService);
-
-		this.braintreeGateway = new BraintreeGateway({
-			environment: Environment.Sandbox,
-			merchantId: config.braintreeMerchantId,
-			publicKey: config.braintreePublicKey,
-			privateKey: config.braintreePrivateKey,
-		});
 	}
 
 	/**
@@ -93,16 +80,10 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			},
 			paymentId: ctPayment.id,
 		});
+		const braintreeClient = BraintreeClient.getInstance();
 
-		try {
-			const response = await this.braintreeGateway.clientToken.generate({
-				customerId,
-			});
-			return { clientToken: response.clientToken, paymentReference: ctPayment.id };
-		} catch (error) {
-			console.error("Error in BraintreePaymentService init: ", error);
-			throw error;
-		}
+		const response = await braintreeClient.initiateSession(customerId);
+		return { clientToken: response.clientToken, paymentReference: ctPayment.id };
 	}
 
 	/**
@@ -196,28 +177,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			});
 		}
 
-		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
-		try {
-			btResponse = await this.braintreeGateway.transaction.sale({
-				amount: mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice),
-				paymentMethodNonce: request.data.nonce,
-				options: request.data.options ?? { submitForSettlement: false },
-			});
-			// if (!btResponse.success) {
-			// 	const prefix = ["soft_declined", "hard_declined"].includes(
-			// 		btResponse?.transaction?.processorResponseType,
-			// 	)
-			// 		? `[${btResponse.transaction.processorResponseType}] `
-			// 		: "";
-			// 	// TODO standardize errors
-			// 	throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
-			// }
-		} catch (error) {
-			throw wrapBraintreeError(error);
-		}
+		const amount: string = mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice);
+		const nonce: string = request.data.nonce;
+
+		let btResponse = await BraintreeClient.getInstance().createPayment(amount, nonce);
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
-
 		const updatedPayment = await this.ctPaymentService.updatePayment({
 			id: ctPayment.id,
 			pspReference: btResponse.transaction.id,
@@ -389,42 +354,34 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
 	): Promise<ValidatedResponse<Transaction>> {
-		try {
-			switch (braintreeOperation) {
-				case "capture": {
+		switch (braintreeOperation) {
+			case "capture": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.capturePayment(interfaceId);
+			}
+			case "refund": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.refundPayment(interfaceId);
+			}
+			case "cancel": {
+				const braintreeClient = BraintreeClient.getInstance();
+				return await braintreeClient.cancelPayment(interfaceId);
+			}
+			case "reverse": {
+				if (transactionType === "CancelAuthorization") {
 					const braintreeClient = BraintreeClient.getInstance();
-					return await braintreeClient.capturePayment(interfaceId);
-				}
-				case "refund": {
+					return await braintreeClient.cancelPayment(interfaceId);
+				} else {
+					// transactionType === "Charge"
 					const braintreeClient = BraintreeClient.getInstance();
 					return await braintreeClient.refundPayment(interfaceId);
 				}
-				case "cancel": {
-					const braintreeClient = BraintreeClient.getInstance();
-					return await braintreeClient.cancelPayment(interfaceId);
-				}
-				case "reverse": {
-					if (transactionType === "CancelAuthorization") {
-						const braintreeClient = BraintreeClient.getInstance();
-						return await braintreeClient.cancelPayment(interfaceId);
-					} else {
-						// transactionType === "Charge"
-						const braintreeClient = BraintreeClient.getInstance();
-						return await braintreeClient.refundPayment(interfaceId);
-					}
-				}
-				default: {
-					logger.error(
-						`makeCallToBraintreeInternal: Operation ${braintreeOperation} not supported when modifying payment.`,
-					);
-					throw new ErrorInvalidOperation(`Operation not supported.`);
-				}
 			}
-		} catch (e) {
-			if (e instanceof Errorx) {
-				throw e;
-			} else {
-				throw wrapBraintreeError(e);
+			default: {
+				logger.error(
+					`makeCallToBraintreeInternal: Operation ${braintreeOperation} not supported when modifying payment.`,
+				);
+				throw new ErrorInvalidOperation(`Operation not supported.`);
 			}
 		}
 	}

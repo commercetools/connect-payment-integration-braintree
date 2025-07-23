@@ -2,16 +2,12 @@ import { TransactionState } from "@commercetools/connect-payments-sdk";
 import { TransactionStatus } from "braintree";
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
-	//TODO check this is correct, currently based on the Ayden method and guessing
 	switch (resultCode) {
-		case "authorizing": {
-			if (success) return "Pending";
-			return "Failure";
-		}
+		case "authorizing":
 		case "settlement_pending":
 		case "settling":
 		case "submitted_for_settlement": {
-			if (success) return "Pending";
+			if (success) return "Success";
 			return "Failure";
 		}
 		case "authorized":

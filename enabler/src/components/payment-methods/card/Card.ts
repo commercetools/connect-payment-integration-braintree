@@ -130,7 +130,7 @@ export class Card extends BaseComponent {
 
 			const paymentResult: PaymentResult = {
 				paymentReference: createPaymentResponse.paymentReference ?? "",
-				isSuccess: createPaymentResponse.success,
+				isSuccess: createPaymentResponse.success ? true : false,
 			};
 			await this.hostedFieldsInstance.teardown();
 
