@@ -20,12 +20,12 @@ import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { PaymentModificationStatus } from "../dtos/operations";
 import type { AmountSchemaDTO } from "../dtos/operations";
-import { ErrorInvalidOperation, Errorx, TransactionState } from "@commercetools/connect-payments-sdk";
-import { wrapBraintreeError } from "../errors";
+import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
 import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
-import { BraintreeClient } from "../clients/BraintreeClient";
+import { BraintreeClient } from "../clients/braintree.client";
+import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
 
 const config = getConfig();
 
@@ -38,7 +38,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		this.braintreeGateway = new BraintreeGateway({
 			environment: Environment.Sandbox,
 			merchantId: config.braintreeMerchantId,
-			publicKey: config.braintreePublicKey,
+			publicKey: config.braintreePublicKey + "....",
 			privateKey: config.braintreePrivateKey,
 		});
 	}
@@ -99,9 +99,19 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				customerId,
 			});
 			return { clientToken: response.clientToken, paymentReference: ctPayment.id };
-		} catch (error) {
-			console.error("Error in BraintreePaymentService init: ", error);
-			throw error;
+		} catch (e) {
+			
+			logger.error(`Error generating Braintree client token.`, {
+				error: e,
+			});
+			console.log(JSON.stringify(e));
+			const errorData: BraintreeApiErrorData = {
+				status: 500,
+			};
+			throw new BraintreeApiError(errorData, {
+				privateMessage: "Braintree client token generation failed.",
+				cause: e,
+			});
 		}
 	}
 
@@ -204,16 +214,29 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				options: request.data.options ?? { submitForSettlement: false },
 			});
 			// if (!btResponse.success) {
-			// 	const prefix = ["soft_declined", "hard_declined"].includes(
-			// 		btResponse?.transaction?.processorResponseType,
-			// 	)
-			// 		? `[${btResponse.transaction.processorResponseType}] `
-			// 		: "";
-			// 	// TODO standardize errors
-			// 	throw new Error(`Error: 500. ${prefix}${btResponse.message}`);
+			// 	const message = `Braintree transaction failed with status [${btResponse.transaction.status}] and message [${btResponse.message}]`;
+			// 	logger.error(message, {
+			// 		transactionId: btResponse.transaction.id,
+			// 		status: btResponse.transaction.status,
+			// 	});
+			// 	throw new Errorx(message, {
+			// 		fields: {
+			// 			transactionId: btResponse.transaction.id,
+			// 			status: btResponse.transaction.status,
+			// 		},
+			// 	});
 			// }
-		} catch (error) {
-			throw wrapBraintreeError(error);
+		} catch (e) {
+			logger.error(`Error creating Braintree transaction.`, {
+				error: e,
+			});
+			const errorData: BraintreeApiErrorData = {
+				status: 500,
+			};
+			throw new BraintreeApiError(errorData, {
+				privateMessage: "Error creating Braintree transaction.",
+				cause: e,
+			});
 		}
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
@@ -421,11 +444,16 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				}
 			}
 		} catch (e) {
-			if (e instanceof Errorx) {
-				throw e;
-			} else {
-				throw wrapBraintreeError(e);
-			}
+			logger.error(`Error processing Braintree [${braintreeOperation}] for transaction [${interfaceId}].`, {
+				error: e,
+			});
+			const errorData: BraintreeApiErrorData = {
+				status: 500,
+			};
+			throw new BraintreeApiError(errorData, {
+				privateMessage: "Error creating Braintree transaction.",
+				cause: e,
+			});
 		}
 	}
 
