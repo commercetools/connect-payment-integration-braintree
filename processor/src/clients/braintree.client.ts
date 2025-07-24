@@ -39,16 +39,16 @@ export class BraintreeClient {
 
 	public async healthCheck(): Promise<MerchantAccount[]> {
 		try {
-			return await this.braintreeGateway.merchantAccount.all();
-			logger.info("Braintree client token generated successfully.");
-		} catch (error) {
-			logger.error("Braintree health check failed.", { error });
-			throw new ErrorGeneral(undefined, {
-				privateMessage: "Braintree health check failed.",					
-				cause: error,
-			});
+			const result = await this.braintreeGateway.merchantAccount.all();
+			if (!result) throw new Error("Error communicating with Braintree platform.");
+			console.log(result);
+			logger.info("Connect to Braintree platform successfully.");
+			return result;
+		} catch (e) {
+			logger.error("Braintree health check failed.", e);
+			this.handleError(e, "Error communicating with Braintree platform.");
 		}
-	}	
+	}
 
 	public async initiateSession(customerId?: string): Promise<ValidatedResponse<ClientToken>> {
 		try {

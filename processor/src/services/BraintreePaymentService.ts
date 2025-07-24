@@ -120,8 +120,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				async () => {
 					try {
 						const braintreeClient = BraintreeClient.getInstance();
-						const result = await braintreeClient.healthCheck();	
-						console.log(result)
+						const result = await braintreeClient.healthCheck();
+						console.log(result);
 						return {
 							name: "Braintree Status check",
 							status: "UP",
@@ -133,7 +133,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 						return {
 							name: "Adyen Status check",
 							status: "DOWN",
-							message: `Not able to talk to the Adyen API`,
+							message: `Not able to talk to the Braintree API`,
 							details: {
 								error: e,
 							},
@@ -144,7 +144,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			metadataFn: async () => ({
 				name: packageJSON.name,
 				description: packageJSON.description,
-				"@commercetools/sdk-client-v2": packageJSON.dependencies["@commercetools/sdk-client-v2"],
+				"@commercetools/connect-payments-sdk": packageJSON.dependencies["@commercetools/connect-payments-sdk"],
 				braintree: packageJSON.dependencies["braintree"],
 			}),
 			log: logger,
