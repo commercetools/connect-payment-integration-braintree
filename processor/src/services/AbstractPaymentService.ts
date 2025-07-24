@@ -18,8 +18,6 @@ import {
 } from "./types/operations";
 import {
 	SupportedPaymentComponentsSchemaDTO,
-	TransactionDraftDTO,
-	TransactionResponseDTO,
 	AmountSchemaDTO,
 	PaymentModificationStatus,
 } from "../dtos/operations";

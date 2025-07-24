@@ -8,22 +8,29 @@ import {
 	StatusResponse,
 } from "./types/operations";
 
-import type { TransactionType } from "@commercetools/connect-payments-sdk";
+import {
+	statusHandler,
+	healthCheckCommercetoolsPermissions,
+	type TransactionType,
+} from "@commercetools/connect-payments-sdk";
 
 import { AbstractPaymentService } from "./AbstractPaymentService";
-import { SupportedPaymentComponentsSchemaDTO, TransactionDraftDTO, TransactionResponseDTO } from "../dtos/operations";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
 import { type ValidatedResponse, type Transaction } from "braintree";
 import { logger } from "../libs/logger";
-import { PaymentModificationStatus } from "../dtos/operations";
+import { getConfig } from "../dev-utils/getConfig";
+import { PaymentModificationStatus, SupportedPaymentComponentsSchemaDTO } from "../dtos/operations";
+import { paymentSDK } from "../sdk/paymentSDK";
 import type { AmountSchemaDTO } from "../dtos/operations";
 import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
 import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 import { BraintreeClient } from "../clients/braintree.client";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const packageJSON = require("../../package.json");
 
 export class BraintreePaymentService extends AbstractPaymentService {
 	constructor(opts: BraintreePaymentServiceOptions) {
@@ -95,7 +102,55 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * @returns Promise with mocking data containing a list of status from different external systems
 	 */
 	public async status(): Promise<StatusResponse> {
-		throw new Error("Not yet implemented");
+		const handler = await statusHandler({
+			timeout: getConfig().healthCheckTimeout,
+			checks: [
+				healthCheckCommercetoolsPermissions({
+					requiredPermissions: [
+						"manage_payments",
+						"view_sessions",
+						"view_api_clients",
+						"manage_orders",
+						"introspect_oauth_tokens",
+						"manage_checkout_payment_intents",
+					],
+					ctAuthorizationService: paymentSDK.ctAuthorizationService,
+					projectKey: getConfig().projectKey,
+				}),
+				async () => {
+					try {
+						const braintreeClient = BraintreeClient.getInstance();
+						const result = await braintreeClient.healthCheck();	
+						console.log(result)
+						return {
+							name: "Braintree Status check",
+							status: "UP",
+							details: {
+								paymentMethods: "Card",
+							},
+						};
+					} catch (e) {
+						return {
+							name: "Adyen Status check",
+							status: "DOWN",
+							message: `Not able to talk to the Adyen API`,
+							details: {
+								error: e,
+							},
+						};
+					}
+				},
+			],
+			metadataFn: async () => ({
+				name: packageJSON.name,
+				description: packageJSON.description,
+				"@commercetools/sdk-client-v2": packageJSON.dependencies["@commercetools/sdk-client-v2"],
+				braintree: packageJSON.dependencies["braintree"],
+			}),
+			log: logger,
+		})();
+
+		return handler.body;
 	}
 
 	/**
