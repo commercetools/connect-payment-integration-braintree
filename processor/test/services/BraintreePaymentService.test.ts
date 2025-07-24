@@ -1,5 +1,5 @@
 import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
-import { ConfigResponse, ModifyPayment /*  StatusResponse*/ } from "../../src/services/types/operations";
+import { ConfigResponse, ModifyPayment, StatusResponse } from "../../src/services/types/operations";
 import { paymentSDK } from "../../src/sdk/paymentSDK";
 import { DefaultPaymentService } from "@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service";
 
@@ -23,10 +23,8 @@ import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
 import { PaymentMethodType } from "../../src/dtos/payment";
-// import * as FastifyContext from "../../src/libs/fastify/context";
-// import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
-
-// import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
+import * as StatusHandler from "@commercetools/connect-payments-sdk/dist/api/handlers/status.handler";
+import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
 // import { PaymentMethodType, PaymentOutcome } from '../../src/dtos/payment';
 // import { TransactionDraftDTO } from '../../src/dtos/operations';
 
@@ -82,30 +80,29 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("getStatus", async () => {
-		// TODO: implement and fix
-		// const mockHealthCheckFunction: () => Promise<HealthCheckResult> = async () => {
-		//   const result: HealthCheckResult = {
-		//     name: 'CoCo Permissions',
-		//     status: 'DOWN',
-		//     message: 'CoCo Permissions are not available',
-		//     details: {},
-		//   };
-		//   return result;
-		// };
-		// jest.spyOn(StatusHandler, 'healthCheckCommercetoolsPermissions').mockReturnValue(mockHealthCheckFunction);
-		// const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
-		// const result: StatusResponse = await paymentService.status();
-		// expect(result?.status).toBeDefined();
-		// expect(result?.checks).toHaveLength(2);
-		// expect(result?.status).toStrictEqual('Partially Available');
-		// expect(result?.checks[0]?.name).toStrictEqual('CoCo Permissions');
-		// expect(result?.checks[0]?.status).toStrictEqual('DOWN');
-		// expect(result?.checks[0]?.details).toStrictEqual({});
-		// expect(result?.checks[0]?.message).toBeDefined();
-		// expect(result?.checks[1]?.name).toStrictEqual('Mock Payment API');
-		// expect(result?.checks[1]?.status).toStrictEqual('UP');
-		// expect(result?.checks[1]?.details).toBeDefined();
-		// expect(result?.checks[1]?.message).toBeDefined();
+		const mockHealthCheckFunction: () => Promise<HealthCheckResult> = async () => {
+			const result: HealthCheckResult = {
+				name: "CoCo Permissions",
+				status: "DOWN",
+				message: "CoCo Permissions are not available",
+				details: {},
+			};
+			return result;
+		};
+		jest.spyOn(StatusHandler, "healthCheckCommercetoolsPermissions").mockReturnValue(mockHealthCheckFunction);
+		const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
+		const result: StatusResponse = await paymentService.status();
+		expect(result?.status).toBeDefined();
+		expect(result?.checks).toHaveLength(2);
+		expect(result?.status).toStrictEqual("Partially Available");
+		expect(result?.checks[0]?.name).toStrictEqual("CoCo Permissions");
+		expect(result?.checks[0]?.status).toStrictEqual("DOWN");
+		expect(result?.checks[0]?.details).toStrictEqual({});
+		expect(result?.checks[0]?.message).toBeDefined();
+		expect(result?.checks[1]?.name).toStrictEqual("Braintree status check");
+		expect(result?.checks[1]?.status).toStrictEqual("UP");
+		expect(result?.checks[1]?.details).toBeDefined();
+		expect(result?.checks[1]?.message).toBeDefined();
 	});
 
 	test("cancelPayment", async () => {
