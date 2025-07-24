@@ -16,10 +16,6 @@ import {
 	StatusResponseSchema,
 	StatusResponseSchemaDTO,
 	SupportedPaymentComponentsSchema,
-	TransactionDraft,
-	TransactionDraftDTO,
-	TransactionResponse,
-	TransactionResponseDTO,
 } from "../dtos/operations";
 import { AbstractPaymentService } from "../services/AbstractPaymentService";
 
