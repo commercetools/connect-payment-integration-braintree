@@ -16,11 +16,7 @@ import {
 	ReversePaymentRequest,
 	StatusResponse,
 } from "./types/operations";
-import {
-	SupportedPaymentComponentsSchemaDTO,
-	AmountSchemaDTO,
-	PaymentModificationStatus,
-} from "../dtos/operations";
+import { SupportedPaymentComponentsSchemaDTO, AmountSchemaDTO, PaymentModificationStatus } from "../dtos/operations";
 
 import { logger } from "../libs/logger";
 import { PaymentTransactionTypes } from "./types/operations/PaymentTransactionTypes";
