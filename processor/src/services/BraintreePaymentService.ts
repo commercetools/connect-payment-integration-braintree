@@ -121,12 +121,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 					try {
 						const braintreeClient = BraintreeClient.getInstance();
 						const result = await braintreeClient.healthCheck();
-						console.log(result);
+						logger.info(result);
 						return {
 							name: "Braintree status check",
 							status: "UP",
 							details: {
-								paymentMethods: "Card",
+								paymentMethods: [PaymentMethodType.CARD],
 							},
 							message: "Braintree API is reachable",
 						};
@@ -158,13 +158,13 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * Get supported payment components
 	 *
 	 * @remarks
-	 * Implementation to provide the mocking payment components supported by the processor.
+	 * Implementation to provide the payment components supported by the processor.
 	 *
-	 * @returns Promise with mocking data containing a list of supported payment components
+	 * @returns Promise with data containing a list of supported payment components
 	 */
 	public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
 		return {
-			dropins: [{ type: "embedded" }],
+			dropins: [],
 			components: [
 				{
 					type: PaymentMethodType.CARD,
