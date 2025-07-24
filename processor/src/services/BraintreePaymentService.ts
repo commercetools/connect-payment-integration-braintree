@@ -41,12 +41,15 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * Get configurations
 	 *
 	 * @remarks
-	 * Implementation to provide mocking configuration information
+	 * Implementation to provide configuration information
 	 *
-	 * @returns Promise with mocking object containing configuration information
+	 * @returns Promise with object containing configuration information
 	 */
 	public async config(): Promise<ConfigResponse> {
-		throw new Error("Not yet implemented");
+		return {
+			environment: getConfig().braintreeEnvironment,
+			merchantId: getConfig().braintreeMerchantId,
+		};
 	}
 
 	/**

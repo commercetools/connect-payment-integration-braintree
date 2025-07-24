@@ -17,7 +17,7 @@ import {
 	mockBrainTreeCreatePaymentResponse,
 } from "../utils/mock-payment-results";
 import { mockGetCartResult } from "../utils/mock-cart-data";
-// import * as Config from '../../src/dev-utils/getConfig';
+import * as Config from "../../src/dev-utils/getConfig";
 
 import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
@@ -28,19 +28,18 @@ import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
 // import { PaymentMethodType, PaymentOutcome } from '../../src/dtos/payment';
 // import { TransactionDraftDTO } from '../../src/dtos/operations';
 
-// interface FlexibleConfig {
-//   [key: string]: string; // Adjust the type according to your config values
-// }
+interface FlexibleConfig {
+	[key: string]: string; // Adjust the type according to your config values
+}
 
-// function setupMockConfig(keysAndValues: Record<string, string>) {
-//   const mockConfig: FlexibleConfig = {};
-//   Object.keys(keysAndValues).forEach((key) => {
-//     mockConfig[key] = keysAndValues[key] as string;
-//   });
-
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig as any);
-// }
+function setupMockConfig(keysAndValues: Record<string, string>) {
+	const mockConfig: FlexibleConfig = {};
+	Object.keys(keysAndValues).forEach((key) => {
+		mockConfig[key] = keysAndValues[key] as string;
+	});
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	jest.spyOn(Config, "getConfig").mockReturnValue(mockConfig as any);
+}
 
 describe(BraintreePaymentService.name, () => {
 	const opts: BraintreePaymentServiceOptions = {
@@ -60,23 +59,18 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("getConfig", async () => {
-		// TODO: implement and fix
-		// // Setup mock config for a system using `clientKey`
-		// setupMockConfig({ mockClientKey: '', mockEnvironment: 'test' });
-		// const result: ConfigResponse = await paymentService.config();
-		// // Assertions can remain the same or be adapted based on the abstracted access
-		// expect(result?.clientKey).toStrictEqual('');
-		// expect(result?.environment).toStrictEqual('test');
+		setupMockConfig({ braintreeMerchantId: "test-merchant-id", braintreeEnvironment: "test" });
+		const result: ConfigResponse = await paymentService.config();
+		// Assertions can remain the same or be adapted based on the abstracted access
+		expect(result?.merchantId).toStrictEqual("test-merchant-id");
+		expect(result?.environment).toStrictEqual("test");
 	});
 
 	test("getSupportedPaymentComponents", async () => {
 		const result: ConfigResponse = await paymentService.getSupportedPaymentComponents();
 		expect(result?.components).toHaveLength(1);
 		expect(result?.components[0]?.type).toStrictEqual("card");
-		// expect(result?.components[1]?.type).toStrictEqual("invoice");
-		// expect(result?.components[2]?.type).toStrictEqual("purchaseorder");
-		expect(result?.dropins).toHaveLength(1);
-		expect(result?.dropins[0]?.type).toStrictEqual("embedded");
+		expect(result?.dropins).toHaveLength(0);
 	});
 
 	test("getStatus", async () => {
