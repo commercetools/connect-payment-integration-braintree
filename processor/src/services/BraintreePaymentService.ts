@@ -97,9 +97,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 * Get status
 	 *
 	 * @remarks
-	 * Implementation to provide mocking status of external systems
+	 * Implementation to provide status of external systems including Commercetools and Braintree
 	 *
-	 * @returns Promise with mocking data containing a list of status from different external systems
+	 * @returns Promise with data containing a list of status from Commercetools and Braintree
 	 */
 	public async status(): Promise<StatusResponse> {
 		const handler = await statusHandler({
