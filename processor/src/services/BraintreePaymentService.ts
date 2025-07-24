@@ -123,15 +123,16 @@ export class BraintreePaymentService extends AbstractPaymentService {
 						const result = await braintreeClient.healthCheck();
 						console.log(result);
 						return {
-							name: "Braintree Status check",
+							name: "Braintree status check",
 							status: "UP",
 							details: {
 								paymentMethods: "Card",
 							},
+							message: "Braintree API is reachable",
 						};
 					} catch (e) {
 						return {
-							name: "Adyen Status check",
+							name: "Braintree status check",
 							status: "DOWN",
 							message: `Not able to talk to the Braintree API`,
 							details: {
