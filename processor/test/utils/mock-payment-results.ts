@@ -147,3 +147,17 @@ export const mockGetPaymentResultWithAuthorizedTxn: Payment = {
 	createdAt: "2024-02-13T00:00:00.000Z",
 	lastModifiedAt: "2024-02-13T00:00:00.000Z",
 };
+
+// mock create payment response
+export const mockBrainTreeCreatePaymentResponse: ValidatedResponse<BraintreeTransaction> = {
+	success: true,
+	message: "Payment successful",
+	params: {},
+	errors: errorsCollection,
+	transaction: {
+		id: "dummy-braintree-transaction-id",
+		additionalProcessorResponse: "Approved",
+		amount: "1500.00",
+		status: "authorized",
+	},
+} as ValidatedResponse<BraintreeTransaction>;
