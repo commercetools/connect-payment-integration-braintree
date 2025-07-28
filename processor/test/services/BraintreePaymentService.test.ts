@@ -22,9 +22,8 @@ import { mockGetCartResult } from "../utils/mock-cart-data";
 import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
-import * as Mappers from "../../src/services/mappers";
 import { PaymentMethodType } from "../../src/dtos/payment";
-import * as FastifyContext from "../../src/libs/fastify/context";
+// import * as FastifyContext from "../../src/libs/fastify/context";
 // import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 // import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
@@ -220,15 +219,11 @@ describe(BraintreePaymentService.name, () => {
 		const mockUpdatedPayment = { ...mockUpdatePaymentResult, amountPlanned: mockCart.totalPrice };
 		const mockBraintreeResponse = mockBrainTreeCreatePaymentResponse;
 
-		jest.spyOn(FastifyContext, "getCartIdFromContext").mockReturnValue(mockCart.id);
-		jest.spyOn(FastifyContext, "getPaymentInterfaceFromContext").mockReturnValue("braintree");
 		jest.spyOn(paymentSDK.ctCartService, "getCart").mockResolvedValue(mockCart);
 		jest.spyOn(paymentSDK.ctCartService, "getPaymentAmount").mockResolvedValue(mockCart.totalPrice);
 		jest.spyOn(paymentSDK.ctCartService, "addPayment").mockResolvedValue(mockCart);
 		jest.spyOn(paymentSDK.ctPaymentService, "createPayment").mockResolvedValue(mockPayment);
 		jest.spyOn(paymentSDK.ctPaymentService, "updatePayment").mockResolvedValue(mockUpdatedPayment);
-		jest.spyOn(Mappers, "mapCtTotalPriceToBraintreeAmount").mockReturnValue("1500.00");
-		jest.spyOn(Mappers, "mapBraintreeToCtResultCode").mockReturnValue("Success");
 		jest.spyOn(BraintreeClient.prototype, "createPayment").mockResolvedValue(mockBraintreeResponse);
 
 		const createPaymentRequest: CreatePaymentRequest = {
@@ -258,7 +253,7 @@ describe(BraintreePaymentService.name, () => {
 			},
 		});
 
-		expect(BraintreeClient.prototype.createPayment).toHaveBeenCalledWith("1500.00", "dummy-nonce");
+		expect(BraintreeClient.prototype.createPayment).toHaveBeenCalledWith("1500", "dummy-nonce");
 
 		expect(paymentSDK.ctPaymentService.updatePayment).toHaveBeenCalledWith({
 			id: mockPayment.id,
