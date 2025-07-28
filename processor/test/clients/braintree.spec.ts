@@ -39,10 +39,8 @@ describe("BraintreeClient", () => {
 
 	beforeAll(() => {
 		jest.clearAllMocks();
-		// We need to re-require the braintree module to get the fresh mock instance in each test
-		const braintree = require("braintree");
 		client = BraintreeClient.getInstance();
-		mockGateway = braintree.BraintreeGateway.mock.results[0].value;
+		mockGateway = (braintree.BraintreeGateway as jest.Mock).mock.results[0].value;
 	});
 
 	describe("initiateSession", () => {
