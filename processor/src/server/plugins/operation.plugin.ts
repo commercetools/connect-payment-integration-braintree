@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { paymentSDK } from "../../sdk/paymentSDK";
-import { operationsRoutes } from "../../routes/operationsRoutes";
+import { operationsRoutes } from "../../routes/operations.route";
 import { app } from "../app";
 
 export default async function (server: FastifyInstance) {
