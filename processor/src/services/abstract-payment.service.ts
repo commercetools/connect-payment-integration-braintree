@@ -15,11 +15,11 @@ import {
 	RefundPaymentRequest,
 	ReversePaymentRequest,
 	StatusResponse,
-} from "./types/operations";
+} from "./types";
 import { SupportedPaymentComponentsSchemaDTO, AmountSchemaDTO, PaymentModificationStatus } from "../dtos/operations";
 
 import { logger } from "../libs/logger";
-import { PaymentTransactionTypes } from "./types/operations/PaymentTransactionTypes";
+import { PaymentTransactionTypes } from "./types/operation.type";
 
 export abstract class AbstractPaymentService {
 	protected ctCartService: CommercetoolsCartService;

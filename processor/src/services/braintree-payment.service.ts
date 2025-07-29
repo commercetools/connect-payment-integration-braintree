@@ -6,7 +6,7 @@ import {
 	RefundPaymentRequest,
 	ReversePaymentRequest,
 	StatusResponse,
-} from "./types/operations";
+} from "./types";
 
 import {
 	statusHandler,
