@@ -19,7 +19,7 @@ import {
 import { mockGetCartResult } from "../utils/mock-cart-data";
 import * as Config from "../../src/dev-utils/getConfig";
 
-import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment";
+import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment.type";
 import { AbstractPaymentService } from "../../src/services/abstract-payment.service";
 import { BraintreePaymentService } from "../../src/services/braintree-payment.service";
 import { PaymentMethodType } from "../../src/dtos/payment";

@@ -1,4 +1,7 @@
-// TODO change type to Cart['CentPrecisionMoney'] of @commercetools/connect-payments-sdk, it's readonly and not exported but there must be a proper way
+
+import { TransactionState } from "@commercetools/connect-payments-sdk";
+import { TransactionStatus } from "braintree";
+
 type CentPrecisionMoney = {
 	/**
 	 *	Amount in the smallest indivisible unit of a currency, such as:
@@ -15,6 +18,35 @@ type CentPrecisionMoney = {
 	 *
 	 */
 	readonly fractionDigits: number;
+};
+
+
+export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
+	switch (resultCode) {
+		case "authorizing":
+		case "settlement_pending":
+		case "settling":
+		case "submitted_for_settlement": {
+			if (success) return "Success";
+			return "Failure";
+		}
+		case "authorized":
+		case "settlement_confirmed":
+		case "settled":
+		case "voided": {
+			return "Success";
+		}
+		case "authorization_expired":
+		case "settlement_declined":
+		case "failed":
+		case "gateway_rejected":
+		case "processor_declined": {
+			return "Failure";
+		}
+		default: {
+			return "Initial";
+		}
+	}
 };
 
 export const mapCtTotalPriceToBraintreeAmount = (totalPrice: CentPrecisionMoney): string => {

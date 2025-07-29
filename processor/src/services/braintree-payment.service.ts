@@ -25,7 +25,7 @@ import { PaymentModificationStatus, SupportedPaymentComponentsSchemaDTO } from "
 import { paymentSDK } from "../sdk/paymentSDK";
 import type { AmountSchemaDTO } from "../dtos/operations";
 import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
-import { mapBraintreeToCtResultCode } from "./mappers/mapBraintreeToCtResultCode";
+import { mapBraintreeToCtResultCode } from "./mappers/braintree.mapper";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 import { BraintreeClient } from "../clients/braintree.client";
