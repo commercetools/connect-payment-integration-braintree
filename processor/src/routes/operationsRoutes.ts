@@ -17,7 +17,7 @@ import {
 	StatusResponseSchemaDTO,
 	SupportedPaymentComponentsSchema,
 } from "../dtos/operations";
-import { AbstractPaymentService } from "../services/AbstractPaymentService";
+import { AbstractPaymentService } from "../services/abstract-payment.service";
 
 type OperationRouteOptions = {
 	sessionHeaderAuthHook: SessionHeaderAuthenticationHook;

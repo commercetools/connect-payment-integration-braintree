@@ -14,7 +14,7 @@ import {
 	type TransactionType,
 } from "@commercetools/connect-payments-sdk";
 
-import { AbstractPaymentService } from "./AbstractPaymentService";
+import { AbstractPaymentService } from "././abstract-payment.service";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
 import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";

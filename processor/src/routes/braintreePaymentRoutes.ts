@@ -10,7 +10,7 @@ import {
 	CreatePaymentResponseSchema,
 	CreatePaymentResponseSchemaDTO,
 } from "../dtos/payment";
-import { BraintreePaymentService } from "../services/BraintreePaymentService";
+import { BraintreePaymentService } from "../services/braintree-payment.service";
 
 type PaymentRoutesOptions = {
 	paymentService: BraintreePaymentService;

@@ -1,6 +1,6 @@
 import { SessionHeaderAuthenticationHook } from "@commercetools/connect-payments-sdk";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { BraintreeCustomerService } from "../services/BraintreeCustomerService";
+import { BraintreeCustomerService } from "../services/braintree-customer.service";
 import {
 	CreateCustomerRequestSchema,
 	CreateCustomerRequestSchemaDTO,
