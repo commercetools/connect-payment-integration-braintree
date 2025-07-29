@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "path";
 import { getConfig } from "../dev-utils/getConfig";
 import { requestContextPlugin } from "../libs/fastify/context";
-import { errorHandler } from "../libs/fastify/errorHandler";
+import { errorHandler } from "../libs/fastify/error-handler";
 
 /**
  * Setup Fastify server instance

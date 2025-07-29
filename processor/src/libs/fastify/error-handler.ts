@@ -10,6 +10,7 @@ import {
 	MultiErrorx,
 } from "@commercetools/connect-payments-sdk";
 import { TAuthErrorResponse, TErrorObject, TErrorResponse } from "./dtos/error";
+
 import { logger } from "../logger";
 
 type NonEmptyArray<T> = [T, ...T[]];

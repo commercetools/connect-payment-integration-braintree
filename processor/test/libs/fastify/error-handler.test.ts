@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "@jest/globals";
 import Fastify, { type FastifyInstance, FastifyError } from "fastify";
-import { errorHandler } from "../../../src/libs/fastify/errorHandler";
+import { errorHandler } from "../../../src/libs/fastify/error-handler";
 import { ErrorAuthErrorResponse, Errorx, ErrorxAdditionalOpts } from "@commercetools/connect-payments-sdk";
 import { requestContextPlugin } from "../../../src/libs/fastify/context";
 import { FastifySchemaValidationError } from "fastify/types/schema";

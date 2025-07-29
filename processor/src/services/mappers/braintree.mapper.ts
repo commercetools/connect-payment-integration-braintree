@@ -1,4 +1,3 @@
-
 import { TransactionState } from "@commercetools/connect-payments-sdk";
 import { TransactionStatus } from "braintree";
 
@@ -19,7 +18,6 @@ type CentPrecisionMoney = {
 	 */
 	readonly fractionDigits: number;
 };
-
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
 	switch (resultCode) {
