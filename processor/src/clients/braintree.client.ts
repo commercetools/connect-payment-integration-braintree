@@ -41,7 +41,6 @@ export class BraintreeClient {
 		try {
 			const result = await this.braintreeGateway.merchantAccount.all();
 			if (!result) throw new Error("Error communicating with Braintree platform.");
-			console.log(result);
 			logger.info("Connect to Braintree platform successfully.");
 			return result;
 		} catch (e) {
