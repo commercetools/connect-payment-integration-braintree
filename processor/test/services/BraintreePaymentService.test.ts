@@ -24,6 +24,7 @@ import { AbstractPaymentService } from "../../src/services/AbstractPaymentServic
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
 import { PaymentMethodType } from "../../src/dtos/payment";
 import * as StatusHandler from "@commercetools/connect-payments-sdk/dist/api/handlers/status.handler";
+
 import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
 // import { PaymentMethodType, PaymentOutcome } from '../../src/dtos/payment';
 // import { TransactionDraftDTO } from '../../src/dtos/operations';
