@@ -1,8 +1,7 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from "@commercetools/connect-payments-sdk";
-import { BraintreeCustomerServiceOptions } from "./types/payment/BraintreeCustomerServiceOptions";
 import braintree from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
-import { CreateCustomerRequest, CreateCustomerResponse } from "./types/customer";
+import { BraintreeCustomerServiceOptions, CreateCustomerRequest, CreateCustomerResponse } from "./types/customer.type";
 import { logger } from "../libs/logger";
 
 const config = getConfig();

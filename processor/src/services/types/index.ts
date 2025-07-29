@@ -1,5 +1,3 @@
-
-export * from './customer.type';
-export * from './payment';
-export * from './transaction';
-export * from './operation.type';
+export * from "./customer.type";
+export * from "./payment.type";
+export * from "./operation.type";

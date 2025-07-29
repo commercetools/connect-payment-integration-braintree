@@ -1,6 +1,11 @@
-
 import { Payment } from "@commercetools/connect-payments-sdk/dist/commercetools";
-import { AmountSchemaDTO, PaymentIntentRequestSchemaDTO, ConfigResponseSchemaDTO, StatusResponseSchemaDTO, PaymentModificationStatus } from "../../dtos/operations";
+import {
+	AmountSchemaDTO,
+	PaymentIntentRequestSchemaDTO,
+	ConfigResponseSchemaDTO,
+	StatusResponseSchemaDTO,
+	PaymentModificationStatus,
+} from "../../dtos/operations";
 
 export type CancelPaymentRequest = {
 	payment: Payment;

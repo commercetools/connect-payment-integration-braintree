@@ -16,8 +16,8 @@ import {
 
 import { AbstractPaymentService } from "././abstract-payment.service";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
-import { BraintreePaymentServiceOptions } from "./types/payment/BraintreePaymentServiceOptions";
-import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment";
+import { BraintreePaymentServiceOptions } from "./types/payment.type";
+import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment.type";
 import { type ValidatedResponse, type Transaction } from "braintree";
 import { logger } from "../libs/logger";
 import { getConfig } from "../dev-utils/getConfig";
