@@ -1,5 +1,4 @@
 import { Type, Static } from "@sinclair/typebox";
-import { BraintreeTransaction } from "./basic-types";
 
 export enum PaymentMethodType {
 	CARD = "card",
@@ -20,7 +19,25 @@ export const BraintreeInitResponseSchema = Type.Object({
 
 export type BraintreeInitResponseSchemaDTO = Static<typeof BraintreeInitResponseSchema>;
 
-export const CreatePaymentResponseSchema = BraintreeTransaction;
+export const CreatePaymentResponseSchema = Type.Object({
+	id: Type.String(),
+	success: Type.Boolean(),
+	paymentReference: Type.Optional(Type.String()),
+	additionalProcessorResponse: Type.String(),
+	amount: Type.String(),
+	status: Type.String(),
+	statusHistory: Type.Optional(
+		Type.Array(
+			Type.Object({
+				amount: Type.String(),
+				status: Type.String(),
+				timestamp: Type.Any(),
+				transactionSource: Type.Optional(Type.String()),
+				user: Type.String(),
+			}),
+		),
+	),
+});
 
 export type CreatePaymentResponseSchemaDTO = Static<typeof CreatePaymentResponseSchema>;
 
