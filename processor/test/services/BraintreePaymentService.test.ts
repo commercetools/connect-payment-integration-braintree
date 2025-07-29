@@ -1,5 +1,5 @@
 import { describe, test, expect, afterEach, jest, beforeEach } from "@jest/globals";
-import { ConfigResponse, ModifyPayment /*  StatusResponse*/ } from "../../src/services/types/operations";
+import { ConfigResponse, ModifyPayment, StatusResponse } from "../../src/services/types/operations";
 import { paymentSDK } from "../../src/sdk/paymentSDK";
 import { DefaultPaymentService } from "@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service";
 
@@ -17,32 +17,30 @@ import {
 	mockBrainTreeCreatePaymentResponse,
 } from "../utils/mock-payment-results";
 import { mockGetCartResult } from "../utils/mock-cart-data";
-// import * as Config from '../../src/dev-utils/getConfig';
+import * as Config from "../../src/dev-utils/getConfig";
 
 import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment";
 import { AbstractPaymentService } from "../../src/services/AbstractPaymentService";
 import { BraintreePaymentService } from "../../src/services/BraintreePaymentService";
 import { PaymentMethodType } from "../../src/dtos/payment";
-// import * as FastifyContext from "../../src/libs/fastify/context";
-// import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
+import * as StatusHandler from "@commercetools/connect-payments-sdk/dist/api/handlers/status.handler";
 
-// import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
+import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
 // import { PaymentMethodType, PaymentOutcome } from '../../src/dtos/payment';
 // import { TransactionDraftDTO } from '../../src/dtos/operations';
 
-// interface FlexibleConfig {
-//   [key: string]: string; // Adjust the type according to your config values
-// }
+interface FlexibleConfig {
+	[key: string]: string; // Adjust the type according to your config values
+}
 
-// function setupMockConfig(keysAndValues: Record<string, string>) {
-//   const mockConfig: FlexibleConfig = {};
-//   Object.keys(keysAndValues).forEach((key) => {
-//     mockConfig[key] = keysAndValues[key] as string;
-//   });
-
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig as any);
-// }
+function setupMockConfig(keysAndValues: Record<string, string>) {
+	const mockConfig: FlexibleConfig = {};
+	Object.keys(keysAndValues).forEach((key) => {
+		mockConfig[key] = keysAndValues[key] as string;
+	});
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	jest.spyOn(Config, "getConfig").mockReturnValue(mockConfig as any);
+}
 
 describe(BraintreePaymentService.name, () => {
 	const opts: BraintreePaymentServiceOptions = {
@@ -62,50 +60,44 @@ describe(BraintreePaymentService.name, () => {
 	});
 
 	test("getConfig", async () => {
-		// TODO: implement and fix
-		// // Setup mock config for a system using `clientKey`
-		// setupMockConfig({ mockClientKey: '', mockEnvironment: 'test' });
-		// const result: ConfigResponse = await paymentService.config();
-		// // Assertions can remain the same or be adapted based on the abstracted access
-		// expect(result?.clientKey).toStrictEqual('');
-		// expect(result?.environment).toStrictEqual('test');
+		setupMockConfig({ braintreeMerchantId: "test-merchant-id", braintreeEnvironment: "test" });
+		const result: ConfigResponse = await paymentService.config();
+		// Assertions can remain the same or be adapted based on the abstracted access
+		expect(result?.merchantId).toStrictEqual("test-merchant-id");
+		expect(result?.environment).toStrictEqual("test");
 	});
 
 	test("getSupportedPaymentComponents", async () => {
 		const result: ConfigResponse = await paymentService.getSupportedPaymentComponents();
 		expect(result?.components).toHaveLength(1);
 		expect(result?.components[0]?.type).toStrictEqual("card");
-		// expect(result?.components[1]?.type).toStrictEqual("invoice");
-		// expect(result?.components[2]?.type).toStrictEqual("purchaseorder");
-		expect(result?.dropins).toHaveLength(1);
-		expect(result?.dropins[0]?.type).toStrictEqual("embedded");
+		expect(result?.dropins).toHaveLength(0);
 	});
 
 	test("getStatus", async () => {
-		// TODO: implement and fix
-		// const mockHealthCheckFunction: () => Promise<HealthCheckResult> = async () => {
-		//   const result: HealthCheckResult = {
-		//     name: 'CoCo Permissions',
-		//     status: 'DOWN',
-		//     message: 'CoCo Permissions are not available',
-		//     details: {},
-		//   };
-		//   return result;
-		// };
-		// jest.spyOn(StatusHandler, 'healthCheckCommercetoolsPermissions').mockReturnValue(mockHealthCheckFunction);
-		// const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
-		// const result: StatusResponse = await paymentService.status();
-		// expect(result?.status).toBeDefined();
-		// expect(result?.checks).toHaveLength(2);
-		// expect(result?.status).toStrictEqual('Partially Available');
-		// expect(result?.checks[0]?.name).toStrictEqual('CoCo Permissions');
-		// expect(result?.checks[0]?.status).toStrictEqual('DOWN');
-		// expect(result?.checks[0]?.details).toStrictEqual({});
-		// expect(result?.checks[0]?.message).toBeDefined();
-		// expect(result?.checks[1]?.name).toStrictEqual('Mock Payment API');
-		// expect(result?.checks[1]?.status).toStrictEqual('UP');
-		// expect(result?.checks[1]?.details).toBeDefined();
-		// expect(result?.checks[1]?.message).toBeDefined();
+		const mockHealthCheckFunction: () => Promise<HealthCheckResult> = async () => {
+			const result: HealthCheckResult = {
+				name: "CoCo Permissions",
+				status: "DOWN",
+				message: "CoCo Permissions are not available",
+				details: {},
+			};
+			return result;
+		};
+		jest.spyOn(StatusHandler, "healthCheckCommercetoolsPermissions").mockReturnValue(mockHealthCheckFunction);
+		const paymentService: AbstractPaymentService = new BraintreePaymentService(opts);
+		const result: StatusResponse = await paymentService.status();
+		expect(result?.status).toBeDefined();
+		expect(result?.checks).toHaveLength(2);
+		expect(result?.status).toStrictEqual("Partially Available");
+		expect(result?.checks[0]?.name).toStrictEqual("CoCo Permissions");
+		expect(result?.checks[0]?.status).toStrictEqual("DOWN");
+		expect(result?.checks[0]?.details).toStrictEqual({});
+		expect(result?.checks[0]?.message).toBeDefined();
+		expect(result?.checks[1]?.name).toStrictEqual("Braintree status check");
+		expect(result?.checks[1]?.status).toStrictEqual("UP");
+		expect(result?.checks[1]?.details).toBeDefined();
+		expect(result?.checks[1]?.message).toBeDefined();
 	});
 
 	test("cancelPayment", async () => {

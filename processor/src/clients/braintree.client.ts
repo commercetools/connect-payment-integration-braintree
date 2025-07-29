@@ -1,4 +1,4 @@
-import braintree, { type ClientToken, type Transaction, type ValidatedResponse } from "braintree";
+import braintree, { type ClientToken, type MerchantAccount, type Transaction, type ValidatedResponse } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
@@ -35,6 +35,18 @@ export class BraintreeClient {
 			BraintreeClient.instance = new BraintreeClient();
 		}
 		return BraintreeClient.instance;
+	}
+
+	public async healthCheck(): Promise<MerchantAccount[]> {
+		try {
+			const result = await this.braintreeGateway.merchantAccount.all();
+			if (!result) throw new Error("Error communicating with Braintree platform.");
+			logger.info("Connect to Braintree platform successfully.");
+			return result;
+		} catch (e) {
+			logger.error("Braintree health check failed.", e);
+			this.handleError(e, "Error communicating with Braintree platform.");
+		}
 	}
 
 	public async initiateSession(customerId?: string): Promise<ValidatedResponse<ClientToken>> {
