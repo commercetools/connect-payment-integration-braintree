@@ -1,4 +1,4 @@
-import { BraintreeInitResponseSchemaDTO, PaymentRequestSchemaDTO } from "../../dtos/payment";
+import { BraintreeInitResponseSchemaDTO, PaymentRequestSchemaDTO } from "../../dtos/payment.dto";
 import { CommercetoolsCartService, CommercetoolsPaymentService } from "@commercetools/connect-payments-sdk";
 
 export type CreatePaymentRequest = {

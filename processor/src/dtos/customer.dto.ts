@@ -1,4 +1,9 @@
-import { Type } from "@sinclair/typebox";
+import { Type, Static } from "@sinclair/typebox";
+import { BraintreeCustomer } from "./basic-types";
+
+export const CreateCustomerRequestSchema = BraintreeCustomer;
+
+export type CreateCustomerRequestSchemaDTO = Static<typeof CreateCustomerRequestSchema>;
 
 export const CreateCustomerResponseSchema = Type.Object({
 	// addresses?: Address[] | undefined,
@@ -23,3 +28,9 @@ export const CreateCustomerResponseSchema = Type.Object({
 	// visaCheckoutCards?: VisaCheckoutCard[] | undefined,
 	website: Type.Optional(Type.String()),
 });
+
+export type CreateCustomerResponseSchemaDTO = Static<typeof CreateCustomerResponseSchema>;
+
+export const GetCustomerResponseSchema = BraintreeCustomer;
+
+export type GetCustomerResponseSchemaDTO = Static<typeof GetCustomerResponseSchema>;

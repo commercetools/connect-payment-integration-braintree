@@ -15,15 +15,15 @@ import {
 } from "@commercetools/connect-payments-sdk";
 
 import { AbstractPaymentService } from "././abstract-payment.service";
-import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment";
+import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment.dto";
 import { BraintreePaymentServiceOptions } from "./types/payment.type";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment.type";
 import { type ValidatedResponse, type Transaction } from "braintree";
 import { logger } from "../libs/logger";
 import { getConfig } from "../dev-utils/getConfig";
-import { PaymentModificationStatus, SupportedPaymentComponentsSchemaDTO } from "../dtos/operations";
+import { PaymentModificationStatus, SupportedPaymentComponentsSchemaDTO } from "../dtos/operation.dto";
 import { paymentSDK } from "../sdk/paymentSDK";
-import type { AmountSchemaDTO } from "../dtos/operations";
+import type { AmountSchemaDTO } from "../dtos/operation.dto";
 import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
 import { mapBraintreeToCtResultCode } from "./mappers/braintree.mapper";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";

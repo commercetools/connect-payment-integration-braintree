@@ -16,7 +16,7 @@ import {
 	StatusResponseSchema,
 	StatusResponseSchemaDTO,
 	SupportedPaymentComponentsSchema,
-} from "../dtos/operations";
+} from "../dtos/operation.dto";
 import { AbstractPaymentService } from "../services/abstract-payment.service";
 
 type OperationRouteOptions = {

@@ -6,7 +6,7 @@ import {
 	CreateCustomerRequestSchemaDTO,
 	CreateCustomerResponseSchema,
 	CreateCustomerResponseSchemaDTO,
-} from "../dtos/customer";
+} from "../dtos/customer.dto";
 import { Type } from "@sinclair/typebox";
 
 type CustomerRoutesOptions = {

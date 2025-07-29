@@ -3,8 +3,6 @@ import { ConfigResponse, ModifyPayment, StatusResponse } from "../../src/service
 import { paymentSDK } from "../../src/sdk/paymentSDK";
 import { DefaultPaymentService } from "@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service";
 
-// import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
-// import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
 import { BraintreeClient } from "../../src/clients";
 
 import {
@@ -22,12 +20,10 @@ import * as Config from "../../src/dev-utils/getConfig";
 import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment.type";
 import { AbstractPaymentService } from "../../src/services/abstract-payment.service";
 import { BraintreePaymentService } from "../../src/services/braintree-payment.service";
-import { PaymentMethodType } from "../../src/dtos/payment";
+import { PaymentMethodType } from "../../src/dtos/payment.dto";
 import * as StatusHandler from "@commercetools/connect-payments-sdk/dist/api/handlers/status.handler";
 
 import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
-// import { PaymentMethodType, PaymentOutcome } from '../../src/dtos/payment';
-// import { TransactionDraftDTO } from '../../src/dtos/operations';
 
 interface FlexibleConfig {
 	[key: string]: string; // Adjust the type according to your config values
@@ -256,125 +252,6 @@ describe(BraintreePaymentService.name, () => {
 				interactionId: "dummy-braintree-transaction-id",
 				state: "Success",
 			},
-		});
-	});
-
-	test("create invoice payment", async () => {
-		// TODO: implement and fix
-		// const createPaymentOpts: CreatePaymentRequest = {
-		//   data: {
-		//     paymentMethod: {
-		//       type: PaymentMethodType.INVOICE,
-		//     },
-		//     paymentOutcome: PaymentOutcome.AUTHORIZED,
-		//   },
-		// };
-		// jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(FastifyContext, 'getProcessorUrlFromContext').mockReturnValue('http://127.0.0.1');
-		// jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// const result = await mockPaymentService.createPayment(createPaymentOpts);
-		// expect(result?.paymentReference).toStrictEqual('123456');
-	});
-
-	test("create purchaseorder payment successfully", async () => {
-		// TODO: implement and fix
-		// const createPaymentOpts: CreatePaymentRequest = {
-		//   data: {
-		//     paymentMethod: {
-		//       type: PaymentMethodType.PURCHASE_ORDER,
-		//       poNumber: '123456',
-		//       invoiceMemo: 'This is a test invoice',
-		//     },
-		//     paymentOutcome: PaymentOutcome.AUTHORIZED,
-		//   },
-		// };
-		// jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(FastifyContext, 'getProcessorUrlFromContext').mockReturnValue('http://127.0.0.1');
-		// jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// const result = await mockPaymentService.createPayment(createPaymentOpts);
-		// expect(result?.paymentReference).toStrictEqual('123456');
-	});
-
-	test("create purchaseorder payment returns an error when PO number is not received", async () => {
-		// TODO: implement and fix
-		// const createPaymentOpts: CreatePaymentRequest = {
-		//   data: {
-		//     paymentMethod: {
-		//       type: PaymentMethodType.PURCHASE_ORDER,
-		//     },
-		//     paymentOutcome: PaymentOutcome.AUTHORIZED,
-		//   },
-		// };
-		// jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
-		// jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValue(Promise.resolve(mockGetCartResult()));
-		// jest.spyOn(FastifyContext, 'getProcessorUrlFromContext').mockReturnValue('http://127.0.0.1');
-		// const resultPromise = mockPaymentService.createPayment(createPaymentOpts);
-		// await expect(resultPromise).rejects.toThrow('A value is required for field poNumber.');
-	});
-
-	describe("handleTransaction", () => {
-		test("should create the payment in CoCo and return it with a success state", async () => {
-			// TODO: implement and fix
-			// const createPaymentOpts: TransactionDraftDTO = {
-			//   cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
-			//   paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
-			//   amount: {
-			//     centAmount: 1000,
-			//     currencyCode: 'EUR',
-			//   },
-			// };
-			// jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-			// jest
-			//   .spyOn(DefaultPaymentService.prototype, 'createPayment')
-			//   .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
-			// jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-			// jest
-			//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-			//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-			// const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
-			// expect(resultPromise).resolves.toStrictEqual({
-			//   transactionStatus: {
-			//     errors: [],
-			//     state: 'Pending',
-			//   },
-			// });
-		});
-
-		test("should create the payment in CoCo and return it with a failed state", async () => {
-			// TODO: implement and fix
-			// const createPaymentOpts: TransactionDraftDTO = {
-			//   cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
-			//   paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
-			//   amount: {
-			//     centAmount: 10000,
-			//     currencyCode: 'EUR',
-			//   },
-			// };
-			// jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-			// jest
-			//   .spyOn(DefaultPaymentService.prototype, 'createPayment')
-			//   .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
-			// jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-			// jest
-			//   .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-			//   .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
-			// const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
-			// expect(resultPromise).resolves toStrictEqual({
-			//   transactionStatus: {
-			//     errors: [
-			//       {
-			//         code: 'PaymentRejected',
-			//         message: `Payment '${mockGetPaymentResult.id}' has been rejected.`,
-			//       },
-			//     ],
-			//     state: 'Failed',
-			//   },
-			// });
 		});
 	});
 });

@@ -5,7 +5,7 @@ import {
 	ConfigResponseSchemaDTO,
 	StatusResponseSchemaDTO,
 	PaymentModificationStatus,
-} from "../../dtos/operations";
+} from "../../dtos/operation.dto";
 
 export type CancelPaymentRequest = {
 	payment: Payment;
