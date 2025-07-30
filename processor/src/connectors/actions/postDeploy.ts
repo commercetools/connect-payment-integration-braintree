@@ -2,8 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function postDeploy(_properties: Map<string, unknown>) {
-}
+async function postDeploy(_properties: Map<string, unknown>) {}
 
 async function runPostDeployScripts() {
 	try {
