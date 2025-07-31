@@ -33,7 +33,7 @@ export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatu
 export const mapToBraintreeCreatePaymentRequest = (cart: Cart): TransactionRequest => {
 	return {
 		amount: mapCtPaymentAmountToBraintreeAmount(cart.totalPrice),
-		lineItems: mapLineItems(cart.lineItems),
+		lineItems: mapLineItems(cart.lineItems, cart.locale),
 
 		billing: mapBillingAddress(cart.billingAddress),
 	};
@@ -51,19 +51,20 @@ export const mapCtPaymentAmountToBraintreeAmount = (amountPlanned: PaymentAmount
 	return (amountPlanned.centAmount / Math.pow(10, amountPlanned.fractionDigits)).toString();
 };
 
-const mapLineItems = (lineItems: LineItem[]): TransactionLineItem[] | undefined => {
+const mapLineItems = (lineItems: LineItem[], locale: string | undefined): TransactionLineItem[] | undefined => {
 	if (!lineItems || lineItems.length === 0) {
 		return undefined;
 	}
 	return lineItems.map((lineItem) => ({
 		quantity: lineItem.quantity.toString(),
-		name: lineItem.name["en-US"] as string,
+		name: locale ? (lineItem.name[locale] as string) : "",
 		kind: "debit",
 		unitAmount: (lineItem.price.value.centAmount / Math.pow(10, lineItem.price.value.fractionDigits)).toString(),
 		taxAmount: "0",
 		totalAmount: "0",
 	}));
 };
+
 const mapBillingAddress = (billingAddress: Address | undefined) => {
 	if (!billingAddress) {
 		return undefined;
