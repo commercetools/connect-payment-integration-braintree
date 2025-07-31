@@ -1,23 +1,6 @@
-import { TransactionState } from "@commercetools/connect-payments-sdk";
-import { TransactionStatus } from "braintree";
-
-type CentPrecisionMoney = {
-	/**
-	 *	Amount in the smallest indivisible unit of a currency, such as:
-	 *
-	 *	* Cents for EUR and USD, pence for GBP, or centime for CHF (5 CHF is specified as `500`).
-	 *	* The value in the major unit for currencies without minor units, like JPY (5 JPY is specified as `5`).
-	 *
-	 *
-	 */
-	readonly centAmount: number;
-	/**
-	 *	The number of default fraction digits for the given currency, like `2` for EUR or `0` for JPY.
-	 *
-	 *
-	 */
-	readonly fractionDigits: number;
-};
+import { Address, Cart, LineItem, TransactionState } from "@commercetools/connect-payments-sdk";
+import { PaymentAmount } from "@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type";
+import { type TransactionLineItem, type TransactionRequest, TransactionStatus } from "braintree";
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
 	switch (resultCode) {
@@ -47,14 +30,54 @@ export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatu
 	}
 };
 
-export const mapCtTotalPriceToBraintreeAmount = (totalPrice: CentPrecisionMoney): string => {
-	if (totalPrice.centAmount <= 0 || totalPrice.centAmount.toString().indexOf(".") !== -1) {
+export const mapToBraintreeCreatePaymentRequest = (cart: Cart): TransactionRequest => {
+	return {
+		amount: mapCtPaymentAmountToBraintreeAmount(cart.totalPrice),
+		lineItems: mapLineItems(cart.lineItems),
+
+		billing: mapBillingAddress(cart.billingAddress),
+	};
+};
+
+export const mapCtPaymentAmountToBraintreeAmount = (amountPlanned: PaymentAmount): string => {
+	if (amountPlanned.centAmount <= 0 || amountPlanned.centAmount.toString().indexOf(".") !== -1) {
 		throw new Error(
-			`Payment cent amount must be a positive integer above zero, received ${totalPrice.centAmount}.`,
+			`Payment cent amount must be a positive integer above zero, received ${amountPlanned.centAmount}.`,
 		);
 	}
-	if (totalPrice.fractionDigits === 0) {
-		return totalPrice.centAmount.toString();
+	if (amountPlanned.fractionDigits === 0) {
+		return amountPlanned.centAmount.toString();
 	}
-	return (totalPrice.centAmount / Math.pow(10, totalPrice.fractionDigits)).toString();
+	return (amountPlanned.centAmount / Math.pow(10, amountPlanned.fractionDigits)).toString();
+};
+
+const mapLineItems = (lineItems: LineItem[]): TransactionLineItem[] | undefined => {
+	if (!lineItems || lineItems.length === 0) {
+		return undefined;
+	}
+	return lineItems.map((lineItem) => ({
+		quantity: lineItem.quantity.toString(),
+		name: lineItem.name["en-US"] as string,
+		kind: "debit",
+		unitAmount: (lineItem.price.value.centAmount / Math.pow(10, lineItem.price.value.fractionDigits)).toString(),
+		taxAmount: "0",
+		totalAmount: "0",
+	}));
+};
+const mapBillingAddress = (billingAddress: Address | undefined) => {
+	if (!billingAddress) {
+		return undefined;
+	}
+	return;
+	{
+		firstName: (billingAddress as Address).firstName;
+		lastName: (billingAddress as Address).lastName;
+		company: (billingAddress as Address).company;
+		streetAddress: (billingAddress as Address).streetName;
+		extendedAddress: (billingAddress as Address).streetNumber;
+		locality: (billingAddress as Address).city;
+		region: (billingAddress as Address).state;
+		postalCode: (billingAddress as Address).postalCode;
+		countryCodeAlpha2: (billingAddress as Address).country;
+	}
 };

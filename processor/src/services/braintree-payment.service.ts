@@ -18,7 +18,7 @@ import { AbstractPaymentService } from "././abstract-payment.service";
 import { PaymentMethodType, CreatePaymentResponseSchemaDTO } from "../dtos/payment.dto";
 import { BraintreePaymentServiceOptions } from "./types/payment.type";
 import { BraintreeInitResponse, CreatePaymentRequest } from "./types/payment.type";
-import { type ValidatedResponse, type Transaction } from "braintree";
+import { type ValidatedResponse, type Transaction, TransactionRequest } from "braintree";
 import { logger } from "../libs/logger";
 import { getConfig } from "../dev-utils/getConfig";
 import { PaymentModificationStatus, SupportedPaymentComponentsSchemaDTO } from "../dtos/operation.dto";
@@ -26,7 +26,7 @@ import { paymentSDK } from "../sdk/paymentSDK";
 import type { AmountSchemaDTO } from "../dtos/operation.dto";
 import { ErrorInvalidOperation, TransactionState } from "@commercetools/connect-payments-sdk";
 import { mapBraintreeToCtResultCode } from "./mappers/braintree.mapper";
-import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
+import { mapToBraintreeCreatePaymentRequest } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 import { BraintreeClient } from "../clients/braintree.client";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -187,6 +187,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 */
 	public async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponseSchemaDTO> {
 		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
+		const amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
 		let ctPayment = request.data.paymentReference
 			? await this.ctPaymentService.updatePayment({
 					id: request.data.paymentReference,
@@ -209,7 +210,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			}
 		} else {
 			// Else no payment reference
-			const amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
 			ctPayment = await this.ctPaymentService.createPayment({
 				amountPlanned,
 				paymentMethodInfo: {
@@ -236,7 +236,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			});
 		}
 
-		const amount: string = mapCtTotalPriceToBraintreeAmount(ctCart.totalPrice);
+		const amount: TransactionRequest = mapToBraintreeCreatePaymentRequest(ctCart);
 		const nonce: string = request.data.nonce;
 
 		let btResponse = await BraintreeClient.getInstance().createPayment(amount, nonce);

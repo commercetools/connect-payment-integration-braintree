@@ -1,3 +1,7 @@
-import { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount } from "./braintree.mapper";
+import {
+	mapBraintreeToCtResultCode,
+	mapCtTotalPriceToBraintreeAmount,
+	mapToBraintreeCreatePaymentRequest,
+} from "./braintree.mapper";
 
-export { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount };
+export { mapBraintreeToCtResultCode, mapCtTotalPriceToBraintreeAmount, mapToBraintreeCreatePaymentRequest };
