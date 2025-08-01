@@ -45,9 +45,7 @@ export class BraintreeClient {
 
 	public async findMerchantAccount(merchantAccountId: string): Promise<MerchantAccount | undefined> {
 		try {
-			const result = await this.braintreeGateway.merchantAccount.find(merchantAccountId);
-			if (!result) throw new Error("Error communicating with Braintree platform.");
-			return result;
+			return await this.braintreeGateway.merchantAccount.find(merchantAccountId);
 		} catch (e) {
 			logger.error(`Error finding Braintree merchant account [${merchantAccountId}].`, {
 				error: e,
