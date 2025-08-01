@@ -1,6 +1,7 @@
-import { Address, Cart, LineItem, TransactionState } from "@commercetools/connect-payments-sdk";
+import { Address, Cart, TransactionState } from "@commercetools/connect-payments-sdk";
 import { PaymentAmount } from "@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type";
-import { type TransactionLineItem, type TransactionRequest, TransactionStatus } from "braintree";
+import { type TransactionRequest, TransactionStatus } from "braintree";
+import { getConfig } from "../../dev-utils/getConfig";
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
 	switch (resultCode) {
@@ -33,9 +34,8 @@ export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatu
 export const mapToBraintreeCreatePaymentRequest = (cart: Cart): TransactionRequest => {
 	return {
 		amount: mapCtPaymentAmountToBraintreeAmount(cart.totalPrice),
-		lineItems: mapLineItems(cart.lineItems, cart.locale),
-
 		billing: mapBillingAddress(cart.billingAddress),
+		merchantAccountId: getConfig().braintreeMerchantId,
 	};
 };
 
@@ -45,40 +45,24 @@ export const mapCtPaymentAmountToBraintreeAmount = (amountPlanned: PaymentAmount
 			`Payment cent amount must be a positive integer above zero, received ${amountPlanned.centAmount}.`,
 		);
 	}
-	if (amountPlanned.fractionDigits === 0) {
-		return amountPlanned.centAmount.toString();
-	}
 	return (amountPlanned.centAmount / Math.pow(10, amountPlanned.fractionDigits)).toString();
 };
 
-const mapLineItems = (lineItems: LineItem[], locale: string | undefined): TransactionLineItem[] | undefined => {
-	if (!lineItems || lineItems.length === 0) {
-		return undefined;
-	}
-	return lineItems.map((lineItem) => ({
-		quantity: lineItem.quantity.toString(),
-		name: locale ? (lineItem.name[locale] as string) : "",
-		kind: "debit",
-		unitAmount: (lineItem.price.value.centAmount / Math.pow(10, lineItem.price.value.fractionDigits)).toString(),
-		taxAmount: "0",
-		totalAmount: "0",
-	}));
-};
 
 const mapBillingAddress = (billingAddress: Address | undefined) => {
 	if (!billingAddress) {
 		return undefined;
 	}
-	return;
-	{
-		firstName: (billingAddress as Address).firstName;
-		lastName: (billingAddress as Address).lastName;
-		company: (billingAddress as Address).company;
-		streetAddress: (billingAddress as Address).streetName;
-		extendedAddress: (billingAddress as Address).streetNumber;
-		locality: (billingAddress as Address).city;
-		region: (billingAddress as Address).state;
-		postalCode: (billingAddress as Address).postalCode;
-		countryCodeAlpha2: (billingAddress as Address).country;
+	const braintreeBillingAddress = {
+		firstName: (billingAddress as Address).firstName,
+		lastName: (billingAddress as Address).lastName,
+		company: (billingAddress as Address).company,
+		streetAddress: (billingAddress as Address).streetNumber + ' ' + (billingAddress as Address).streetName,
+		extendedAddress: (billingAddress as Address).additionalStreetInfo,
+		locality: (billingAddress as Address).city,
+		region: (billingAddress as Address).state,
+		postalCode: (billingAddress as Address).postalCode,
+		countryCodeAlpha2: (billingAddress as Address).country,
 	}
+	return braintreeBillingAddress
 };

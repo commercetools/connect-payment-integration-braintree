@@ -1,10 +1,4 @@
-import braintree, {
-	type ClientToken,
-	type MerchantAccount,
-	type Transaction,
-	type TransactionRequest,
-	type ValidatedResponse,
-} from "braintree";
+import braintree, { type ClientToken, type MerchantAccount, type Transaction, type TransactionRequest, type ValidatedResponse } from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
@@ -73,7 +67,7 @@ export class BraintreeClient {
 		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 		try {
 			btResponse = await this.braintreeGateway.transaction.sale({
-				...request,
+				... request,
 				paymentMethodNonce: nonce,
 				options: { submitForSettlement: false },
 			});

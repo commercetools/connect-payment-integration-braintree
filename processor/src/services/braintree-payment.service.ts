@@ -236,10 +236,10 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			});
 		}
 
-		const amount: TransactionRequest = mapToBraintreeCreatePaymentRequest(ctCart);
+		const txnReq: TransactionRequest = mapToBraintreeCreatePaymentRequest(ctCart);
 		const nonce: string = request.data.nonce;
 
-		let btResponse = await BraintreeClient.getInstance().createPayment(amount, nonce);
+		let btResponse = await BraintreeClient.getInstance().createPayment(txnReq, nonce);
 
 		const txState: TransactionState = mapBraintreeToCtResultCode(btResponse.transaction.status, btResponse.success);
 		const updatedPayment = await this.ctPaymentService.updatePayment({
