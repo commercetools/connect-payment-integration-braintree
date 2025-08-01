@@ -1,4 +1,10 @@
-import braintree, { type ClientToken, type MerchantAccount, type Transaction, type TransactionRequest, type ValidatedResponse } from "braintree";
+import braintree, {
+	type ClientToken,
+	type MerchantAccount,
+	type Transaction,
+	type TransactionRequest,
+	type ValidatedResponse,
+} from "braintree";
 import { getConfig } from "../dev-utils/getConfig";
 import { logger } from "../libs/logger";
 import { BraintreeApiError, BraintreeApiErrorData } from "../errors/braintree-api.error";
@@ -63,14 +69,10 @@ export class BraintreeClient {
 		}
 	}
 
-	public async createPayment(request: TransactionRequest, nonce: string): Promise<ValidatedResponse<Transaction>> {
+	public async createPayment(request: TransactionRequest): Promise<ValidatedResponse<Transaction>> {
 		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 		try {
-			btResponse = await this.braintreeGateway.transaction.sale({
-				... request,
-				paymentMethodNonce: nonce,
-				options: { submitForSettlement: false },
-			});
+			btResponse = await this.braintreeGateway.transaction.sale(request);
 
 			// If the transaction is not present, it means no transaction status is returned and no transaction will be saved to CoCo
 			if (!btResponse.success && !btResponse.transaction) {

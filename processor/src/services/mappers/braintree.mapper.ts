@@ -31,11 +31,15 @@ export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatu
 	}
 };
 
-export const mapToBraintreeCreatePaymentRequest = (cart: Cart): TransactionRequest => {
+export const mapToBraintreeCreatePaymentRequest = (cart: Cart, nonce: string): TransactionRequest => {
 	return {
 		amount: mapCtPaymentAmountToBraintreeAmount(cart.totalPrice),
 		billing: mapBillingAddress(cart.billingAddress),
 		merchantAccountId: getConfig().braintreeMerchantId,
+		paymentMethodNonce: nonce,
+		options: {
+			submitForSettlement: false,
+		},
 	};
 };
 
@@ -48,7 +52,6 @@ export const mapCtPaymentAmountToBraintreeAmount = (amountPlanned: PaymentAmount
 	return (amountPlanned.centAmount / Math.pow(10, amountPlanned.fractionDigits)).toString();
 };
 
-
 const mapBillingAddress = (billingAddress: Address | undefined) => {
 	if (!billingAddress) {
 		return undefined;
@@ -57,12 +60,12 @@ const mapBillingAddress = (billingAddress: Address | undefined) => {
 		firstName: (billingAddress as Address).firstName,
 		lastName: (billingAddress as Address).lastName,
 		company: (billingAddress as Address).company,
-		streetAddress: (billingAddress as Address).streetNumber + ' ' + (billingAddress as Address).streetName,
+		streetAddress: (billingAddress as Address).streetNumber + " " + (billingAddress as Address).streetName,
 		extendedAddress: (billingAddress as Address).additionalStreetInfo,
 		locality: (billingAddress as Address).city,
 		region: (billingAddress as Address).state,
 		postalCode: (billingAddress as Address).postalCode,
 		countryCodeAlpha2: (billingAddress as Address).country,
-	}
-	return braintreeBillingAddress
+	};
+	return braintreeBillingAddress;
 };
