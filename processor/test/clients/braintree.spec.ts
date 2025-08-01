@@ -68,8 +68,12 @@ describe("BraintreeClient", () => {
 			const mockTransaction = { id: "txn-123", status: "authorized" };
 			const mockResponse = { success: true, transaction: mockTransaction };
 			mockGateway.transaction.sale.mockResolvedValue(mockResponse);
-
-			const response = await client.createPayment("100.00", "nonce-123");
+			const request = {
+				amount: "100.00",
+				paymentMethodNonce: "nonce-123",
+				options: { submitForSettlement: false },
+			};
+			const response = await client.createPayment(request);
 
 			expect(response).toEqual(mockResponse);
 			expect(mockGateway.transaction.sale).toHaveBeenCalledWith({
@@ -82,8 +86,12 @@ describe("BraintreeClient", () => {
 		it("should throw a BraintreeApiError if transaction fails and no transaction object is returned", async () => {
 			const mockResponse = { success: false, message: "Payment failed" };
 			mockGateway.transaction.sale.mockResolvedValue(mockResponse);
-
-			await expect(client.createPayment("100.00", "nonce-123")).rejects.toThrow(BraintreeApiError);
+			const request = {
+				amount: "100.00",
+				paymentMethodNonce: "nonce-123",
+				options: { submitForSettlement: false },
+			};
+			await expect(client.createPayment(request)).rejects.toThrow(BraintreeApiError);
 		});
 	});
 

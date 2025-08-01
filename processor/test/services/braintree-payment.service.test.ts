@@ -240,8 +240,15 @@ describe(BraintreePaymentService.name, () => {
 				method: PaymentMethodType.CARD,
 			},
 		});
+		const expectedCreatePaymentRequest = {
+			amount: "1500",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: { submitForSettlement: false },
+			paymentMethodNonce: "dummy-nonce",
+		};
 
-		expect(BraintreeClient.prototype.createPayment).toHaveBeenCalledWith("1500", "dummy-nonce");
+		expect(BraintreeClient.prototype.createPayment).toHaveBeenCalledWith(expectedCreatePaymentRequest);
 
 		expect(paymentSDK.ctPaymentService.updatePayment).toHaveBeenCalledWith({
 			id: mockPayment.id,

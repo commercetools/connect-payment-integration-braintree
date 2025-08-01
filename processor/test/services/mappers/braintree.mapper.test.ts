@@ -1,80 +1,133 @@
-import { describe, expect, test } from "@jest/globals";
-import { mapCtTotalPriceToBraintreeAmount } from "../../../src/services/mappers";
+import { describe, expect, test, jest } from "@jest/globals";
+import { mapToBraintreeCreatePaymentRequest } from "../../../src/services/mappers";
+import { mockGetCartResult } from "../../utils/mock-cart-data";
+import { CentPrecisionMoney } from "@commercetools/platform-sdk";
 
 describe("mapCtTotalPriceToBraintreeAmount", () => {
+	const cart = mockGetCartResult();
+	const nonce = "fake-nonce";
 	test("throws error when centAmount passed is a non-positive integer or 0", () => {
-		const totalPrice = {
-			centAmount: -1,
-			fractionDigits: 0,
-		};
-		expect(() => mapCtTotalPriceToBraintreeAmount(totalPrice)).toThrow(
-			`Payment cent amount must be a positive integer above zero, received ${totalPrice.centAmount}.`,
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: -1,
+			writable: true,
+		});
+
+		expect(() => mapToBraintreeCreatePaymentRequest(cart, nonce)).toThrow(
+			`Payment cent amount must be a positive integer above zero, received -1.`,
 		);
 
-		totalPrice.centAmount = 1.2;
-		expect(() => mapCtTotalPriceToBraintreeAmount(totalPrice)).toThrow(
-			`Payment cent amount must be a positive integer above zero, received ${totalPrice.centAmount}.`,
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 1.2,
+			writable: true,
+		});
+
+		expect(() => mapToBraintreeCreatePaymentRequest(cart, nonce)).toThrow(
+			`Payment cent amount must be a positive integer above zero, received 1.2.`,
 		);
 
-		totalPrice.centAmount = 0;
-		expect(() => mapCtTotalPriceToBraintreeAmount(totalPrice)).toThrow(
-			`Payment cent amount must be a positive integer above zero, received ${totalPrice.centAmount}.`,
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 0,
+			writable: true,
+		});
+		expect(() => mapToBraintreeCreatePaymentRequest(cart, nonce)).toThrow(
+			`Payment cent amount must be a positive integer above zero, received 0.`,
 		);
 	});
 
 	test("returns string version of centAmount passed when fractionDigits are zero", async () => {
-		const totalPrice = {
-			centAmount: 3457,
-			fractionDigits: 0,
-		};
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual(`${totalPrice.centAmount}`);
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 3457,
+			writable: true,
+		});
 
-		totalPrice.centAmount = 800000000;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual(`${totalPrice.centAmount}`);
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "34.57",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
 
-		totalPrice.centAmount = 1;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual(`${totalPrice.centAmount}`);
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 800000000,
+			writable: true,
+		});
+
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "8000000",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
+
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 1,
+			writable: true,
+		});
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "0.01",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
 	});
 
 	test("returns string version of centAmount/10 passed when fractionDigits are 1", () => {
-		const totalPrice = {
-			centAmount: 3457,
-			fractionDigits: 1,
-		};
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("345.7");
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 3457,
+			writable: true,
+		});
 
-		totalPrice.centAmount = 800000000;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("80000000");
+		Object.defineProperty(cart.totalPrice, "fractionDigits", {
+			value: 1,
+			writable: true,
+		});
 
-		totalPrice.centAmount = 1;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("0.1");
-	});
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "345.7",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
 
-	test("returns string version of centAmount/100 passed when fractionDigits are 2", () => {
-		const totalPrice = {
-			centAmount: 3457,
-			fractionDigits: 2,
-		};
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("34.57");
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 800000000,
+			writable: true,
+		});
 
-		totalPrice.centAmount = 800000000;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("8000000");
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "80000000",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
 
-		totalPrice.centAmount = 1;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("0.01");
-	});
-
-	test("returns string version of centAmount/10000 passed when fractionDigits are 4", () => {
-		const totalPrice = {
-			centAmount: 3457,
-			fractionDigits: 4,
-		};
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("0.3457");
-
-		totalPrice.centAmount = 800000000;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("80000");
-
-		totalPrice.centAmount = 1;
-		expect(mapCtTotalPriceToBraintreeAmount(totalPrice)).toStrictEqual("0.0001");
+		Object.defineProperty(cart.totalPrice, "centAmount", {
+			value: 1,
+			writable: true,
+		});
+		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
+			amount: "0.1",
+			billing: undefined,
+			merchantAccountId: "xxx",
+			options: {
+				submitForSettlement: false,
+			},
+			paymentMethodNonce: "fake-nonce",
+		});
 	});
 });
