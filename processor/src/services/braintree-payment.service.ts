@@ -12,6 +12,7 @@ import {
 	statusHandler,
 	healthCheckCommercetoolsPermissions,
 	type TransactionType,
+	Errorx,
 } from "@commercetools/connect-payments-sdk";
 
 import { AbstractPaymentService } from "././abstract-payment.service";
@@ -29,6 +30,7 @@ import { mapBraintreeToCtResultCode } from "./mappers/braintree.mapper";
 import { mapCtTotalPriceToBraintreeAmount } from "./mappers";
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from "../libs/fastify/context";
 import { BraintreeClient } from "../clients/braintree.client";
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const packageJSON = require("../../package.json");
 
@@ -64,8 +66,18 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		const ctCart = await this.ctCartService.getCart({
 			id: getCartIdFromContext(),
 		});
+		const braintreeClient = BraintreeClient.getInstance();
+		const merchantAccount = await braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
 
 		const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		if (merchantAccount?.currencyIsoCode !== amountPlanned.currencyCode) {
+			throw new Errorx({
+				message: "cart and braintree merchant account currency do not match",
+				httpErrorStatus: 400,
+				code: "CurrencyNotMatch",
+			});
+		}
+
 		const ctPayment = await this.ctPaymentService.createPayment({
 			amountPlanned,
 			paymentMethodInfo: {
@@ -90,7 +102,6 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			},
 			paymentId: ctPayment.id,
 		});
-		const braintreeClient = BraintreeClient.getInstance();
 
 		const response = await braintreeClient.initiateSession(customerId);
 		return { clientToken: response.clientToken, paymentReference: ctPayment.id };
@@ -187,6 +198,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 */
 	public async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponseSchemaDTO> {
 		let ctCart = await this.ctCartService.getCart({ id: getCartIdFromContext() });
+
 		let ctPayment = request.data.paymentReference
 			? await this.ctPaymentService.updatePayment({
 					id: request.data.paymentReference,
@@ -210,6 +222,16 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		} else {
 			// Else no payment reference
 			const amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+			const braintreeClient = BraintreeClient.getInstance();
+			const merchantAccount = await braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
+
+			if (merchantAccount?.currencyIsoCode !== amountPlanned.currencyCode) {
+				throw new Errorx({
+					message: "cart and braintree merchant account currency do not match",
+					httpErrorStatus: 400,
+					code: "CurrencyNotMatch",
+				});
+			}
 			ctPayment = await this.ctPaymentService.createPayment({
 				amountPlanned,
 				paymentMethodInfo: {

@@ -15,6 +15,7 @@ import {
 	mockBrainTreeCreatePaymentResponse,
 } from "../utils/mock-payment-results";
 import { mockGetCartResult } from "../utils/mock-cart-data";
+import { mockBraintreeMerchantAccount } from "../utils/mock-merchant-account-data";
 import * as Config from "../../src/dev-utils/getConfig";
 
 import { CreatePaymentRequest, BraintreePaymentServiceOptions } from "../../src/services/types/payment.type";
@@ -23,7 +24,7 @@ import { BraintreePaymentService } from "../../src/services/braintree-payment.se
 import { PaymentMethodType } from "../../src/dtos/payment.dto";
 import * as StatusHandler from "@commercetools/connect-payments-sdk/dist/api/handlers/status.handler";
 
-import { HealthCheckResult } from "@commercetools/connect-payments-sdk";
+import { Errorx, HealthCheckResult } from "@commercetools/connect-payments-sdk";
 
 interface FlexibleConfig {
 	[key: string]: string; // Adjust the type according to your config values
@@ -213,7 +214,7 @@ describe(BraintreePaymentService.name, () => {
 		jest.spyOn(paymentSDK.ctPaymentService, "createPayment").mockResolvedValue(mockPayment);
 		jest.spyOn(paymentSDK.ctPaymentService, "updatePayment").mockResolvedValue(mockUpdatedPayment);
 		jest.spyOn(BraintreeClient.prototype, "createPayment").mockResolvedValue(mockBraintreeResponse);
-
+		jest.spyOn(BraintreeClient.prototype, "findMerchantAccount").mockResolvedValue(mockBraintreeMerchantAccount);
 		const createPaymentRequest: CreatePaymentRequest = {
 			data: {
 				nonce: "dummy-nonce",
@@ -253,5 +254,38 @@ describe(BraintreePaymentService.name, () => {
 				state: "Success",
 			},
 		});
+	});
+
+	test("create card payment with incorrect currency in cart", async () => {
+		const mockCart = mockGetCartResult();
+		Object.defineProperty(mockCart.totalPrice, "currencyCode", {
+			value: "EUR",
+			writable: true,
+		});
+		const mockPayment = { ...mockGetPaymentResult, amountPlanned: mockCart.totalPrice };
+		const mockUpdatedPayment = { ...mockUpdatePaymentResult, amountPlanned: mockCart.totalPrice };
+		const mockBraintreeResponse = mockBrainTreeCreatePaymentResponse;
+
+		jest.spyOn(paymentSDK.ctCartService, "getCart").mockResolvedValue(mockCart);
+		jest.spyOn(paymentSDK.ctCartService, "getPaymentAmount").mockResolvedValue(mockCart.totalPrice);
+		jest.spyOn(paymentSDK.ctCartService, "addPayment").mockResolvedValue(mockCart);
+		jest.spyOn(paymentSDK.ctPaymentService, "createPayment").mockResolvedValue(mockPayment);
+		jest.spyOn(paymentSDK.ctPaymentService, "updatePayment").mockResolvedValue(mockUpdatedPayment);
+		jest.spyOn(BraintreeClient.prototype, "createPayment").mockResolvedValue(mockBraintreeResponse);
+		jest.spyOn(BraintreeClient.prototype, "findMerchantAccount").mockResolvedValue(mockBraintreeMerchantAccount);
+		const createPaymentRequest: CreatePaymentRequest = {
+			data: {
+				nonce: "dummy-nonce",
+				paymentMethodType: PaymentMethodType.CARD,
+			},
+		};
+
+		try {
+			await (paymentService as BraintreePaymentService).createPayment(createPaymentRequest);
+		} catch (error) {
+			expect(error).toBeInstanceOf(Errorx);
+			expect(error.message).toStrictEqual("cart and braintree merchant account currency do not match");
+			expect(error.httpErrorStatus).toStrictEqual(400);
+		}
 	});
 });
