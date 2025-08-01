@@ -15,6 +15,7 @@ const config = {
 
 	// Update with specific payment providers config
 	braintreeMerchantId: process.env.BRAINTREE_MERCHANT_ID || "xxx",
+	braintreeMerchantAccountId: process.env.BRAINTREE_MERCHANT_ACCOUNT_ID || "",
 	braintreePublicKey: process.env.BRAINTREE_PUBLIC_KEY || "xxx",
 	braintreePrivateKey: process.env.BRAINTREE_PRIVATE_KEY || "xxx",
 	braintreeEnvironment: process.env.BRAINTREE_ENVIRONMENT || "sandbox",
