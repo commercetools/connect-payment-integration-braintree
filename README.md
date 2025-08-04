@@ -1,8 +1,8 @@
-# connect-payment-integration-template
+# connect-payment-integration-braintree
 
-This repository provides a [connect](https://docs.commercetools.com/connect) template for payment integration connector. This boilerplate code acts as a starting point for integration with external payment service provider.
+This repository provides a [connect](https://docs.commercetools.com/connect) for integration to Braintree payment service provider (PSP).
 
-## Template Features
+## Features
 
 - Typescript language supported.
 - Uses Fastify as web server framework.
@@ -21,6 +21,9 @@ In addition, please make sure the API client should have enough scope to be able
 
 Various URLs from commercetools platform are required to be configured so that the connect application can handle session and authentication process for endpoints.
 Their values are taken as input as environment variables/ configuration for connect with variable names `CTP_API_URL`, `CTP_AUTH_URL` and `CTP_SESSION_URL`.
+
+3. Braintree account credentials
+Various account data provided by Braintree are necessary to be configured so that the requests from the connect application can be authenticated by Braintree platform within the integration. Their values are taken as input as environment variables/ configuration for connect with variable names BRAINTREE_MERCHANT_ID, BRAINTREE_MERCHANT_ACCOUNT_ID, BRAINTREE_PUBLIC_KEY, BRAINTREE_PRIVATE_KEY.
 
 ## Getting started
 
