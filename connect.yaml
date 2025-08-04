@@ -38,6 +38,9 @@ deployAs:
         - key: BRAINTREE_MERCHANT_ID
           description: Braintree merchant ID
           required: true
+        - key: BRAINTREE_MERCHANT_ACCOUNT_ID
+          description: Braintree merchant account ID
+          required: true          
         - key: BRAINTREE_ENVIRONMENT
           description: Braintree environment (sandbox or production)
           required: true
