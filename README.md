@@ -1,4 +1,4 @@
-# connect-payment-integration-braintree
+# connect-payment-integration-Braintree
 
 This repository provides a [connect](https://docs.commercetools.com/connect) for integration to Braintree payment service provider (PSP).
 
@@ -13,7 +13,7 @@ This repository provides a [connect](https://docs.commercetools.com/connect) for
 ## Important Notes
 
 ### Merchant Account Configuration
-- Each connect deployment supports only one Braintree merchant account
+- Each connect deployment supports only one Braintree merchant account.
 - Cart currency is validated against the Braintree merchant account currency during:
   - Payment session initialization
   - Payment creation
@@ -38,7 +38,7 @@ Various URLs from commercetools platform are required to be configured so that t
 Their values are taken as input as environment variables/ configuration for connect with variable names `CTP_API_URL`, `CTP_AUTH_URL` and `CTP_SESSION_URL`.
 
 3. Braintree account credentials
-Various account data provided by Braintree are necessary to be configured so that the requests from the connect application can be authenticated by Braintree platform within the integration. Their values are taken as input as environment variables/ configuration for connect with variable names BRAINTREE_MERCHANT_ID, BRAINTREE_MERCHANT_ACCOUNT_ID, BRAINTREE_PUBLIC_KEY, BRAINTREE_PRIVATE_KEY.
+Various account data provided by Braintree are necessary to be configured so that the requests from the connect application can be authenticated by Braintree platform within the integration. Their values are taken as input as environment variables/ configuration for connect with variable names `BRAINTREE_MERCHANT_ID`, `BRAINTREE_MERCHANT_ACCOUNT_ID`, `BRAINTREE_PUBLIC_KEY`, `BRAINTREE_PRIVATE_KEY`.
 
 ## Development Guide
 Regarding the development of enabler module, please refer to the following documentations:
@@ -52,7 +52,7 @@ Use public connector listed in connect marketplace. If any customization done, f
 
 #### Deployment Configuration
 In order to deploy your customized connector application on commercetools Connect, it needs to be published. For details, please refer to [documentation about commercetools Connect](https://docs.commercetools.com/connect/concepts)
-In addition, in order to support connect, the braintree payment integration connector has a folder structure as listed below
+In addition, in order to support connect, the Braintree payment integration connector has a folder structure as listed below
 ```
 ├── enabler
 │   ├── src
@@ -132,10 +132,10 @@ Here you can see the details about various variables in configuration
 - `CTP_SESSION_URL`: The URL for session creation in commercetools platform. Connectors relies on the session created to be able to share information between enabler and processor. The default value is `https://session.europe-west1.gcp.commercetools.com`.
 - `CTP_JWKS_URL`: The URL which provides JSON Web Key Set. Default value is `https://mc-api.europe-west1.gcp.commercetools.com/.well-known/jwks.json`.
 - `CTP_JWT_ISSUER`: The issuer inside JSON Web Token which is required in JWT validation process. Default value is `default: https://mc-api.europe-west1.gcp.commercetools.com`
-- `BRAINTREE_ENVIRONMENT`: The indicator of braintree environment.  Default value is `SANDBOX`. It can be configured either as `PRODUCTION` or `SANDBOX`.
+- `BRAINTREE_ENVIRONMENT`: The indicator of Braintree environment.  Default value is `SANDBOX`. It can be configured either as `PRODUCTION` or `SANDBOX`.
 - `BRAINTREE_MERCHANT_ID`: A unique identifier for the entire gateway account. This value is required to send API calls to the Braintree gateway.
-- `BRAINTREE_MERCHANT_ACCOUNT_ID`: The merchant account ID is a unique identifier for a specific merchant account in your braintree gateway, and is used to specify which merchant account to use when creating a transaction. Remember that each connect deployment supports only 1 merchant account.
-- `BRAINTREE_PUBLIC_KEY`: This is the user-specific public identifier for braintree. Each user associated with their Braintree gateway will have their own public key.
+- `BRAINTREE_MERCHANT_ACCOUNT_ID`: The merchant account ID is a unique identifier for a specific merchant account in your Braintree gateway, and is used to specify which merchant account to use when creating a transaction. Remember that each connect deployment supports only 1 merchant account.
+- `BRAINTREE_PUBLIC_KEY`: This is the user-specific public identifier for Braintree. Each user associated with their Braintree gateway will have their own public key.
 - `BRAINTREE_PRIVATE_KEY`: This is the user-specific private identifier. Each user associated with their Braintree gateway will have their own private key. 
 
 ## Development
