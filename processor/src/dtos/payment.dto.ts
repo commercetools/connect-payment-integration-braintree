@@ -2,8 +2,6 @@ import { Type, Static } from "@sinclair/typebox";
 
 export enum PaymentMethodType {
 	CARD = "card",
-	INVOICE = "invoice",
-	PURCHASE_ORDER = "purchaseorder",
 }
 
 export const BraintreeInitRequestSchema = Type.Object({
