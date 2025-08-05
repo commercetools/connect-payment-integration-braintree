@@ -10,6 +10,21 @@ This repository provides a [connect](https://docs.commercetools.com/connect) for
 - Uses [connect payment SDK](https://github.com/commercetools/connect-payments-sdk) to manage request context, sessions and JWT authentication.
 - Includes local development utilities in npm commands to build, start, test, lint & prettify code.
 
+## Important Notes
+
+### Merchant Account Configuration
+- Each connect deployment supports only one Braintree merchant account
+- Cart currency is validated against the Braintree merchant account currency during:
+  - Payment session initialization
+  - Payment creation
+
+### Payment Status Updates
+Our payment connector submits requests for various payment operations to Braintree. Since the payment capture and refund operations are asynchronous in Braintree (Payment reversal is also asynchronous in case the payment has been captured), the most up-to-date status of these operations reside in the Braintree platform, not in commercetools payment transactions.
+
+**Note for Merchants**: 
+- The transaction status indicates whether payment capture/refund requests can be delivered to to Braintree platform.
+- Merchants are suggested to implement their own mechanism to fetch the latest capture/refund status from Braintree after submission.
+
 ## Prerequisite
 
 #### 1. commercetools composable commerce API client
