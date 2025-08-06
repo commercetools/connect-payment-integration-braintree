@@ -4,9 +4,7 @@ export enum PaymentMethodType {
 	CARD = "card",
 }
 
-export const BraintreeInitRequestSchema = Type.Object({
-	customerId: Type.Optional(Type.String()),
-});
+export const BraintreeInitRequestSchema = Type.Object({});
 
 export type BraintreeInitRequestSchemaDTO = Static<typeof BraintreeInitRequestSchema>;
 

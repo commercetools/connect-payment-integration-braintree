@@ -62,7 +62,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 	 *
 	 * @returns Promise returning Braintree client token
 	 */
-	public async init(customerId?: string): Promise<BraintreeInitResponse> {
+	public async init(): Promise<BraintreeInitResponse> {
 		const ctCart = await this.ctCartService.getCart({
 			id: getCartIdFromContext(),
 		});
@@ -103,7 +103,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			paymentId: ctPayment.id,
 		});
 
-		const response = await braintreeClient.initiateSession(customerId);
+		const response = await braintreeClient.initiateSession();
 		return { clientToken: response.clientToken, paymentReference: ctPayment.id };
 	}
 
