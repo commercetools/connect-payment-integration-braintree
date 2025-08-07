@@ -65,11 +65,9 @@ export class BraintreeClient {
 		}
 	}
 
-	public async initiateSession(customerId?: string): Promise<ValidatedResponse<ClientToken>> {
+	public async initiateSession(): Promise<ValidatedResponse<ClientToken>> {
 		try {
-			const response = await this.braintreeGateway.clientToken.generate({
-				customerId,
-			});
+			const response = await this.braintreeGateway.clientToken.generate({});
 			return response;
 		} catch (e: any) {
 			logger.error(`Error generating Braintree client token.`, {
