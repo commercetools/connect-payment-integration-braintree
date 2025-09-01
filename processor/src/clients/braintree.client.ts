@@ -103,10 +103,12 @@ export class BraintreeClient {
 		}
 	}
 
-	public async refundPayment(interactionId: string): Promise<ValidatedResponse<Transaction>> {
+	public async refundPayment(interactionId: string, amount?: string): Promise<ValidatedResponse<Transaction>> {
 		try {
-			const refundResult: ValidatedResponse<Transaction> =
-				await this.braintreeGateway.transaction.refund(interactionId);
+			const refundResult: ValidatedResponse<Transaction> = await this.braintreeGateway.transaction.refund(
+				interactionId,
+				amount,
+			);
 			if (!refundResult.success && !refundResult.transaction) {
 				const errorData = {
 					status: 500,
@@ -151,10 +153,10 @@ export class BraintreeClient {
 		}
 	}
 
-	public async capturePayment(interactionId: string): Promise<ValidatedResponse<Transaction>> {
+	public async capturePayment(interactionId: string, amount?: string): Promise<ValidatedResponse<Transaction>> {
 		try {
 			const captureResult: ValidatedResponse<Transaction> =
-				await this.braintreeGateway.transaction.submitForSettlement(interactionId);
+				await this.braintreeGateway.transaction.submitForSettlement(interactionId, amount);
 			if (!captureResult.success && !captureResult.transaction) {
 				const errorData = {
 					status: 500,

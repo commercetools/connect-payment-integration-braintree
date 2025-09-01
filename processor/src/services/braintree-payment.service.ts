@@ -423,17 +423,22 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		interfaceId: string,
 		transactionType: TransactionType,
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
-		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
 	): Promise<ValidatedResponse<Transaction>> {
 		switch (braintreeOperation) {
 			case "capture": {
 				const braintreeClient = BraintreeClient.getInstance();
-				return await braintreeClient.capturePayment(interfaceId);
+				const centAmount = (request as CapturePaymentRequest).amount?.centAmount;
+				const fractionDigits = (request as CapturePaymentRequest).amount?.fractionDigits;
+				const amount = centAmount / Math.pow(10, fractionDigits);
+				return await braintreeClient.capturePayment(interfaceId, amount.toString());
 			}
 			case "refund": {
+				const centAmount = (request as RefundPaymentRequest).amount?.centAmount;
+				const fractionDigits = (request as RefundPaymentRequest).amount?.fractionDigits;
+				const amount = centAmount / Math.pow(10, fractionDigits);
 				const braintreeClient = BraintreeClient.getInstance();
-				return await braintreeClient.refundPayment(interfaceId);
+				return await braintreeClient.refundPayment(interfaceId, amount.toString());
 			}
 			case "cancel": {
 				const braintreeClient = BraintreeClient.getInstance();
