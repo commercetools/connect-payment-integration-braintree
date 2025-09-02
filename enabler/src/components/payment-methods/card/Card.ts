@@ -125,15 +125,19 @@ export class Card extends BaseComponent {
 				},
 				body: JSON.stringify(request),
 			});
+
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
-			console.log("Payment response:", createPaymentResponse);
-
-			const paymentResult: PaymentResult = {
-				paymentReference: createPaymentResponse.paymentReference ?? "",
-				isSuccess: createPaymentResponse.success ? true : false,
-			};
+			const paymentResult: PaymentResult = createPaymentResponse.success
+				? {
+						isSuccess: true,
+						paymentReference: createPaymentResponse.paymentReference ?? "",
+					}
+				: {
+						isSuccess: false,
+						paymentReference: createPaymentResponse.paymentReference ?? "",
+						message: createPaymentResponse.message ?? "",
+					};
 			await this.hostedFieldsInstance.teardown();
-
 			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
 			console.error("Error creating payment");

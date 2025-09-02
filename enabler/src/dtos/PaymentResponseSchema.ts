@@ -3,6 +3,7 @@ import { Type } from "@sinclair/typebox";
 export const PaymentResponseSchema = Type.Object({
 	id: Type.String(),
 	paymentReference: Type.Optional(Type.String()),
+	message: Type.Optional(Type.String()),
 	success: Type.Boolean(),
 	additionalProcessorResponse: Type.String(),
 	amount: Type.String(),

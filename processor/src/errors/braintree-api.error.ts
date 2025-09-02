@@ -4,6 +4,7 @@ export type BraintreeApiErrorData = {
 	status: number;
 	name?: string;
 	type?: string;
+	message?: string;
 };
 
 export class BraintreeApiError extends Errorx {
@@ -11,7 +12,7 @@ export class BraintreeApiError extends Errorx {
 		super({
 			code: `BraintreeError-${errorData.name}`,
 			httpErrorStatus: errorData.status,
-			message: `error type : ${errorData.type}`,
+			message: errorData.message || `error type : ${errorData.type}`,
 			...additionalOpts,
 		});
 	}

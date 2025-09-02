@@ -287,6 +287,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
 			amount: btResponse.transaction.amount,
 			paymentReference: updatedPayment.id,
+			message: btResponse.message ?? undefined,
 			statusHistory:
 				btResponse.transaction.statusHistory?.map((history: any) => ({
 					amount: history.amount,
