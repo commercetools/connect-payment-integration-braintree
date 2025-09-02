@@ -272,7 +272,7 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				state: txState,
 			},
 		});
-		
+
 		logger.info(`Payment authorization processed.`, {
 			paymentId: updatedPayment.id,
 			interactionId: btResponse.transaction.id,

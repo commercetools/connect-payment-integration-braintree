@@ -101,10 +101,10 @@ describe("BraintreeClient", () => {
 			const mockResponse = { success: true, transaction: mockTransaction };
 			mockGateway.transaction.refund.mockResolvedValue(mockResponse);
 
-			const response = await client.refundPayment("txn-123");
+			const response = await client.refundPayment("txn-123", "1234.00");
 
 			expect(response).toEqual(mockResponse);
-			expect(mockGateway.transaction.refund).toHaveBeenCalledWith("txn-123");
+			expect(mockGateway.transaction.refund).toHaveBeenCalledWith("txn-123", "1234.00");
 		});
 
 		it("should throw a BraintreeApiError if refund fails", async () => {
@@ -141,10 +141,10 @@ describe("BraintreeClient", () => {
 			const mockResponse = { success: true, transaction: mockTransaction };
 			mockGateway.transaction.submitForSettlement.mockResolvedValue(mockResponse);
 
-			const response = await client.capturePayment("txn-123");
+			const response = await client.capturePayment("txn-123", "1234.00");
 
 			expect(response).toEqual(mockResponse);
-			expect(mockGateway.transaction.submitForSettlement).toHaveBeenCalledWith("txn-123");
+			expect(mockGateway.transaction.submitForSettlement).toHaveBeenCalledWith("txn-123", "1234.00");
 		});
 
 		it("should throw a BraintreeApiError if capture fails", async () => {
