@@ -18,4 +18,9 @@ export type PaymentResult =
 			 * Indicates whether the payment was unsuccessful.
 			 */
 			isSuccess: false;
+
+			/**
+			 * The error message.
+			 */
+			message: string;
 	  };

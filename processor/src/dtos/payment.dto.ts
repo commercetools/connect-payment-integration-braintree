@@ -18,6 +18,7 @@ export type BraintreeInitResponseSchemaDTO = Static<typeof BraintreeInitResponse
 export const CreatePaymentResponseSchema = Type.Object({
 	id: Type.String(),
 	success: Type.Boolean(),
+	message: Type.Optional(Type.String()),
 	paymentReference: Type.Optional(Type.String()),
 	additionalProcessorResponse: Type.String(),
 	amount: Type.String(),

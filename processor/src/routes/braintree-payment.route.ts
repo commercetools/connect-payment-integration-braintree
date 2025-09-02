@@ -58,11 +58,7 @@ export const braintreePaymentRoutes = async (
 			const response = await opts.paymentService.createPayment({
 				data: request.body,
 			});
-			if (response.paymentReference) {
-				return reply.status(200).send(response);
-			} else {
-				return reply.status(500).send();
-			}
+			return reply.status(200).send(response);
 		},
 	);
 };
