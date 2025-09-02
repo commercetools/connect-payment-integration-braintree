@@ -20,6 +20,11 @@ export type PaymentResult =
 			isSuccess: false;
 
 			/**
+			 * The payment reference.
+			 */
+			paymentReference: string;
+
+			/**
 			 * The error message.
 			 */
 			message: string;

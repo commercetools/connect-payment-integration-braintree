@@ -134,6 +134,7 @@ export class Card extends BaseComponent {
 					}
 				: {
 						isSuccess: false,
+						paymentReference: createPaymentResponse.paymentReference ?? "",
 						message: createPaymentResponse.message ?? "",
 					};
 			await this.hostedFieldsInstance.teardown();
