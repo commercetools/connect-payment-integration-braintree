@@ -13,6 +13,7 @@ export class Card extends BaseComponent {
 	}
 
 	async mount(containerId: string) {
+		console.log(containerId);
 		document.getElementById(containerId)!.insertAdjacentHTML("afterbegin", this._getTemplate());
 		this.hostedFieldsInstance = await hostedFields.create({
 			client: this.sdk,
