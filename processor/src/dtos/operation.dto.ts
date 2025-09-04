@@ -3,6 +3,7 @@ import { Type, Static } from "@sinclair/typebox";
 export const AmountSchema = Type.Object({
 	centAmount: Type.Integer(),
 	currencyCode: Type.String(),
+	fractionDigits: Type.Integer(),
 });
 
 export type AmountSchemaDTO = Static<typeof AmountSchema>;

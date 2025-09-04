@@ -424,17 +424,22 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		interfaceId: string,
 		transactionType: TransactionType,
 		braintreeOperation: "capture" | "refund" | "cancel" | "reverse",
-		// @ts-expect-error - unused parameter
 		request: CapturePaymentRequest | CancelPaymentRequest | RefundPaymentRequest,
 	): Promise<ValidatedResponse<Transaction>> {
 		switch (braintreeOperation) {
 			case "capture": {
 				const braintreeClient = BraintreeClient.getInstance();
-				return await braintreeClient.capturePayment(interfaceId);
+				const centAmount = (request as RefundPaymentRequest).amount?.centAmount;
+				const fractionDigits = (request as RefundPaymentRequest).amount?.fractionDigits;
+				const amount = (centAmount / Math.pow(10, fractionDigits)).toFixed(fractionDigits);
+				return await braintreeClient.capturePayment(interfaceId, amount);
 			}
 			case "refund": {
 				const braintreeClient = BraintreeClient.getInstance();
-				return await braintreeClient.refundPayment(interfaceId);
+				const centAmount = (request as RefundPaymentRequest).amount?.centAmount;
+				const fractionDigits = (request as RefundPaymentRequest).amount?.fractionDigits;
+				const amount = (centAmount / Math.pow(10, fractionDigits)).toFixed(fractionDigits);
+				return await braintreeClient.refundPayment(interfaceId, amount);
 			}
 			case "cancel": {
 				const braintreeClient = BraintreeClient.getInstance();
@@ -447,7 +452,10 @@ export class BraintreePaymentService extends AbstractPaymentService {
 				} else {
 					// transactionType === "Charge"
 					const braintreeClient = BraintreeClient.getInstance();
-					return await braintreeClient.refundPayment(interfaceId);
+					const centAmount = (request as RefundPaymentRequest).amount?.centAmount;
+					const fractionDigits = (request as RefundPaymentRequest).amount?.fractionDigits;
+					const amount = (centAmount / Math.pow(10, fractionDigits)).toFixed(fractionDigits);
+					return await braintreeClient.refundPayment(interfaceId, amount);
 				}
 			}
 			default: {
