@@ -108,7 +108,7 @@ const createCheckout = async function () {
 						}),
 			});
 
-			component.mount(braintreeContainerId);
+			component.mount(`#${braintreeContainerId}`);
 		});
 	} else {
 		console.error('Cannot create checkout component, element with ID "createCheckout" not found.');
