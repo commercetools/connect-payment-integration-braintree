@@ -22,7 +22,7 @@ import { ErrorGeneral } from "@commercetools/connect-payments-sdk";
 export class BraintreeClient {
 	private braintreeGateway: braintree.BraintreeGateway;
 	private static instance: BraintreeClient;
-
+	private static readonly BNCode = "commercetools_BT_XO_CT"; // Braintree channel code for Commercetools
 	private constructor() {
 		const config = getConfig();
 		this.braintreeGateway = new braintree.BraintreeGateway({
@@ -80,7 +80,11 @@ export class BraintreeClient {
 	public async createPayment(request: TransactionRequest): Promise<ValidatedResponse<Transaction>> {
 		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 		try {
-			btResponse = await this.braintreeGateway.transaction.sale(request);
+			const requestWithChannel: TransactionRequest = {
+				...request,
+				channel: BraintreeClient.BNCode,
+			};
+			btResponse = await this.braintreeGateway.transaction.sale(requestWithChannel);
 
 			// If the transaction is not present, it means no transaction status is returned and no transaction will be saved to CoCo
 			if (!btResponse.success && !btResponse.transaction) {
