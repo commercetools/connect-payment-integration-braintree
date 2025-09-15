@@ -38,10 +38,6 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
 		const { clientToken, paymentReference } = await BraintreePaymentEnabler.getBraintreeToken(options);
 
-		const sdkOptions = {
-			environment: "test",
-		};
-
 		const braintreeClient: Client = await client.create({
 			authorization: clientToken,
 		});
@@ -51,7 +47,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 				sdk: braintreeClient,
 				processorUrl: options.processorUrl,
 				sessionId: options.sessionId,
-				environment: sdkOptions.environment,
+				// environment: sdkOptions.environment,
 				paymentReference,
 				onComplete: options.onComplete || (() => {}),
 				onError: options.onError || (() => {}),
