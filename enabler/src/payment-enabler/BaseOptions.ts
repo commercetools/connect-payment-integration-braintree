@@ -8,7 +8,6 @@ export type BaseOptions = {
 	sdk: Client;
 	processorUrl: string;
 	sessionId: string;
-	locale?: string;
 	paymentReference?: string;
 	onComplete: (result: PaymentResult) => void;
 	onError: (error?: any) => void;

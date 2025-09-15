@@ -13,6 +13,25 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		this.setupData = BraintreePaymentEnabler._Setup(options);
 	}
 
+	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
+		const { clientToken, paymentReference } = await BraintreePaymentEnabler.getBraintreeToken(options);
+
+		const braintreeClient: Client = await client.create({
+			authorization: clientToken,
+		});
+
+		return {
+			baseOptions: {
+				sdk: braintreeClient,
+				processorUrl: options.processorUrl,
+				sessionId: options.sessionId,
+				paymentReference,
+				onComplete: options.onComplete || (() => {}),
+				onError: options.onError || (() => {}),
+			},
+		};
+	};
+
 	private static getBraintreeToken = async (
 		options: EnablerOptions,
 	): Promise<{ clientToken: string; paymentReference: string }> => {
@@ -33,26 +52,6 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 
 		const initResponse: { clientToken: string; paymentReference: string } = await response.json();
 		return { clientToken: initResponse.clientToken, paymentReference: initResponse.paymentReference };
-	};
-
-	private static _Setup = async (options: EnablerOptions): Promise<{ baseOptions: BaseOptions }> => {
-		const { clientToken, paymentReference } = await BraintreePaymentEnabler.getBraintreeToken(options);
-
-		const braintreeClient: Client = await client.create({
-			authorization: clientToken,
-		});
-
-		return {
-			baseOptions: {
-				sdk: braintreeClient,
-				processorUrl: options.processorUrl,
-				sessionId: options.sessionId,
-				// environment: sdkOptions.environment,
-				paymentReference,
-				onComplete: options.onComplete || (() => {}),
-				onError: options.onError || (() => {}),
-			},
-		};
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
