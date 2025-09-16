@@ -52,56 +52,43 @@ export class Card extends BaseComponent {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
 
-		function findLabel(field: HostedFieldsHostedFieldsFieldData): Element | null {
-			return document.querySelector(`.hosted-field--label[for="${field.container.id}"]`);
-		}
-
 		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-
-			const label = findLabel(field);
-			if (label) {
-				label.classList.add("label-float");
-				label.classList.remove("filled");
-			}
+			field.container.classList.add("label-float");
+			field.container.classList.remove("filled");
 		});
 		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-			var label = findLabel(field);
 
-			if (label && field.isEmpty) {
-				label.classList.remove("label-float");
-			} else if (label && field.isValid) {
-				label.classList.add("filled");
-			} else if (label) {
-				label.classList.add("invalid");
+			if (field.isEmpty) {
+				field.container.classList.remove("label-float");
+			} else if (field.isValid) {
+				field.container.classList.add("filled");
+			} else {
+				field.container.classList.add("is-invalid");
 			}
 		});
 
 		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-			var label = findLabel(field);
-			if (label) {
-				label.classList.remove("filled");
-				label.classList.remove("invalid");
-			}
+			field.container.classList.remove("filled");
+			field.container.classList.remove("is-invalid");
 		});
 
 		this.hostedFieldsInstance.on("validityChange", function (event) {
 			var field = event.fields[event.emittedBy];
-			var label = findLabel(field);
-
-			if (label && field.isPotentiallyValid) {
-				label.classList.remove("invalid");
-			} else if (label) {
-				label.classList.add("invalid");
+			if (field.isValid) {
+				field.container.classList.remove("is-invalid");
+			} else {
+				field.container.classList.add("is-invalid");
 			}
 		});
 
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();
-				this.submit();
+				// this.submit();
+				this.showValidation();
 			});
 		}
 	}
@@ -153,6 +140,21 @@ export class Card extends BaseComponent {
 		}
 	}
 
+	async showValidation(): Promise<void> {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
+		Object.keys(state.fields).forEach((key) => {
+			const field = state.fields[key as keyof typeof state.fields];
+			if (!field.isValid) {
+				field.container.classList.add("is-invalid");
+			} else {
+				field.container.classList.remove("is-invalid");
+			}
+		});
+	}
+
 	async isValid(): Promise<boolean> {
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
@@ -168,11 +170,12 @@ export class Card extends BaseComponent {
 		}
 		var result = this.hostedFieldsInstance.getState();
 		const state = {
-			card: {
-				brand: result.cards[0]?.type,
-			},
+			card: result.cards[0]
+				? {
+						brand: result.cards[0]?.type,
+					}
+				: undefined,
 		};
-		console.log("Current state: ", result);
 		return state;
 	}
 
