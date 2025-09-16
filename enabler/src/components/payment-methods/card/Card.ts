@@ -1,13 +1,14 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
+import { type Client, hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
 import type {
 	HostedFieldsHostedFieldsFieldData,
 	HostedFieldsState,
 	HostedFieldsTokenizePayload,
 } from "braintree-web/hosted-fields";
+
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -57,6 +58,7 @@ export class Card extends BaseComponent {
 			field.container.classList.add("label-float");
 			field.container.classList.remove("filled");
 		});
+
 		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 
@@ -87,8 +89,7 @@ export class Card extends BaseComponent {
 		if (this.showPayButton) {
 			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
 				e.preventDefault();
-				// this.submit();
-				this.showValidation();
+				this.submit();
 			});
 		}
 	}
@@ -147,10 +148,10 @@ export class Card extends BaseComponent {
 		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
 		Object.keys(state.fields).forEach((key) => {
 			const field = state.fields[key as keyof typeof state.fields];
-			if (!field.isValid) {
-				field.container.classList.add("is-invalid");
+			if (field.isValid) {
+				field.container.classList.add("is-valid");
 			} else {
-				field.container.classList.remove("is-invalid");
+				field.container.classList.add("is-invalid");
 			}
 		});
 	}
@@ -177,6 +178,13 @@ export class Card extends BaseComponent {
 				: undefined,
 		};
 		return state;
+	}
+
+	async isAvailable(): Promise<boolean> {
+		const client: Client = this.sdk;
+		const configuration = client.getConfiguration();
+		const cardEnabled = configuration.gatewayConfiguration.creditCards ? true : false;
+		return Promise.resolve(cardEnabled);
 	}
 
 	private _getTemplate() {

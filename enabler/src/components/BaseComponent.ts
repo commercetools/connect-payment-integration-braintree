@@ -37,6 +37,4 @@ export abstract class BaseComponent implements PaymentComponent {
 	abstract submit(): void;
 
 	abstract mount(selector: string): void;
-
-	isAvailable?(): Promise<boolean>;
 }
