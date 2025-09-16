@@ -38,14 +38,5 @@ export abstract class BaseComponent implements PaymentComponent {
 
 	abstract mount(selector: string): void;
 
-	showValidation?(): void;
-	isValid?(): boolean;
-	getState?(): {
-		card?: {
-			endDigits?: string;
-			brand?: string;
-			expiryDate?: string;
-		};
-	};
 	isAvailable?(): Promise<boolean>;
 }

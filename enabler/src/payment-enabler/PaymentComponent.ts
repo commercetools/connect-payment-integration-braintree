@@ -22,7 +22,7 @@ export interface PaymentComponent {
 	 * Checks if the payment component is valid.
 	 * @returns A boolean indicating whether the payment component is valid.
 	 */
-	isValid?(): boolean;
+	isValid?(): Promise<boolean>;
 
 	/**
 	 * Gets the state of the payment component.

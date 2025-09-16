@@ -3,7 +3,11 @@ import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentRes
 import { BaseComponent } from "../../BaseComponent";
 import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
-import type { HostedFieldsHostedFieldsFieldData, HostedFieldsTokenizePayload } from "braintree-web/hosted-fields";
+import type {
+	HostedFieldsHostedFieldsFieldData,
+	HostedFieldsState,
+	HostedFieldsTokenizePayload,
+} from "braintree-web/hosted-fields";
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -148,6 +152,30 @@ export class Card extends BaseComponent {
 			this.onError(error);
 		}
 	}
+
+	async isValid(): Promise<boolean> {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
+		// state fields is an array containing [number, cvv, expirationDate, cardholderName]
+		return Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid);
+	}
+
+	async getState() {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var result = this.hostedFieldsInstance.getState();
+		const state = {
+			card: {
+				brand: result.cards[0]?.type,
+			},
+		};
+		console.log("Current state: ", result);
+		return state;
+	}
+
 	private _getTemplate() {
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
