@@ -55,6 +55,7 @@ Setup correct environment variables: check `processor/src/config/config.ts` for 
 Make sure commercetools client credential have at least the following permissions:
 
 * `manage_payments`
+* `manage_orders`
 * `manage_checkout_payment_intents`
 * `view_sessions`
 * `introspect_oauth_tokens`
@@ -104,7 +105,7 @@ In order to make easy running the application locally, following commands help t
 
 ####Set environment variable to point to the jwksUrl
 ```
-export CTP_JWKS_URL="http://localhost:9000/jwt/.well-known/jwks.json"
+export CTP_JWKS_URL="http://localhost:9002/jwt/.well-known/jwks.json"
 ```
 ####Run the jwt server
 ```
@@ -114,7 +115,7 @@ docker compose up -d
 ####Obtain JWT
 ```
 # Request token
-curl --location 'http://localhost:9000/jwt/token' \
+curl --location 'http://localhost:9002/jwt/token' \
 --header 'Content-Type: application/json' \
 --data '{
     "iss": "https://mc-api.europe-west1.gcp.commercetools.com",
@@ -166,7 +167,15 @@ The request body contains following attributes
 - paymentReference: It represents the unique identifier of payment resource created in composable commerce platform.
 
 #### Response Parameters
-- TBC
+
+The response body contains following attributes
+- id: The unique identifier of the commercetools payment created.
+- success: The successity of create transaction in Braintree platform.
+- message: Optional. It represents the message returned from Braintree response.
+- paymentReference: Identifier of Braintree transaction.
+- additionalProcessorResponse: Optional. It represents the raw response of Braintree processor.
+- amount: The transaction amount created.
+- status: The status of the Braintree transaction.
 
 ### Get supported payment components
 
@@ -208,12 +217,14 @@ N/A
 
 #### Response Parameters
 
-It returns an object with `clientKey` and `environment` as key-value pair as below:
+It returns an object with `merchantId`, `merchantAccountId`, `publicKey`, `environment` as below:
 
 ```
 {
-  clientKey: <clientKey>,
   environment: <environment>,
+  merchantId: <merchantId>,
+  merchantAccountId: <merchantAccountId>,
+	publicKey: <publicKey>
 }
 ```
 
@@ -276,6 +287,7 @@ The request payload is different based on different update operations:
 
   - centAmount: Amount in the smallest indivisible unit of a currency. For example, 5 EUR is specified as 500 while 5 JPY is specified as 5.
   - currencyCode: Currency code compliant to [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
+  - fractionDigits: The number of default fraction digits for the given currency, like 2 for EUR or 0 for JPY.
 
   ```
   {
@@ -283,7 +295,8 @@ The request payload is different based on different update operations:
           action: "capturePayment",
           amount: {
               centAmount: <amount>,
-              currencyCode: <currecy code>
+              currencyCode: <currecy code>,
+              fractionDigits: <fraction digit>
           }
       }]
   }
@@ -293,6 +306,7 @@ The request payload is different based on different update operations:
 
   - centAmount: Amount in the smallest indivisible unit of a currency. For example, 5 EUR is specified as 500 while 5 JPY is specified as 5.
   - currencyCode: Currency code compliant to [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
+  - fractionDigits: The number of default fraction digits for the given currency, like 2 for EUR or 0 for JPY.
 
   ```
   {
@@ -300,7 +314,9 @@ The request payload is different based on different update operations:
           action: "refundPayment",
           amount: {
               centAmount: <amount>,
-              currencyCode: <currecy code>
+              currencyCode: <currecy code>,
+              fractionDigits: <fraction digit>
+          
           }
       }]
   }
@@ -310,7 +326,8 @@ The request payload is different based on different update operations:
 
 ```
 {
-    outcome: "approved|rejected|received"
+    outcome: "approved|rejected|received",
+    pspReference: <identifier of transaction from PSP>
 }
 
 ```

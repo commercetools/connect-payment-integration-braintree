@@ -3,7 +3,7 @@ import { getConfig } from "./getConfig";
 const config = getConfig();
 
 export const fetchAccessToken = async function (): Promise<string> {
-	const tokenResponse = await fetch("http://localhost:9000/jwt/token", {
+	const tokenResponse = await fetch("http://localhost:9002/jwt/token", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",

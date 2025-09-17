@@ -78,6 +78,7 @@ describe("BraintreeClient", () => {
 			expect(response).toEqual(mockResponse);
 			expect(mockGateway.transaction.sale).toHaveBeenCalledWith({
 				amount: "100.00",
+				channel: "commercetools_BT_XO_CT",
 				paymentMethodNonce: "nonce-123",
 				options: { submitForSettlement: false },
 			});

@@ -13,7 +13,7 @@ This repository provides a [connect](https://docs.commercetools.com/connect) for
 ## Important Notes
 
 ### Merchant Account Configuration
-- Each connect deployment supports only one Braintree merchant account.
+- Each connect deployment supports only one Braintree merchant account with single specific currency.
 - Cart currency is validated against the Braintree merchant account currency during:
   - Payment session initialization
   - Payment creation
@@ -22,8 +22,8 @@ This repository provides a [connect](https://docs.commercetools.com/connect) for
 Our payment connector submits requests for various payment operations to Braintree. Since the payment capture and refund operations are asynchronous in Braintree (Payment reversal is also asynchronous in case the payment has been captured), the most up-to-date status of these operations reside in the Braintree platform, not in commercetools payment transactions.
 
 **Note for Merchants**: 
-- The transaction status indicates whether payment capture/refund requests can be delivered to to Braintree platform.
-- Merchants are suggested to implement their own mechanism to fetch the latest capture/refund status from Braintree after submission.
+- The transaction status in commercetools payment indicates whether payment capture/refund requests can be delivered to to Braintree platform.
+- Merchants are suggested to send request directly to the Braintree platform in case it is necessaary to know the latest capture/refund processing status.
 
 ## Prerequisite
 
