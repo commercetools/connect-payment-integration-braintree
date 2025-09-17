@@ -15,11 +15,6 @@ export type EnablerOptions = {
 	sessionId: string;
 
 	/**
-	 * The locale for the payment.
-	 */
-	locale?: string;
-
-	/**
 	 * The currency of the payment.
 	 */
 	currency?: string;
