@@ -187,7 +187,7 @@ export class Card extends BaseComponent {
 		return Promise.resolve(cardEnabled);
 	}
 
-	private _mapCardBrandType(brand: string): string | undefined {
+	private _mapCardBrandType(brand: string): string {
 		switch (brand) {
 			case "visa":
 				return "Visa";
