@@ -48,18 +48,18 @@ describe("BraintreeClient", () => {
 			const mockResponse = { success: true, clientToken: "test-token" };
 			mockGateway.clientToken.generate.mockResolvedValue(mockResponse);
 
-			const response = await client.initiateSession("customer-123");
+			const response = await client.initiateSession();
 
 			expect(response).toEqual(mockResponse);
-			expect(mockGateway.clientToken.generate).toHaveBeenCalledWith({ customerId: "customer-123" });
+			expect(mockGateway.clientToken.generate).toHaveBeenCalledWith({});
 		});
 
 		it("should throw a BraintreeApiError on failure", async () => {
 			const mockError = new Error("Error generating Braintree client token.");
 			mockGateway.clientToken.generate.mockRejectedValue(mockError);
 
-			await expect(client.initiateSession("customer-123")).rejects.toThrow("Unknown error.");
-			await expect(client.initiateSession("customer-123")).rejects.toBeInstanceOf(ErrorGeneral);
+			await expect(client.initiateSession()).rejects.toThrow("Unknown error.");
+			await expect(client.initiateSession()).rejects.toBeInstanceOf(ErrorGeneral);
 		});
 	});
 
@@ -101,10 +101,10 @@ describe("BraintreeClient", () => {
 			const mockResponse = { success: true, transaction: mockTransaction };
 			mockGateway.transaction.refund.mockResolvedValue(mockResponse);
 
-			const response = await client.refundPayment("txn-123");
+			const response = await client.refundPayment("txn-123", "1234.00");
 
 			expect(response).toEqual(mockResponse);
-			expect(mockGateway.transaction.refund).toHaveBeenCalledWith("txn-123");
+			expect(mockGateway.transaction.refund).toHaveBeenCalledWith("txn-123", "1234.00");
 		});
 
 		it("should throw a BraintreeApiError if refund fails", async () => {
@@ -141,10 +141,10 @@ describe("BraintreeClient", () => {
 			const mockResponse = { success: true, transaction: mockTransaction };
 			mockGateway.transaction.submitForSettlement.mockResolvedValue(mockResponse);
 
-			const response = await client.capturePayment("txn-123");
+			const response = await client.capturePayment("txn-123", "1234.00");
 
 			expect(response).toEqual(mockResponse);
-			expect(mockGateway.transaction.submitForSettlement).toHaveBeenCalledWith("txn-123");
+			expect(mockGateway.transaction.submitForSettlement).toHaveBeenCalledWith("txn-123", "1234.00");
 		});
 
 		it("should throw a BraintreeApiError if capture fails", async () => {

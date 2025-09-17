@@ -22,7 +22,7 @@ import { ErrorGeneral } from "@commercetools/connect-payments-sdk";
 export class BraintreeClient {
 	private braintreeGateway: braintree.BraintreeGateway;
 	private static instance: BraintreeClient;
-
+	private static readonly BNCode = "commercetools_BT_XO_CT"; // Braintree channel code for Commercetools
 	private constructor() {
 		const config = getConfig();
 		this.braintreeGateway = new braintree.BraintreeGateway({
@@ -65,11 +65,9 @@ export class BraintreeClient {
 		}
 	}
 
-	public async initiateSession(customerId?: string): Promise<ValidatedResponse<ClientToken>> {
+	public async initiateSession(): Promise<ValidatedResponse<ClientToken>> {
 		try {
-			const response = await this.braintreeGateway.clientToken.generate({
-				customerId,
-			});
+			const response = await this.braintreeGateway.clientToken.generate({});
 			return response;
 		} catch (e: any) {
 			logger.error(`Error generating Braintree client token.`, {
@@ -82,7 +80,11 @@ export class BraintreeClient {
 	public async createPayment(request: TransactionRequest): Promise<ValidatedResponse<Transaction>> {
 		let btResponse: braintree.ValidatedResponse<braintree.Transaction>;
 		try {
-			btResponse = await this.braintreeGateway.transaction.sale(request);
+			const requestWithChannel: TransactionRequest = {
+				...request,
+				channel: BraintreeClient.BNCode,
+			};
+			btResponse = await this.braintreeGateway.transaction.sale(requestWithChannel);
 
 			// If the transaction is not present, it means no transaction status is returned and no transaction will be saved to CoCo
 			if (!btResponse.success && !btResponse.transaction) {
@@ -90,13 +92,14 @@ export class BraintreeClient {
 					status: 500,
 					name: "TransactionError",
 					type: "TransactionError",
+					message: btResponse.message,
 				};
 				throw new BraintreeApiError(errorData, {
 					privateMessage: btResponse.message,
 					cause: btResponse.errors ? btResponse.errors : undefined,
 				});
 			}
-			return btResponse;
+			return btResponse; // if it is not successful but transaction exists, it will be save to CoCo as failed transaction in CoCo payment
 		} catch (e: any) {
 			logger.error(`Error creating Braintree transaction.`, {
 				error: e,
@@ -105,10 +108,12 @@ export class BraintreeClient {
 		}
 	}
 
-	public async refundPayment(interactionId: string): Promise<ValidatedResponse<Transaction>> {
+	public async refundPayment(interactionId: string, amount?: string): Promise<ValidatedResponse<Transaction>> {
 		try {
-			const refundResult: ValidatedResponse<Transaction> =
-				await this.braintreeGateway.transaction.refund(interactionId);
+			const refundResult: ValidatedResponse<Transaction> = await this.braintreeGateway.transaction.refund(
+				interactionId,
+				amount,
+			);
 			if (!refundResult.success && !refundResult.transaction) {
 				const errorData = {
 					status: 500,
@@ -153,10 +158,10 @@ export class BraintreeClient {
 		}
 	}
 
-	public async capturePayment(interactionId: string): Promise<ValidatedResponse<Transaction>> {
+	public async capturePayment(interactionId: string, amount?: string): Promise<ValidatedResponse<Transaction>> {
 		try {
 			const captureResult: ValidatedResponse<Transaction> =
-				await this.braintreeGateway.transaction.submitForSettlement(interactionId);
+				await this.braintreeGateway.transaction.submitForSettlement(interactionId, amount);
 			if (!captureResult.success && !captureResult.transaction) {
 				const errorData = {
 					status: 500,

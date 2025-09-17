@@ -42,8 +42,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "34.57",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},
@@ -57,8 +55,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "8000000",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},
@@ -71,8 +67,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 		});
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "0.01",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},
@@ -93,8 +87,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "345.7",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},
@@ -108,8 +100,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "80000000",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},
@@ -122,8 +112,6 @@ describe("mapCtTotalPriceToBraintreeAmount", () => {
 		});
 		expect(mapToBraintreeCreatePaymentRequest(cart, nonce)).toStrictEqual({
 			amount: "0.1",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: {
 				submitForSettlement: false,
 			},

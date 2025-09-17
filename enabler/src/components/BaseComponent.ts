@@ -20,7 +20,6 @@ export abstract class BaseComponent implements PaymentComponent {
 	protected sdk: Client;
 	protected processorUrl: BaseOptions["processorUrl"];
 	protected sessionId: BaseOptions["sessionId"];
-	protected environment: BaseOptions["environment"];
 	protected paymentReference?: BaseOptions["paymentReference"];
 	protected onComplete: (result: PaymentResult) => void;
 	protected onError: (error?: any) => void;
@@ -30,7 +29,6 @@ export abstract class BaseComponent implements PaymentComponent {
 		this.sdk = baseOptions.sdk;
 		this.processorUrl = baseOptions.processorUrl;
 		this.sessionId = baseOptions.sessionId;
-		this.environment = baseOptions.environment;
 		this.paymentReference = baseOptions.paymentReference;
 		this.onComplete = baseOptions.onComplete;
 		this.onError = baseOptions.onError;
@@ -39,15 +37,4 @@ export abstract class BaseComponent implements PaymentComponent {
 	abstract submit(): void;
 
 	abstract mount(selector: string): void;
-
-	showValidation?(): void;
-	isValid?(): boolean;
-	getState?(): {
-		card?: {
-			endDigits?: string;
-			brand?: string;
-			expiryDate?: string;
-		};
-	};
-	isAvailable?(): Promise<boolean>;
 }

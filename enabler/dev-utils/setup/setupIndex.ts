@@ -89,26 +89,26 @@ const createCheckout = async function () {
 			let component: PaymentComponent;
 
 			const componentBuilder = await braintreeEnabler.createComponentBuilder(selectedPaymentMethod);
-				component = componentBuilder.build({
-					showPayButton: !componentBuilder.componentHasSubmit,
-					...(componentBuilder.componentHasSubmit
-						? {}
-						: {
-								onPayButtonClick: async () => {
-									// to be used for validation
-									const termsChecked = (document.getElementById("termsCheckbox") as HTMLInputElement)
-										?.checked;
-									if (!termsChecked) {
-										event.preventDefault();
-										alert("You must agree to the terms and conditions.");
-										return Promise.reject("error-occurred");
-									}
-									return Promise.resolve(); // change to true, to test payment flow
-								},
-							}),
-				});
-			
-			component.mount(braintreeContainerId);
+			component = componentBuilder.build({
+				showPayButton: !componentBuilder.componentHasSubmit,
+				...(componentBuilder.componentHasSubmit
+					? {}
+					: {
+							onPayButtonClick: async () => {
+								// to be used for validation
+								const termsChecked = (document.getElementById("termsCheckbox") as HTMLInputElement)
+									?.checked;
+								if (!termsChecked) {
+									event.preventDefault();
+									alert("You must agree to the terms and conditions.");
+									return Promise.reject("error-occurred");
+								}
+								return Promise.resolve(); // change to true, to test payment flow
+							},
+						}),
+			});
+
+			component.mount(`#${braintreeContainerId}`);
 		});
 	} else {
 		console.error('Cannot create checkout component, element with ID "createCheckout" not found.');

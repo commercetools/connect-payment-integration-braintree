@@ -4,5 +4,4 @@
 export enum PaymentMethod {
 	/* Card */
 	card = "card",
-	
 }

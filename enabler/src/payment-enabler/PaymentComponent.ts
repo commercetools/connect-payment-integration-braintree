@@ -16,25 +16,23 @@ export interface PaymentComponent {
 	/**
 	 * Shows the validation for the payment component.
 	 */
-	showValidation?(): void;
+	showValidation?(): Promise<void>;
 
 	/**
 	 * Checks if the payment component is valid.
 	 * @returns A boolean indicating whether the payment component is valid.
 	 */
-	isValid?(): boolean;
+	isValid?(): Promise<boolean>;
 
 	/**
 	 * Gets the state of the payment component.
 	 * @returns An object representing the state of the payment component.
 	 */
-	getState?(): {
+	getState?(): Promise<{
 		card?: {
-			endDigits?: string;
-			brand?: string;
-			expiryDate?: string;
+			brand: string;
 		};
-	};
+	}>;
 
 	/**
 	 * Checks if the payment component is available for use.

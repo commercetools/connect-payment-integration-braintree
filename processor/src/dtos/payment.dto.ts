@@ -2,13 +2,9 @@ import { Type, Static } from "@sinclair/typebox";
 
 export enum PaymentMethodType {
 	CARD = "card",
-	INVOICE = "invoice",
-	PURCHASE_ORDER = "purchaseorder",
 }
 
-export const BraintreeInitRequestSchema = Type.Object({
-	customerId: Type.Optional(Type.String()),
-});
+export const BraintreeInitRequestSchema = Type.Object({});
 
 export type BraintreeInitRequestSchemaDTO = Static<typeof BraintreeInitRequestSchema>;
 
@@ -22,6 +18,7 @@ export type BraintreeInitResponseSchemaDTO = Static<typeof BraintreeInitResponse
 export const CreatePaymentResponseSchema = Type.Object({
 	id: Type.String(),
 	success: Type.Boolean(),
+	message: Type.Optional(Type.String()),
 	paymentReference: Type.Optional(Type.String()),
 	additionalProcessorResponse: Type.String(),
 	amount: Type.String(),

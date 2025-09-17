@@ -243,8 +243,6 @@ describe(BraintreePaymentService.name, () => {
 		});
 		const expectedCreatePaymentRequest = {
 			amount: "1500",
-			billing: undefined,
-			merchantAccountId: "xxx",
 			options: { submitForSettlement: false },
 			paymentMethodNonce: "dummy-nonce",
 		};

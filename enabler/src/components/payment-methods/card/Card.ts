@@ -1,9 +1,14 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
+import { type Client, hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
-import type { HostedFieldsHostedFieldsFieldData, HostedFieldsTokenizePayload } from "braintree-web/hosted-fields";
+import type {
+	HostedFieldsHostedFieldsFieldData,
+	HostedFieldsState,
+	HostedFieldsTokenizePayload,
+} from "braintree-web/hosted-fields";
+
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
@@ -13,7 +18,11 @@ export class Card extends BaseComponent {
 	}
 
 	async mount(containerId: string) {
-		document.getElementById(containerId)!.insertAdjacentHTML("afterbegin", this._getTemplate());
+		const container = document.querySelector(containerId);
+		if (!container) {
+			throw new Error(`Container with selector "${containerId}" not found`);
+		}
+		container.insertAdjacentHTML("afterbegin", this._getTemplate());
 		this.hostedFieldsInstance = await hostedFields.create({
 			client: this.sdk,
 			styles: {
@@ -44,49 +53,36 @@ export class Card extends BaseComponent {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
 
-		function findLabel(field: HostedFieldsHostedFieldsFieldData): Element | null {
-			return document.querySelector(`.hosted-field--label[for="${field.container.id}"]`);
-		}
-
 		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-
-			const label = findLabel(field);
-			if (label) {
-				label.classList.add("label-float");
-				label.classList.remove("filled");
-			}
+			field.container.classList.add("label-float");
+			field.container.classList.remove("filled");
 		});
+
 		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-			var label = findLabel(field);
 
-			if (label && field.isEmpty) {
-				label.classList.remove("label-float");
-			} else if (label && field.isValid) {
-				label.classList.add("filled");
-			} else if (label) {
-				label.classList.add("invalid");
+			if (field.isEmpty) {
+				field.container.classList.remove("label-float");
+			} else if (field.isValid) {
+				field.container.classList.add("filled");
+			} else {
+				field.container.classList.add("is-invalid");
 			}
 		});
 
 		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
-			var label = findLabel(field);
-			if (label) {
-				label.classList.remove("filled");
-				label.classList.remove("invalid");
-			}
+			field.container.classList.remove("filled");
+			field.container.classList.remove("is-invalid");
 		});
 
 		this.hostedFieldsInstance.on("validityChange", function (event) {
 			var field = event.fields[event.emittedBy];
-			var label = findLabel(field);
-
-			if (label && field.isPotentiallyValid) {
-				label.classList.remove("invalid");
-			} else if (label) {
-				label.classList.add("invalid");
+			if (field.isValid) {
+				field.container.classList.remove("is-invalid");
+			} else {
+				field.container.classList.add("is-invalid");
 			}
 		});
 
@@ -125,24 +121,98 @@ export class Card extends BaseComponent {
 				},
 				body: JSON.stringify(request),
 			});
+
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
-			console.log("Payment response:", createPaymentResponse);
-
-			const paymentResult: PaymentResult = {
-				paymentReference: createPaymentResponse.paymentReference ?? "",
-				isSuccess: createPaymentResponse.success ? true : false,
-			};
+			const paymentResult: PaymentResult = createPaymentResponse.success
+				? {
+						isSuccess: true,
+						paymentReference: createPaymentResponse.paymentReference ?? "",
+					}
+				: {
+						isSuccess: false,
+						paymentReference: createPaymentResponse.paymentReference ?? "",
+						message: createPaymentResponse.message ?? "",
+					};
 			await this.hostedFieldsInstance.teardown();
-
 			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
 			console.error("Error creating payment");
 			this.onError(error);
 		}
 	}
+
+	async showValidation(): Promise<void> {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
+		Object.keys(state.fields).forEach((key) => {
+			const field = state.fields[key as keyof typeof state.fields];
+			if (field.isValid) {
+				field.container.classList.add("is-valid");
+			} else {
+				field.container.classList.add("is-invalid");
+			}
+		});
+	}
+
+	async isValid(): Promise<boolean> {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
+		// state fields is an array containing [number, cvv, expirationDate, cardholderName]
+		return Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid);
+	}
+
+	async getState() {
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
+		}
+		var result = this.hostedFieldsInstance.getState();
+		const state = {
+			card: result.cards[0]
+				? {
+						brand: this._mapCardBrandType(result.cards[0].type),
+					}
+				: undefined,
+		};
+		return state;
+	}
+
+	async isAvailable(): Promise<boolean> {
+		const client: Client = this.sdk;
+		const configuration = client.getConfiguration();
+		const cardEnabled = configuration.gatewayConfiguration.creditCards ? true : false;
+		return Promise.resolve(cardEnabled);
+	}
+
+	private _mapCardBrandType(brand: string): string {
+		switch (brand) {
+			case "visa":
+				return "Visa";
+			case "master-card":
+				return "Mastercard";
+			case "maestro":
+				return "Maestro";
+			case "american-express":
+				return "Amex";
+			case "discover":
+				return "Discover";
+			case "jcb":
+				return "Jcb";
+			case "diners-club":
+				return "Diners";
+			case "unionpay":
+				return "UnionPay";
+			default:
+				return "Unknown";
+		}
+	}
+
 	private _getTemplate() {
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
-				
+				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 				<style>
 					.form-control {
 						height: calc(1.5em + .75rem + 2px);

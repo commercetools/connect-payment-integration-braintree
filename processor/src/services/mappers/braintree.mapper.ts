@@ -1,7 +1,6 @@
 import { Address, Cart, TransactionState } from "@commercetools/connect-payments-sdk";
 import { PaymentAmount } from "@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type";
 import { type TransactionRequest, TransactionStatus } from "braintree";
-import { getConfig } from "../../dev-utils/getConfig";
 
 export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatus, success: boolean): TransactionState {
 	switch (resultCode) {
@@ -32,15 +31,19 @@ export const mapBraintreeToCtResultCode = function (resultCode: TransactionStatu
 };
 
 export const mapToBraintreeCreatePaymentRequest = (cart: Cart, nonce: string): TransactionRequest => {
-	return {
+	const billing = mapBillingAddress(cart.billingAddress);
+	const request: TransactionRequest = {
 		amount: mapCtPaymentAmountToBraintreeAmount(cart.totalPrice),
-		billing: mapBillingAddress(cart.billingAddress),
-		merchantAccountId: getConfig().braintreeMerchantId,
+		// merchantAccountId: getConfig().braintreeMerchantId,
 		paymentMethodNonce: nonce,
 		options: {
 			submitForSettlement: false,
 		},
 	};
+	if (billing) {
+		request.billing = billing;
+	}
+	return request;
 };
 
 export const mapCtPaymentAmountToBraintreeAmount = (amountPlanned: PaymentAmount): string => {
