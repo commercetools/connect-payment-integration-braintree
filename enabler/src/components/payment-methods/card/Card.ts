@@ -173,7 +173,7 @@ export class Card extends BaseComponent {
 		const state = {
 			card: result.cards[0]
 				? {
-						brand: result.cards[0]?.type,
+						brand: this._mapCardBrandType(result.cards[0].type),
 					}
 				: undefined,
 		};
@@ -185,6 +185,29 @@ export class Card extends BaseComponent {
 		const configuration = client.getConfiguration();
 		const cardEnabled = configuration.gatewayConfiguration.creditCards ? true : false;
 		return Promise.resolve(cardEnabled);
+	}
+
+	private _mapCardBrandType(brand: string): string | undefined {
+		switch (brand) {
+			case "visa":
+				return "Visa";
+			case "master-card":
+				return "Mastercard";
+			case "maestro":
+				return "Maestro";
+			case "american-express":
+				return "Amex";
+			case "discover":
+				return "Discover";
+			case "jcb":
+				return "Jcb";
+			case "diners-club":
+				return "Diners";
+			case "unionpay":
+				return "UnionPay";
+			default:
+				return "Unknown";
+		}
 	}
 
 	private _getTemplate() {
