@@ -1,7 +1,7 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { type Client, hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
+import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
 import type {
 	HostedFieldsHostedFieldsFieldData,
@@ -123,7 +123,6 @@ export class Card extends BaseComponent {
 			});
 
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
-			console.log(createPaymentResponse)
 			const paymentResult: PaymentResult = createPaymentResponse.success
 				? {
 						isSuccess: true,
@@ -134,7 +133,7 @@ export class Card extends BaseComponent {
 						paymentReference: createPaymentResponse.paymentReference ?? "",
 						message: createPaymentResponse.message ?? "",
 					};
-			
+
 			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
 			console.error("Error creating payment");
