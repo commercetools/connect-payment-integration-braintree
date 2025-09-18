@@ -51,6 +51,8 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		return {
 			environment: getConfig().braintreeEnvironment,
 			merchantId: getConfig().braintreeMerchantId,
+			merchantAccountId: getConfig().braintreeMerchantAccountId,
+			publicKey: getConfig().braintreePublicKey,
 		};
 	}
 
@@ -281,21 +283,13 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		});
 
 		return {
-			id: btResponse.transaction.id,
+			id: updatedPayment.id,
 			success: btResponse.success,
 			status: btResponse.transaction.status,
-			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse,
+			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse ?? undefined,
 			amount: btResponse.transaction.amount,
-			paymentReference: updatedPayment.id,
+			paymentReference: btResponse.transaction.id,
 			message: btResponse.message ?? undefined,
-			statusHistory:
-				btResponse.transaction.statusHistory?.map((history: any) => ({
-					amount: history.amount,
-					status: history.status,
-					timestamp: history.timestamp,
-					transactionSource: history.transactionSource,
-					user: history.user,
-				})) ?? undefined,
 		};
 	}
 
