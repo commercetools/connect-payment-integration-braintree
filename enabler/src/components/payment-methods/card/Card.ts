@@ -184,10 +184,7 @@ export class Card extends BaseComponent {
 	}
 
 	async isAvailable(): Promise<boolean> {
-		const client: Client = this.sdk;
-		const configuration = client.getConfiguration();
-		const cardEnabled = configuration.gatewayConfiguration.creditCards ? true : false;
-		return Promise.resolve(cardEnabled);
+		return Promise.resolve(true);
 	}
 
 	private _mapCardBrandType(brand: string): string {
