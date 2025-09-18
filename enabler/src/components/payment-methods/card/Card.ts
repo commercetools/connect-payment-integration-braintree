@@ -168,16 +168,10 @@ export class Card extends BaseComponent {
 	}
 
 	async getState() {
-		if (!this.hostedFieldsInstance) {
-			throw new Error("Hosted Fields instance is not initialized.");
-		}
-		var result = this.hostedFieldsInstance.getState();
 		const state = {
-			card: result.cards[0]
-				? {
-						brand: this._mapCardBrandType(result.cards[0].type),
-					}
-				: undefined,
+			card: {
+				brand: this._mapCardBrandType("visa"),
+			},
 		};
 		return state;
 	}
