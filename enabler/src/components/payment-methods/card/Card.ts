@@ -162,11 +162,14 @@ export class Card extends BaseComponent {
 	async isValid(): Promise<boolean> {
 		console.log("Checking if card form is valid");
 		if (!this.hostedFieldsInstance) {
-			
+			console.log("Hosted Fields instance is not initialized.");
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
 		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
+		console.log("state:", state);
 		// state fields is an array containing [number, cvv, expirationDate, cardholderName]
+		console.log("state fields:", state.fields);
+		console.log(Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid));
 		return Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid);
 		// return Promise.resolve(true);
 	}
