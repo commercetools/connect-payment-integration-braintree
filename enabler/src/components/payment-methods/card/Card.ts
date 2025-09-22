@@ -151,7 +151,9 @@ export class Card extends BaseComponent {
 	}
 
 	async showValidation(): Promise<void> {
-		console.log("Showing card validation");
+		if (!this.hasComponentRendered) {
+			return;
+		}
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
@@ -167,34 +169,30 @@ export class Card extends BaseComponent {
 	}
 
 	async isValid(): Promise<boolean> {
-		console.log("Checking if card form is valid");
-		if (this.hasComponentRendered === false) {
-			this.hasComponentRendered = true;
+		if (!this.hasComponentRendered) {
 			return Promise.resolve(true);
 		}
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
 		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
-		console.log("state:", state);
 		// state fields is an array containing [number, cvv, expirationDate, cardholderName]
-		console.log("state fields:", state.fields);
-		console.log(Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid));
 		return Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid);
 	}
 
 	async getState() {
-		console.log("Getting card state");
 		const state = {
 			card: {
 				brand: this._mapCardBrandType("visa"),
 			},
 		};
+		if (!this.hasComponentRendered) {
+			this.hasComponentRendered = true;
+		}
 		return state;
 	}
 
 	async isAvailable(): Promise<boolean> {
-		console.log("Checking if card component is available");
 		return Promise.resolve(true);
 	}
 

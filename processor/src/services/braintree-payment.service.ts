@@ -283,12 +283,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		});
 
 		return {
-			id: updatedPayment.id,
+			id: btResponse.transaction.id,
 			success: btResponse.success,
 			status: btResponse.transaction.status,
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse ?? undefined,
 			amount: btResponse.transaction.amount,
-			paymentReference: btResponse.transaction.id,
+			paymentReference: updatedPayment.id,
 			message: btResponse.message ?? undefined,
 		};
 	}

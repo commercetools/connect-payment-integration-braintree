@@ -225,11 +225,11 @@ describe(BraintreePaymentService.name, () => {
 		const result = await (paymentService as BraintreePaymentService).createPayment(createPaymentRequest);
 
 		expect(result).toMatchObject({
-			id: mockUpdatedPayment.id,
+			id: "dummy-braintree-transaction-id",
 			success: true,
 			status: "authorized",
 			amount: "1500.00",
-			paymentReference: "dummy-braintree-transaction-id",
+			paymentReference: mockUpdatedPayment.id,
 			additionalProcessorResponse: "Approved",
 		});
 
