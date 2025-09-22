@@ -12,6 +12,8 @@ import type {
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
+	private hasComponentRendered: boolean = false;
+
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
 		this.showPayButton = componentOptions?.showPayButton ?? false;
@@ -54,13 +56,14 @@ export class Card extends BaseComponent {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
 
-		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("focus", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 			field.container.classList.add("label-float");
 			field.container.classList.remove("filled");
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("blur", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 
 			if (field.isEmpty) {
@@ -70,21 +73,24 @@ export class Card extends BaseComponent {
 			} else {
 				field.container.classList.add("is-invalid");
 			}
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("empty", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 			field.container.classList.remove("filled");
 			field.container.classList.remove("is-invalid");
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("validityChange", function (event) {
+		this.hostedFieldsInstance.on("validityChange", (event) => {
 			var field = event.fields[event.emittedBy];
 			if (field.isValid) {
 				field.container.classList.remove("is-invalid");
 			} else {
 				field.container.classList.add("is-invalid");
 			}
+			this.hasComponentRendered = true;
 		});
 
 		if (this.showPayButton) {
@@ -161,8 +167,11 @@ export class Card extends BaseComponent {
 
 	async isValid(): Promise<boolean> {
 		console.log("Checking if card form is valid");
+		if (this.hasComponentRendered === false) {
+			this.hasComponentRendered = true;
+			return Promise.resolve(true);
+		}
 		if (!this.hostedFieldsInstance) {
-			console.log("Hosted Fields instance is not initialized.");
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
 		var state: HostedFieldsState = this.hostedFieldsInstance.getState();
@@ -171,7 +180,6 @@ export class Card extends BaseComponent {
 		console.log("state fields:", state.fields);
 		console.log(Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid));
 		return Object.keys(state.fields).every((key) => state.fields[key as keyof typeof state.fields]?.isValid);
-		// return Promise.resolve(true);
 	}
 
 	async getState() {
