@@ -151,6 +151,7 @@ export class Card extends BaseComponent {
 	}
 
 	async showValidation(): Promise<void> {
+		console.log("Showing card validation");
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
@@ -183,6 +184,7 @@ export class Card extends BaseComponent {
 	}
 
 	async getState() {
+		console.log("Getting card state");
 		const state = {
 			card: {
 				brand: this._mapCardBrandType("visa"),
@@ -192,6 +194,7 @@ export class Card extends BaseComponent {
 	}
 
 	async isAvailable(): Promise<boolean> {
+		console.log("Checking if card component is available");
 		return Promise.resolve(true);
 	}
 
