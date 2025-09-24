@@ -1,7 +1,7 @@
 import { type BaseOptions, type ComponentOptions, PaymentMethod, type PaymentResult } from "../../../payment-enabler";
 
 import { BaseComponent } from "../../BaseComponent";
-import { hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
+import { type Client, hostedFields, type HostedFields, type HostedFieldsEvent } from "braintree-web";
 import type { PaymentResponseSchemaDTO } from "../../../dtos/PaymentResponseSchemaDTO";
 import type {
 	HostedFieldsHostedFieldsFieldData,
@@ -181,19 +181,25 @@ export class Card extends BaseComponent {
 	}
 
 	async getState() {
-		const state = {
-			card: {
-				brand: this._mapCardBrandType("visa"),
-			},
-		};
-		if (!this.hasComponentRendered) {
-			this.hasComponentRendered = true;
+		if (!this.hostedFieldsInstance) {
+			throw new Error("Hosted Fields instance is not initialized.");
 		}
+		var result = this.hostedFieldsInstance.getState();
+		const state: { card?: { brand: string } } = {
+			card: result.cards[0]
+				? {
+						brand: this._mapCardBrandType(result.cards[0].type),
+					}
+				: undefined,
+		};
 		return state;
 	}
 
 	async isAvailable(): Promise<boolean> {
-		return Promise.resolve(true);
+		const client: Client = this.sdk;
+		const configuration = client.getConfiguration();
+		const cardEnabled = configuration.gatewayConfiguration.creditCards ? true : false;
+		return Promise.resolve(cardEnabled);
 	}
 
 	private _mapCardBrandType(brand: string): string {
