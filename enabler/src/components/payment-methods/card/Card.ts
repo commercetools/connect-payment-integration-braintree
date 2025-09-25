@@ -94,9 +94,14 @@ export class Card extends BaseComponent {
 		});
 
 		if (this.showPayButton) {
-			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
+			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", async (e) => {
 				e.preventDefault();
-				this.submit();
+				this.hasComponentRendered = true;
+				if (await this.isValid()) {
+					this.submit();
+				} else {
+					await this.showValidation();
+				}
 			});
 		}
 	}
