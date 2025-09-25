@@ -69,9 +69,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			id: getCartIdFromContext(),
 		});
 		const braintreeClient = BraintreeClient.getInstance();
-		const merchantAccount = await braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
-
-		const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		const merchantAccountPromise =  braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
+		const amountPlannedPromise =  this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		const [merchantAccount, amountPlanned] = await Promise.all([merchantAccountPromise, amountPlannedPromise]);
 		if (merchantAccount?.currencyIsoCode !== amountPlanned.currencyCode) {
 			throw new Errorx({
 				message: "cart and braintree merchant account currency do not match",
@@ -283,12 +283,12 @@ export class BraintreePaymentService extends AbstractPaymentService {
 		});
 
 		return {
-			id: updatedPayment.id,
+			id: btResponse.transaction.id,
 			success: btResponse.success,
 			status: btResponse.transaction.status,
 			additionalProcessorResponse: btResponse.transaction.additionalProcessorResponse ?? undefined,
 			amount: btResponse.transaction.amount,
-			paymentReference: btResponse.transaction.id,
+			paymentReference: updatedPayment.id,
 			message: btResponse.message ?? undefined,
 		};
 	}

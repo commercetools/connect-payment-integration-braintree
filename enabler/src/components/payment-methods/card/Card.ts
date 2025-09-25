@@ -12,6 +12,8 @@ import type {
 export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
+	private hasComponentRendered: boolean = false;
+
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
 		this.showPayButton = componentOptions?.showPayButton ?? false;
@@ -53,13 +55,14 @@ export class Card extends BaseComponent {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
 
-		this.hostedFieldsInstance.on("focus", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("focus", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 			field.container.classList.add("label-float");
 			field.container.classList.remove("filled");
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("blur", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("blur", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 
 			if (field.isEmpty) {
@@ -69,27 +72,35 @@ export class Card extends BaseComponent {
 			} else {
 				field.container.classList.add("is-invalid");
 			}
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("empty", function (event: HostedFieldsEvent) {
+		this.hostedFieldsInstance.on("empty", (event: HostedFieldsEvent) => {
 			var field: HostedFieldsHostedFieldsFieldData = event.fields[event.emittedBy];
 			field.container.classList.remove("filled");
 			field.container.classList.remove("is-invalid");
+			this.hasComponentRendered = true;
 		});
 
-		this.hostedFieldsInstance.on("validityChange", function (event) {
+		this.hostedFieldsInstance.on("validityChange", (event) => {
 			var field = event.fields[event.emittedBy];
 			if (field.isValid) {
 				field.container.classList.remove("is-invalid");
 			} else {
 				field.container.classList.add("is-invalid");
 			}
+			this.hasComponentRendered = true;
 		});
 
 		if (this.showPayButton) {
-			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", (e) => {
+			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", async (e) => {
 				e.preventDefault();
-				this.submit();
+				this.hasComponentRendered = true;
+				if (await this.isValid()) {
+					this.submit();
+				} else {
+					await this.showValidation();
+				}
 			});
 		}
 	}
@@ -101,7 +112,6 @@ export class Card extends BaseComponent {
 				throw new Error("Hosted Fields instance is not initialized.");
 			}
 			payload = await this.hostedFieldsInstance.tokenize();
-			console.log("Tokenization result:", payload);
 		} catch (error) {
 			this.onError(error);
 			return;
@@ -123,7 +133,6 @@ export class Card extends BaseComponent {
 			});
 
 			const createPaymentResponse: PaymentResponseSchemaDTO = await response.json();
-			console.log(createPaymentResponse)
 			const paymentResult: PaymentResult = createPaymentResponse.success
 				? {
 						isSuccess: true,
@@ -134,7 +143,7 @@ export class Card extends BaseComponent {
 						paymentReference: createPaymentResponse.paymentReference ?? "",
 						message: createPaymentResponse.message ?? "",
 					};
-			
+
 			this.onComplete && this.onComplete(paymentResult);
 		} catch (error) {
 			console.error("Error creating payment");
@@ -145,6 +154,9 @@ export class Card extends BaseComponent {
 	}
 
 	async showValidation(): Promise<void> {
+		if (!this.hasComponentRendered) {
+			return;
+		}
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
@@ -160,6 +172,9 @@ export class Card extends BaseComponent {
 	}
 
 	async isValid(): Promise<boolean> {
+		if (!this.hasComponentRendered) {
+			return Promise.resolve(true);
+		}
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
@@ -173,7 +188,7 @@ export class Card extends BaseComponent {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
 		var result = this.hostedFieldsInstance.getState();
-		const state = {
+		const state: { card?: { brand: string } } = {
 			card: result.cards[0]
 				? {
 						brand: this._mapCardBrandType(result.cards[0].type),

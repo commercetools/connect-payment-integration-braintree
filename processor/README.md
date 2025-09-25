@@ -169,10 +169,10 @@ The request body contains following attributes
 #### Response Parameters
 
 The response body contains following attributes
-- id: The unique identifier of the commercetools payment created.
+- id: Identifier of Braintree transaction.
 - success: The successity of create transaction in Braintree platform.
 - message: Optional. It represents the message returned from Braintree response.
-- paymentReference: Identifier of Braintree transaction.
+- paymentReference: The unique identifier of the commercetools payment created.
 - additionalProcessorResponse: Optional. It represents the raw response of Braintree processor.
 - amount: The transaction amount created.
 - status: The status of the Braintree transaction.

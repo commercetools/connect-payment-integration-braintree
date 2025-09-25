@@ -36,6 +36,7 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 		options: EnablerOptions,
 	): Promise<{ clientToken: string; paymentReference: string }> => {
 		let response!: Response;
+		let initResponse;
 		try {
 			response = await fetch(`${options.processorUrl}/init`, {
 				method: "POST",
@@ -45,13 +46,22 @@ export class BraintreePaymentEnabler implements PaymentEnabler {
 				},
 				body: JSON.stringify({}),
 			});
-		} catch (error) {
-			console.log("error: ", error);
-			console.log("response: ", response);
-		}
 
-		const initResponse: { clientToken: string; paymentReference: string } = await response.json();
-		return { clientToken: initResponse.clientToken, paymentReference: initResponse.paymentReference };
+			initResponse = await response.json();
+
+			if (initResponse.statusCode >= 400) {
+				throw new Error(`Failed to get Braintree token: ${initResponse.message}`, initResponse.errors);
+			}
+			return {
+				clientToken: initResponse.clientToken,
+				paymentReference: initResponse.paymentReference,
+			};
+		} catch (error: Error | any) {
+			if (typeof options.onError === "function") {
+				options.onError(error);
+			}
+			throw error;
+		}
 	};
 
 	async createComponentBuilder(type: string): Promise<PaymentComponentBuilder | never> {
