@@ -20,7 +20,6 @@ export class Card extends BaseComponent {
 	}
 
 	async mount(containerId: string) {
-		console.log("Mounting card component");
 		const container = document.querySelector(containerId);
 		if (!container) {
 			throw new Error(`Container with selector "${containerId}" not found`);
@@ -113,7 +112,6 @@ export class Card extends BaseComponent {
 				throw new Error("Hosted Fields instance is not initialized.");
 			}
 			payload = await this.hostedFieldsInstance.tokenize();
-			console.log("Tokenization result:", payload);
 		} catch (error) {
 			this.onError(error);
 			return;

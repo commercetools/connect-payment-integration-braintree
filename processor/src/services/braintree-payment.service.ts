@@ -69,9 +69,9 @@ export class BraintreePaymentService extends AbstractPaymentService {
 			id: getCartIdFromContext(),
 		});
 		const braintreeClient = BraintreeClient.getInstance();
-		const merchantAccount = await braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
-
-		const amountPlanned = await this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		const merchantAccountPromise =  braintreeClient.findMerchantAccount(getConfig().braintreeMerchantAccountId);
+		const amountPlannedPromise =  this.ctCartService.getPlannedPaymentAmount({ cart: ctCart });
+		const [merchantAccount, amountPlanned] = await Promise.all([merchantAccountPromise, amountPlannedPromise]);
 		if (merchantAccount?.currencyIsoCode !== amountPlanned.currencyCode) {
 			throw new Errorx({
 				message: "cart and braintree merchant account currency do not match",
