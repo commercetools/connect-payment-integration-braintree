@@ -1,7 +1,6 @@
 {
 	"name": "enabler",
-	"private": true,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "concurrently -n VITE,TSC -c magenta,cyan \"vite --port 3000\" \"npm run tsc:dev\"",
@@ -37,7 +36,6 @@
 		"vite-plugin-css-injected-by-js": "3.5.2"
 	},
 	"overrides": {
-		"path-to-regexp": "3.3.0",
-		"esbuild": "^0.24.0"
+		"path-to-regexp": "3.3.0"
 	}
 }
