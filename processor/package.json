@@ -1,6 +1,6 @@
 {
 	"name": "payment-integration-braintree",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Payment integration with Braintree",
 	"main": "dist/server.js",
 	"scripts": {
