@@ -15,24 +15,24 @@
 		"serve": "npm run build && serve public -l 3000 --cors"
 	},
 	"dependencies": {
-		"@commercetools/platform-sdk": "^8.16.0",
+		"@commercetools/platform-sdk": "^8.18.0",
 		"@commercetools/ts-client": "^4.1.0",
-		"braintree-web-drop-in": "^1.45.1",
-		"braintree-web": "^3.129.1",
+		"braintree-web-drop-in": "^1.46.0",
+		"braintree-web": "^3.133.0",
 		"cookie": "^1.0.2",
 		"serve": "14.2.5"
 	},
 	"devDependencies": {
 		"@types/braintree-web": "^3.96.17",
 		"@types/braintree-web-drop-in": "^1.39.4",
-		"@types/node": "24.6.1",
+		"@types/node": "24.10.1",
 		"concurrently": "^9.2.1",
 		"jest": "30.2.0",
 		"prettier": "^3.6.2",
-		"sass": "1.93.2",
-		"ts-jest": "^29.4.4",
+		"sass": "1.94.0",
+		"ts-jest": "^29.4.5",
 		"typescript": "5.9.3",
-		"vite": "7.1.11",
+		"vite": "7.2.2",
 		"vite-plugin-css-injected-by-js": "3.5.2"
 	},
 	"overrides": {
