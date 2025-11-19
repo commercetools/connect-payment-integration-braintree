@@ -7,7 +7,7 @@ import {
 import { Card } from "./Card";
 
 export class CardBuilder implements PaymentComponentBuilder {
-	public componentHasSubmit = false;
+	public componentHasSubmit = true;
 
 	constructor(private baseOptions: BaseOptions) {}
 
