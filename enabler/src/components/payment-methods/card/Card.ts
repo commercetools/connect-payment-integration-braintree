@@ -13,17 +13,18 @@ export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
 	private hasComponentRendered: boolean = false;
-	private mountedContainer: Element | null = null; 
+
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
 		this.showPayButton = componentOptions?.showPayButton ?? false;
 	}
 
-	async init(): Promise<void> {
-		if (!this.mountedContainer) {
-			throw new Error(`Mounted component fails: container not found.`);
+	async mount(containerId: string) {
+		const container = document.querySelector(containerId);
+		if (!container) {
+			throw new Error(`Container with selector "${containerId}" not found`);
 		}
-		this.mountedContainer.insertAdjacentHTML("afterbegin", this._getTemplate());
+		container.insertAdjacentHTML("afterbegin", this._getTemplate());
 		this.hostedFieldsInstance = await hostedFields.create({
 			client: this.sdk,
 			styles: {
@@ -103,11 +104,6 @@ export class Card extends BaseComponent {
 			});
 		}
 	}
-	async mount(containerId: string) {
-		this.mountedContainer = document.querySelector(containerId);
-	}
-		
-	
 
 	async submit() {
 		let payload: HostedFieldsTokenizePayload;
