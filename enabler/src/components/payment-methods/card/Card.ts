@@ -92,17 +92,20 @@ export class Card extends BaseComponent {
 			this.hasComponentRendered = true;
 		});
 
+		const paymentButton = document.querySelector("#creditCardForm-paymentButton");
 		if (this.showPayButton) {
-			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", async (e) => {
-				e.preventDefault();
-				this.hasComponentRendered = true;
-				if (await this.isValid()) {
-					this.submit();
-				} else {
-					await this.showValidation();
-				}
-			});
-		}
+			if (paymentButton instanceof HTMLElement) {
+				paymentButton.addEventListener("click", async (e) => {
+					e.preventDefault();
+					this.hasComponentRendered = true;
+					if (await this.isValid()) {
+						this.submit();
+					} else {
+						await this.showValidation();
+					}
+				});
+			}
+		} 
 	}
 
 	async submit() {
@@ -229,6 +232,8 @@ export class Card extends BaseComponent {
 	}
 
 	private _getTemplate() {
+		const submitButtonHTML = '<button class="btn btn-primary btn-lg" type="submit" id="creditCardForm-paymentButton">Pay with <span id="card-brand">Card</span></button>'
+		const payButton = this.showPayButton ? submitButtonHTML : '';
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 				<style>
@@ -315,7 +320,7 @@ export class Card extends BaseComponent {
 
 					<hr class="mb-4">
 					<div class="text-center">
-					<button class="btn btn-primary btn-lg" type="submit" id="creditCardForm-paymentButton">Pay with <span id="card-brand">Card</span></button>
+					${payButton}
 					</div>
 				</form>
 				</div>
