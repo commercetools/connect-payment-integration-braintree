@@ -332,7 +332,9 @@ export class Card extends BaseComponent {
 				</form>
 				</div>
 				<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-	
+					<small class="text-muted">
+					<u>Disclaimer</u><br>We use PayPal for payments and other services. If you wish to use one of these services and pay on our website, PayPal may collect the personal data you provide, such as payment and other identifying information. PayPal uses this information to operate and improve the services it provides to us and others, including for fraud detection, harm and loss prevention, authentication, analytics related to the performance of its services, and to comply with applicable legal requirements. The processing of this information will be subject to PayPal’s privacy policy at <a href="https://www.paypal.com/us/legalhub/privacy-full" target="_app">https://www.paypal.com/us/legalhub/privacy-full</a>.
+					</small>
 				</div>`;
 	}
 }
