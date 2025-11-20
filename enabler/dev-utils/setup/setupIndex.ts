@@ -109,6 +109,34 @@ const createCheckout = async function () {
 			});
 
 			component.mount(`#${braintreeContainerId}`);
+
+			const customButton = document.createElement("button");
+			customButton.textContent = "Pay with " + selectedPaymentMethod;
+			customButton.className = "btn btn-lg btn-primary btn-block";
+			customButton.addEventListener("click", async () => {
+				// const termsChecked =
+				//   document.getElementById("termsCheckbox").checked;
+				// if (!termsChecked) {
+				//   event.preventDefault();
+				//   alert("You must agree to the terms and conditions.");
+				//   return;
+				// }
+
+				// const shouldStorePaymentMethod =
+				//   document.getElementById("storePaymentMethod").checked;
+
+				// console.log(
+				//   "Should store/tokenise the payment method?",
+				//   shouldStorePaymentMethod,
+				// );
+
+				await component.submit();
+			});
+			const container = document.querySelector(`#${braintreeContainerId}`);
+			if (!container) {
+				throw new Error(`Container with selector "#${braintreeContainerId}" not found`);
+			}
+			container.appendChild(customButton);
 		});
 	} else {
 		console.error('Cannot create checkout component, element with ID "createCheckout" not found.');
