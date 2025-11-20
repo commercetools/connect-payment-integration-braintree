@@ -13,6 +13,7 @@ export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
 	private hasComponentRendered: boolean = false;
+	private tokenizedPayload: HostedFieldsTokenizePayload | undefined;
 
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
@@ -109,19 +110,21 @@ export class Card extends BaseComponent {
 	}
 
 	async submit() {
-		let payload: HostedFieldsTokenizePayload;
+		
 		try {
 			if (!this.hostedFieldsInstance) {
 				throw new Error("Hosted Fields instance is not initialized.");
 			}
-			payload = await this.hostedFieldsInstance.tokenize();
+			if (!this.tokenizedPayload) {
+				this.tokenizedPayload = await this.hostedFieldsInstance.tokenize();
+			}
 		} catch (error) {
 			this.onError(error);
 			return;
 		}
 
 		const request = {
-			nonce: payload.nonce,
+			nonce: this.tokenizedPayload.nonce,
 			paymentMethodType: "card",
 			paymentReference: this.paymentReference,
 		};
@@ -190,11 +193,14 @@ export class Card extends BaseComponent {
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
+		this.tokenizedPayload = await this.hostedFieldsInstance.tokenize();
+		const endDigits = this.tokenizedPayload.details?.lastFour || ""
+
 		var result = this.hostedFieldsInstance.getState();
 		const state: { card?: { endDigits: string, brand: string } } = {
 			card: result.cards[0]
 				? {
-					    endDigits : "9876",
+					    endDigits : endDigits,
 						brand: this._mapCardBrandType(result.cards[0].type),
 					}
 				: undefined,
