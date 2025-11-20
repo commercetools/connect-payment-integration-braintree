@@ -190,7 +190,6 @@ export class Card extends BaseComponent {
 	}
 
 	async getState() {
-		console.log("Getting state from Card component");
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
