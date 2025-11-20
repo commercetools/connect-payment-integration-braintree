@@ -191,9 +191,10 @@ export class Card extends BaseComponent {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
 		var result = this.hostedFieldsInstance.getState();
-		const state: { card?: { brand: string } } = {
+		const state: { card?: { endDigits: string, brand: string } } = {
 			card: result.cards[0]
 				? {
+					    endDigits : "9876",
 						brand: this._mapCardBrandType(result.cards[0].type),
 					}
 				: undefined,
