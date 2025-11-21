@@ -26,32 +26,33 @@ export class Card extends BaseComponent {
 			throw new Error(`Container with selector "${containerId}" not found`);
 		}
 		container.insertAdjacentHTML("afterbegin", this._getTemplate());
-		this.hostedFieldsInstance = await hostedFields.create({
-			client: this.sdk,
-			styles: {
-				input: {
-					// change input styles to match
-					// bootstrap styles
-					"font-size": "1rem",
-					color: "#495057",
+		if (!this.hostedFieldsInstance)
+			this.hostedFieldsInstance = await hostedFields.create({
+				client: this.sdk,
+				styles: {
+					input: {
+						// change input styles to match
+						// bootstrap styles
+						"font-size": "1rem",
+						color: "#495057",
+					},
 				},
-			},
-			fields: {
-				number: {
-					selector: "#cc-number",
+				fields: {
+					number: {
+						selector: "#cc-number",
+					},
+					cardholderName: {
+						selector: "#cc-name",
+					},
+					cvv: {
+						selector: "#cc-cvv",
+					},
+					expirationDate: {
+						selector: "#cc-expiration",
+						placeholder: "MM/YY",
+					},
 				},
-				cardholderName: {
-					selector: "#cc-name",
-				},
-				cvv: {
-					selector: "#cc-cvv",
-				},
-				expirationDate: {
-					selector: "#cc-expiration",
-					placeholder: "MM/YY",
-				},
-			},
-		});
+			});
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
