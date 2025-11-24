@@ -293,13 +293,7 @@ export class Card extends BaseComponent {
 						Name on card is required
 						</div>
 					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="email">Email</label>
-						<input type="email" class="form-control" id="email" placeholder="you@example.com">
-						<div class="invalid-feedback">
-						Please enter a valid email address for shipping updates.
-						</div>
-					</div>
+				
 					</div>
 
 					<div class="row">
