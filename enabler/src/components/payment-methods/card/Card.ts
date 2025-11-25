@@ -285,43 +285,44 @@ export class Card extends BaseComponent {
 				<form class="needs-validation" novalidate="">
 
 					<div class="row">
-					<div class="col-sm-6 mb-3">
-						<label for="cc-name">Cardholder Name</label>
-						<div class="form-control" id="cc-name"></div>
-						<small class="text-muted">Full name as displayed on card</small>
-						<div class="invalid-feedback">
-						Name on card is required
+						<div class="col-sm-6 mb-3">
+							<label for="cc-number">Credit card number</label>
+							<div class="form-control" id="cc-number"></div>
+							<div class="invalid-feedback">
+							Credit card number is required
+							</div>
 						</div>
-					</div>
-				
 					</div>
 
 					<div class="row">
-					<div class="col-sm-6 mb-3">
-						<label for="cc-number">Credit card number</label>
-						<div class="form-control" id="cc-number"></div>
-						<div class="invalid-feedback">
-						Credit card number is required
+						<div class="col-sm-3 mb-3">
+							<label for="cc-expiration">Expiration</label>
+							<div class="form-control" id="cc-expiration"></div>
+							<div class="invalid-feedback">
+							Expiration date required
+							</div>
+						</div>
+						<div class="col-sm-3 mb-3">
+							<label for="cc-expiration">CVV</label>
+							<div class="form-control" id="cc-cvv"></div>
+							<div class="invalid-feedback">
+							Security code required
+							</div>
 						</div>
 					</div>
-					<div class="col-sm-3 mb-3">
-						<label for="cc-expiration">Expiration</label>
-						<div class="form-control" id="cc-expiration"></div>
-						<div class="invalid-feedback">
-						Expiration date required
+					<div class="row">
+						<div class="col-sm-6 mb-3">
+							<label for="cc-name">Cardholder Name</label>
+							<div class="form-control" id="cc-name"></div>
+							<small class="text-muted">Full name as displayed on card</small>
+							<div class="invalid-feedback">
+								Name on card is required
+							</div>
 						</div>
-					</div>
-					<div class="col-sm-3 mb-3">
-						<label for="cc-expiration">CVV</label>
-						<div class="form-control" id="cc-cvv"></div>
-						<div class="invalid-feedback">
-						Security code required
-						</div>
-					</div>
 					</div>
 
 					<hr class="mb-4">
-					<div class="text-center">
+					<div class="text-center col-sm-6">
 					${payButton}
 					</div>
 				</form>
