@@ -1,6 +1,6 @@
 {
 	"name": "enabler",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"type": "module",
 	"scripts": {
 		"dev": "concurrently -n VITE,TSC -c magenta,cyan \"vite --port 3000\" \"npm run tsc:dev\"",

@@ -13,6 +13,7 @@ export class Card extends BaseComponent {
 	private showPayButton: boolean;
 	private hostedFieldsInstance: HostedFields | undefined;
 	private hasComponentRendered: boolean = false;
+	private tokenizedPayload: HostedFieldsTokenizePayload | undefined;
 
 	constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
 		super(PaymentMethod.card, baseOptions, componentOptions);
@@ -25,32 +26,33 @@ export class Card extends BaseComponent {
 			throw new Error(`Container with selector "${containerId}" not found`);
 		}
 		container.insertAdjacentHTML("afterbegin", this._getTemplate());
-		this.hostedFieldsInstance = await hostedFields.create({
-			client: this.sdk,
-			styles: {
-				input: {
-					// change input styles to match
-					// bootstrap styles
-					"font-size": "1rem",
-					color: "#495057",
+		if (!this.hostedFieldsInstance)
+			this.hostedFieldsInstance = await hostedFields.create({
+				client: this.sdk,
+				styles: {
+					input: {
+						// change input styles to match
+						// bootstrap styles
+						"font-size": "1rem",
+						color: "#495057",
+					},
 				},
-			},
-			fields: {
-				number: {
-					selector: "#cc-number",
+				fields: {
+					number: {
+						selector: "#cc-number",
+					},
+					cardholderName: {
+						selector: "#cc-name",
+					},
+					cvv: {
+						selector: "#cc-cvv",
+					},
+					expirationDate: {
+						selector: "#cc-expiration",
+						placeholder: "MM/YY",
+					},
 				},
-				cardholderName: {
-					selector: "#cc-name",
-				},
-				cvv: {
-					selector: "#cc-cvv",
-				},
-				expirationDate: {
-					selector: "#cc-expiration",
-					placeholder: "MM/YY",
-				},
-			},
-		});
+			});
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Failed to create Hosted Fields instance.");
 		}
@@ -92,33 +94,37 @@ export class Card extends BaseComponent {
 			this.hasComponentRendered = true;
 		});
 
+		const paymentButton = document.querySelector("#creditCardForm-paymentButton");
 		if (this.showPayButton) {
-			document.querySelector("#creditCardForm-paymentButton")!.addEventListener("click", async (e) => {
-				e.preventDefault();
-				this.hasComponentRendered = true;
-				if (await this.isValid()) {
-					this.submit();
-				} else {
-					await this.showValidation();
-				}
-			});
+			if (paymentButton instanceof HTMLElement) {
+				paymentButton.addEventListener("click", async (e) => {
+					e.preventDefault();
+					this.hasComponentRendered = true;
+					if (await this.isValid()) {
+						this.submit();
+					} else {
+						await this.showValidation();
+					}
+				});
+			}
 		}
 	}
 
 	async submit() {
-		let payload: HostedFieldsTokenizePayload;
 		try {
 			if (!this.hostedFieldsInstance) {
 				throw new Error("Hosted Fields instance is not initialized.");
 			}
-			payload = await this.hostedFieldsInstance.tokenize();
+			if (!this.tokenizedPayload) {
+				this.tokenizedPayload = await this.hostedFieldsInstance.tokenize();
+			}
 		} catch (error) {
 			this.onError(error);
 			return;
 		}
 
 		const request = {
-			nonce: payload.nonce,
+			nonce: this.tokenizedPayload.nonce,
 			paymentMethodType: "card",
 			paymentReference: this.paymentReference,
 		};
@@ -187,10 +193,14 @@ export class Card extends BaseComponent {
 		if (!this.hostedFieldsInstance) {
 			throw new Error("Hosted Fields instance is not initialized.");
 		}
+		this.tokenizedPayload = await this.hostedFieldsInstance.tokenize();
+		const endDigits = this.tokenizedPayload.details?.lastFour || "";
+
 		var result = this.hostedFieldsInstance.getState();
-		const state: { card?: { brand: string } } = {
+		const state: { card?: { endDigits: string; brand: string } } = {
 			card: result.cards[0]
 				? {
+						endDigits: endDigits,
 						brand: this._mapCardBrandType(result.cards[0].type),
 					}
 				: undefined,
@@ -229,6 +239,9 @@ export class Card extends BaseComponent {
 	}
 
 	private _getTemplate() {
+		const submitButtonHTML =
+			'<button class="btn btn-primary btn-lg" type="submit" id="creditCardForm-paymentButton">Pay with <span id="card-brand">Card</span></button>';
+		const payButton = this.showPayButton ? submitButtonHTML : "";
 		return `<!-- Bootstrap inspired Braintree Hosted Fields example -->
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 				<style>
@@ -272,55 +285,52 @@ export class Card extends BaseComponent {
 				<form class="needs-validation" novalidate="">
 
 					<div class="row">
-					<div class="col-sm-6 mb-3">
-						<label for="cc-name">Cardholder Name</label>
-						<div class="form-control" id="cc-name"></div>
-						<small class="text-muted">Full name as displayed on card</small>
-						<div class="invalid-feedback">
-						Name on card is required
+						<div class="col-sm-12 mb-3">
+							<label for="cc-number">Credit card number</label>
+							<div class="form-control" id="cc-number"></div>
+							<div class="invalid-feedback">
+							Credit card number is required
+							</div>
 						</div>
-					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="email">Email</label>
-						<input type="email" class="form-control" id="email" placeholder="you@example.com">
-						<div class="invalid-feedback">
-						Please enter a valid email address for shipping updates.
-						</div>
-					</div>
 					</div>
 
 					<div class="row">
-					<div class="col-sm-6 mb-3">
-						<label for="cc-number">Credit card number</label>
-						<div class="form-control" id="cc-number"></div>
-						<div class="invalid-feedback">
-						Credit card number is required
+						<div class="col-sm-6 mb-3">
+							<label for="cc-expiration">Expiration</label>
+							<div class="form-control" id="cc-expiration"></div>
+							<div class="invalid-feedback">
+							Expiration date required
+							</div>
+						</div>
+						<div class="col-sm-6 mb-3">
+							<label for="cc-expiration">CVV</label>
+							<div class="form-control" id="cc-cvv"></div>
+							<div class="invalid-feedback">
+							Security code required
+							</div>
 						</div>
 					</div>
-					<div class="col-sm-3 mb-3">
-						<label for="cc-expiration">Expiration</label>
-						<div class="form-control" id="cc-expiration"></div>
-						<div class="invalid-feedback">
-						Expiration date required
+					<div class="row">
+						<div class="col-sm-12 mb-3">
+							<label for="cc-name">Cardholder Name</label>
+							<div class="form-control" id="cc-name"></div>
+							<small class="text-muted">Full name as displayed on card</small>
+							<div class="invalid-feedback">
+								Name on card is required
+							</div>
 						</div>
-					</div>
-					<div class="col-sm-3 mb-3">
-						<label for="cc-expiration">CVV</label>
-						<div class="form-control" id="cc-cvv"></div>
-						<div class="invalid-feedback">
-						Security code required
-						</div>
-					</div>
 					</div>
 
 					<hr class="mb-4">
-					<div class="text-center">
-					<button class="btn btn-primary btn-lg" type="submit" id="creditCardForm-paymentButton">Pay with <span id="card-brand">Card</span></button>
+					<div class="text-center col-sm-6">
+					${payButton}
 					</div>
 				</form>
 				</div>
 				<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-	
+					<small class="text-muted">
+					<u>Disclaimer</u><br>We use PayPal for payments and other services. If you wish to use one of these services and pay on our website, PayPal may collect the personal data you provide, such as payment and other identifying information. PayPal uses this information to operate and improve the services it provides to us and others, including for fraud detection, harm and loss prevention, authentication, analytics related to the performance of its services, and to comply with applicable legal requirements. The processing of this information will be subject to PayPal’s privacy policy at <a href="https://www.paypal.com/us/legalhub/privacy-full" target="_app">https://www.paypal.com/us/legalhub/privacy-full</a>.
+					</small>
 				</div>`;
 	}
 }
