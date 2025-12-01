@@ -19,7 +19,7 @@
 		"@commercetools/ts-client": "^4.1.0",
 		"braintree-web-drop-in": "^1.46.0",
 		"braintree-web": "^3.133.0",
-		"cookie": "^1.1.0",
+		"cookie": "^1.1.1",
 		"serve": "14.2.5"
 	},
 	"devDependencies": {
@@ -28,11 +28,11 @@
 		"@types/node": "24.10.1",
 		"concurrently": "^9.2.1",
 		"jest": "30.2.0",
-		"prettier": "^3.6.2",
+		"prettier": "^3.7.3",
 		"sass": "1.94.2",
-		"ts-jest": "^29.4.5",
+		"ts-jest": "^29.4.6",
 		"typescript": "5.9.3",
-		"vite": "7.2.4",
+		"vite": "7.2.6",
 		"vite-plugin-css-injected-by-js": "3.5.2"
 	},
 	"overrides": {
